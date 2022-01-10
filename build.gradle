@@ -39,6 +39,52 @@ deploy {
     }
 }
 
+// Reads current Git branch and writes it to src/main/deploy/branch.txt
+tasks.register("writeBranchName") {
+    // Define an output stream for command to write to instead of terminal
+    def stdout = new ByteArrayOutputStream()
+
+    // Execute the Git command
+    exec {
+        // Note that Git must be installed before deploying for this to work
+        commandLine "git", "rev-parse", "--abbrev-ref", "HEAD"
+        // Write to the output stream instead of terminal
+        standardOutput = stdout
+    }
+
+    // Parse the output of the command into a string
+    def branch = stdout.toString().trim()
+
+    // Create a new file
+    new File(
+        // Join project directory and deploy directory
+        projectDir.toString() + "/src/main/deploy",
+        // File name to write to
+        "branch.txt"
+    ).text = branch // Set file contents to the output from Git
+}
+
+// Reads current Git commit hash and writes it to src/main/deploy/commit.txt
+tasks.register("writeCommitHash") {
+    def stdout = new ByteArrayOutputStream()
+
+    exec {
+        commandLine "git", "rev-parse", "--short", "HEAD"
+        standardOutput = stdout
+    }
+
+    def commit = stdout.toString().trim()
+
+    new File(
+        projectDir.toString() + "/src/main/deploy",
+        "commit.txt"
+    ).text = commit
+}
+
+// Register the task that deploys files in src/main/deploy/ to depend on the generation of the branch and commit files
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeBranchName)
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeCommitHash)
+
 def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 
 // Set to true to use debug for JNI.
