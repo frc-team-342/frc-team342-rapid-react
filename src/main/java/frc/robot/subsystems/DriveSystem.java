@@ -8,6 +8,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,8 +46,12 @@ public class DriveSystem extends SubsystemBase {
     }
   }
 
+  public void toggleFieldOriented() {
+    fieldOriented = !fieldOriented;
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    NetworkTableInstance.getDefault().getTable("drive").getEntry("fieldOriented").setBoolean(fieldOriented);
   }
 }
