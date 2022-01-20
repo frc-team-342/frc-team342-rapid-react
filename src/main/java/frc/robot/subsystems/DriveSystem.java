@@ -9,11 +9,13 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveSystem extends SubsystemBase {
+public class DriveSystem extends SubsystemBase implements Sendable {
 
   private MecanumDrive mecanumDrive;
   private CANSparkMax frontLeft;
@@ -63,13 +65,28 @@ public class DriveSystem extends SubsystemBase {
     fieldOriented = !fieldOriented;
   }
 
+  private boolean getFieldOriented() {
+    return fieldOriented;
+  }
+
   public void toggleSlowMode() {
     //If speedMultiplier is not on full speed, it sets it full speed and the inverse
     speedMultiplier = (speedMultiplier == 0.8) ? 0.4 : 0.8;
   }
+
+  private double getSpeedMultiplier() {
+    return speedMultiplier;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    NetworkTableInstance.getDefault().getTable("drive").getEntry("fieldOriented").setBoolean(fieldOriented);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("DriveSystem");
+    builder.addBooleanProperty("Field Oriented", this::getFieldOriented, null);
+    builder.addDoubleProperty("Speed Multiplier", this::getSpeedMultiplier, null);
   }
 }

@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -22,25 +24,34 @@ import frc.robot.subsystems.DriveSystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSystem driveSystem;
+
   private InstantCommand toggleFieldOriented; 
+  private InstantCommand toggleSlowMode;
+
   private DriveWithJoystick driveWithJoystick;
 
   private Joystick joy;
   private JoystickButton toggleFieldOrientedBtn;
+  private JoystickButton toggleSlowModeBtn;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
     joy = new Joystick(0);
     toggleFieldOrientedBtn = new JoystickButton(joy, 5);
+    toggleSlowModeBtn = new JoystickButton(joy, 7);
 
     driveSystem = new DriveSystem();
+
+    toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
+    toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
+
     driveWithJoystick = new DriveWithJoystick(driveSystem, joy);
     driveSystem.setDefaultCommand(driveWithJoystick);
 
-    toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
-
     // Configure the button bindings
     configureButtonBindings();
+
+    SmartDashboard.putData(driveSystem);
   }
 
   /**
@@ -51,6 +62,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     toggleFieldOrientedBtn.whenPressed(toggleFieldOriented);
+    toggleSlowModeBtn.whenPressed(toggleSlowMode);
   }
 
   /**
