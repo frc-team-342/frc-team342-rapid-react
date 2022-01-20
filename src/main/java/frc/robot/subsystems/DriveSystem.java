@@ -21,6 +21,8 @@ public class DriveSystem extends SubsystemBase {
   private CANSparkMax frontRight;
   private CANSparkMax backRight;
 
+  private double speedMultiplier = 0.8;
+
   private boolean fieldOriented = true;
   private AHRS navx;
 
@@ -36,7 +38,18 @@ public class DriveSystem extends SubsystemBase {
     navx = new AHRS();
   }
 
+  /**
+   * Drives based on whether driving is field oriented or not
+   * 
+   * @param xVelocity velocity of the robot moving forward
+   * @param yVelocity velocity of the robot moving side-to-side 
+   * @param rotationVelocity velocity of robot moving clockwise 
+   **/
   public void drive(double xVelocity, double yVelocity, double rotationVelocity) {
+    // Used for slow mode 
+    double x = xVelocity * speedMultiplier;
+    double y = yVelocity * speedMultiplier;
+    double rotation = rotationVelocity * speedMultiplier;
 
     if (fieldOriented) 
     {
@@ -48,6 +61,11 @@ public class DriveSystem extends SubsystemBase {
 
   public void toggleFieldOriented() {
     fieldOriented = !fieldOriented;
+  }
+
+  public void toggleSlowMode() {
+    //If speedMultiplier is not on full speed, it sets it full speed and the inverse
+    speedMultiplier = (speedMultiplier == 0.8) ? 0.4 : 0.8;
   }
   @Override
   public void periodic() {
