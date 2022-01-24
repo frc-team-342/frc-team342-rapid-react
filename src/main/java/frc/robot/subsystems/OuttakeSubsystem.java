@@ -39,7 +39,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
     shootMotor1.set(ControlMode.PercentOutput, 0.8);
-    shootMotor1.set(ControlMode.PercentOutput, 0.8);
+    shootMotor2.set(ControlMode.PercentOutput, 0.8);
 
   }
 
