@@ -5,11 +5,14 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-
-import frc.robot.commands.DriveWithJoystick;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.subsystems.DriveSystem;
 
 /**
@@ -21,13 +24,42 @@ import frc.robot.subsystems.DriveSystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSystem driveSystem;
-  
+
+  private InstantCommand toggleFieldOriented; 
+  private InstantCommand toggleSlowMode;
+
   private DriveWithJoystick driveWithJoystick;
 
+  private Joystick driver;
+  private JoystickButton toggleFieldOrientedBtn;
+  private JoystickButton toggleSlowModeBtn;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    //Subsystems
+    driveSystem = new DriveSystem();
+
+    //Joystick
+    driver = new Joystick(0);
+
+    //Buttons
+      toggleFieldOrientedBtn = new JoystickButton(driver, 5);
+      toggleSlowModeBtn = new JoystickButton(driver, 7);
+
+    //Commands 
+      //Toggle Commands
+      toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
+      toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
+
+      //Drive With Joystick
+      driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
+      driveSystem.setDefaultCommand(driveWithJoystick);
+
     // Configure the button bindings
     configureButtonBindings();
+
+   //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
+    SmartDashboard.putData(driveSystem);
   }
 
   /**
@@ -36,7 +68,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    toggleFieldOrientedBtn.whenPressed(toggleFieldOriented);
+    toggleSlowModeBtn.whenPressed(toggleSlowMode);
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
