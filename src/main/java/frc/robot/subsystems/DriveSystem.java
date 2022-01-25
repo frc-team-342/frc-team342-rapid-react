@@ -5,18 +5,25 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class DriveSystem extends SubsystemBase {
 
@@ -24,6 +31,11 @@ public class DriveSystem extends SubsystemBase {
   private CANSparkMax backLeft;
   private CANSparkMax frontRight;
   private CANSparkMax backRight;
+
+  private RelativeEncoder frontLeftEncoder;
+  private RelativeEncoder backLeftEncoder;
+  private RelativeEncoder frontRightEncoder;
+  private RelativeEncoder backRightEncoder;
 
   private AHRS navx;
 
@@ -68,7 +80,31 @@ public class DriveSystem extends SubsystemBase {
   }
 
   private Pose2d getPose() {
+    return odometry.getPoseMeters();
+  }
 
+  /**
+   * Get the current speeds of the wheel as a MecanumDriveWheelSpeeds object. <br/>
+   * Units are RPM.
+   * 
+   * @return the current wheel speeds
+   */
+  private MecanumDriveWheelSpeeds getWheelSpeeds() {
+    return new MecanumDriveWheelSpeeds(
+      frontLeftEncoder.getVelocity(),
+      backLeftEncoder.getVelocity(),
+      frontRightEncoder.getVelocity(),
+      backRightEncoder.getVelocity()
+    );
+  }
+
+  private void driveVolts(MecanumDriveMotorVoltages voltages) {
+    // "yeah can i get a uhhh MecanumDriveMotorVoltages"
+    // ^^ statements dreamed up by the utterly DERANGED
+    frontLeft.setVoltage(voltages.frontLeftVoltage);
+    backLeft.setVoltage(voltages.rearLeftVoltage);
+    frontRight.setVoltage(voltages.frontRightVoltage);
+    backRight.setVoltage(voltages.rearRightVoltage);
   }
 
   /**
@@ -76,20 +112,30 @@ public class DriveSystem extends SubsystemBase {
    * 
    * @param trajectory the trajectory to follow in the command
    * @param reversed whether the robot drives backwards during the trajectory or not
-   * @return the command 
+   * @return the command that follows the path
    */
   public MecanumControllerCommand trajectoryCommand(Trajectory trajectory, boolean reversed) {
     return new MecanumControllerCommand(
-      trajectory, 
-      pose, 
-      kinematics, 
-      new PIDController(0, 0, 0), 
-      new PIDController(0, 0, 0), 
-      thetaController, 
-      desiredRotation, 
-      maxWheelVelocityMetersPerSecond, 
-      outputWheelSpeeds, 
-      this
+      trajectory, // Path to follow
+      this::getPose, // Current robot position
+
+      Constants.DriveConstants.FEEDFORWARD, // Feedforward control
+      Constants.DriveConstants.KINEMATICS, // Distance from center of robot to each wheel
+
+      new PIDController(0, 0, 0), // PID controller on x-position
+      new PIDController(0, 0, 0), // PID controller on y-position
+      new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0)), // PID controller on rotation
+
+      0, // Maximum speed in m/s
+
+      new PIDController(0, 0, 0), // Front left velocity controller
+      new PIDController(0, 0, 0), // Back left velocity controller
+      new PIDController(0, 0, 0), // Front right velocity controller
+      new PIDController(0, 0, 0), // Back right velocity controller
+
+      this::getWheelSpeeds, // Method pointer to getter for current wheel speeds
+      this::driveVolts, // Method pointer to voltage output
+      this // Command dependencies
     );
   }
 

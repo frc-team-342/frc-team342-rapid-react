@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.util.Units;
@@ -25,22 +26,26 @@ public final class Constants {
         /**
          * Wheel base is the horizontal distance between the center of the back wheel and the center of the front wheel.
          */
-        public static final double WHEEL_BASE = 0;
+        public static final double WHEEL_BASE = Units.inchesToMeters(20.5);
 
         /**
          * Track width is the distance between the centerlines of the left and right wheels.
          */
-        public static final double TRACK_WIDTH = 0;
+        public static final double TRACK_WIDTH = Units.inchesToMeters(26.22);
+
+        /**
+         * Feedforward control for path following.
+         */
+        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0, 0, 0);
 
         /**
          * Distance from the center of the robot to each of the wheels.
-         * Stored in constants because despite being an object, it will never change.
          */
         public static final MecanumDriveKinematics KINEMATICS = new MecanumDriveKinematics(
-            new Translation2d(0, 0), 
-            new Translation2d(0, 0), 
-            new Translation2d(0, 0), 
-            new Translation2d(0, 0)
+            new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), 
+            new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), 
+            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), 
+            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)
         );
     }
 }
