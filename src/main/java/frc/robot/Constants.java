@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -12,4 +16,31 @@ package frc.robot;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {}
+public final class Constants {
+    public final static class DriveConstants {
+        // Wheel dimensions
+        public static final double WHEEL_DIAMETER = Units.inchesToMeters(6);
+        public static final double WHEEL_CIRCUMFERENCE = Units.inchesToMeters(6 * Math.PI);
+
+        /**
+         * Wheel base is the horizontal distance between the center of the back wheel and the center of the front wheel.
+         */
+        public static final double WHEEL_BASE = 0;
+
+        /**
+         * Track width is the distance between the centerlines of the left and right wheels.
+         */
+        public static final double TRACK_WIDTH = 0;
+
+        /**
+         * Distance from the center of the robot to each of the wheels.
+         * Stored in constants because despite being an object, it will never change.
+         */
+        public static final MecanumDriveKinematics KINEMATICS = new MecanumDriveKinematics(
+            new Translation2d(0, 0), 
+            new Translation2d(0, 0), 
+            new Translation2d(0, 0), 
+            new Translation2d(0, 0)
+        );
+    }
+}
