@@ -11,11 +11,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveSystem extends SubsystemBase implements Sendable {
+public class DriveSystem extends SubsystemBase {
 
   private MecanumDrive mecanumDrive;
   private CANSparkMax frontLeft;
@@ -26,7 +27,7 @@ public class DriveSystem extends SubsystemBase implements Sendable {
   private double speedMultiplier = 0.8;
 
   private boolean fieldOriented = true;
-  private AHRS navx;
+  private ADXRS450_Gyro gyro;
 
   /** Creates a new DriveSystem. */
   public DriveSystem() 
@@ -37,7 +38,7 @@ public class DriveSystem extends SubsystemBase implements Sendable {
     backRight = new CANSparkMax(4, MotorType.kBrushless);
 
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
-    navx = new AHRS();
+    gyro = new ADXRS450_Gyro();
   }
 
   /**
@@ -55,9 +56,9 @@ public class DriveSystem extends SubsystemBase implements Sendable {
 
     if (fieldOriented) 
     {
-      mecanumDrive.driveCartesian(yVelocity, xVelocity, rotationVelocity, -navx.getAngle());
+      mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
     } else {
-      mecanumDrive.driveCartesian(yVelocity, xVelocity, rotationVelocity);
+      mecanumDrive.driveCartesian(y, x, rotation);
     }
   }
 
