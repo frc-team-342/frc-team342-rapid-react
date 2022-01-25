@@ -4,6 +4,7 @@
 
 package frc.robot.commands.drive;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSystem;
@@ -11,14 +12,14 @@ import frc.robot.subsystems.DriveSystem;
 public class DriveWithJoystick extends CommandBase {
   
   DriveSystem driveSystem;
-  Joystick joy;
+  Joystick driver;
   
   /** Creates a new DriveWithJoystick. */
   public DriveWithJoystick(DriveSystem drive, Joystick j) {
 
     addRequirements(drive);
     this.driveSystem = drive;
-    this.joy = j;
+    this.driver = j;
     // Use addRequirements() here to declare subsystem dependencies.
   }
   
@@ -31,7 +32,12 @@ public class DriveWithJoystick extends CommandBase {
   @Override
   public void execute() {
 
-    driveSystem.drive(joy.getX(), joy.getY(), joy.getZ());
+    // Checks whether joystick is within a deadzone and returns val
+    double deadBandX = MathUtil.applyDeadband(driver.getX(), 0.15);
+    double deadBandY = MathUtil.applyDeadband(driver.getY(), 0.15);
+    double deadBandZ = MathUtil.applyDeadband(driver.getZ(), 0.15);
+
+    driveSystem.drive(deadBandX, deadBandY, deadBandZ);
 
   }
 

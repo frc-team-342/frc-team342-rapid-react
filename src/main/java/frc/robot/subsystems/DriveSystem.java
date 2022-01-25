@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -20,6 +19,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,8 +37,6 @@ public class DriveSystem extends SubsystemBase {
   private RelativeEncoder frontRightEncoder;
   private RelativeEncoder backRightEncoder;
 
-  private AHRS navx;
-
   private MecanumDrive mecanumDrive;
   private MecanumDriveOdometry odometry;
 
@@ -47,6 +45,7 @@ public class DriveSystem extends SubsystemBase {
   private double speedMultiplier = 0.8;
 
   private boolean fieldOriented = true;
+  private ADXRS450_Gyro gyro;
 
   /** Creates a new DriveSystem. */
   public DriveSystem() {
@@ -56,7 +55,7 @@ public class DriveSystem extends SubsystemBase {
     backRight = new CANSparkMax(4, MotorType.kBrushless);
 
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
-    navx = new AHRS();
+    gyro = new ADXRS450_Gyro();
   }
 
   /**
@@ -72,10 +71,11 @@ public class DriveSystem extends SubsystemBase {
     double y = yVelocity * speedMultiplier;
     double rotation = rotationVelocity * speedMultiplier;
 
-    if (fieldOriented) {
-      mecanumDrive.driveCartesian(yVelocity, xVelocity, rotationVelocity, -navx.getAngle());
+    if (fieldOriented) 
+    {
+      mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
     } else {
-      mecanumDrive.driveCartesian(yVelocity, xVelocity, rotationVelocity);
+      mecanumDrive.driveCartesian(y, x, rotation);
     }
   }
 

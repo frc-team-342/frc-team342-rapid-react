@@ -30,27 +30,35 @@ public class RobotContainer {
 
   private DriveWithJoystick driveWithJoystick;
 
-  private Joystick joy;
+  private Joystick driver;
   private JoystickButton toggleFieldOrientedBtn;
   private JoystickButton toggleSlowModeBtn;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    joy = new Joystick(0);
-    toggleFieldOrientedBtn = new JoystickButton(joy, 5);
-    toggleSlowModeBtn = new JoystickButton(joy, 7);
-
+    //Subsystems
     driveSystem = new DriveSystem();
 
-    toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
-    toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
+    //Joystick
+    driver = new Joystick(0);
 
-    driveWithJoystick = new DriveWithJoystick(driveSystem, joy);
-    driveSystem.setDefaultCommand(driveWithJoystick);
+    //Buttons
+      toggleFieldOrientedBtn = new JoystickButton(driver, 5);
+      toggleSlowModeBtn = new JoystickButton(driver, 7);
+
+    //Commands 
+      //Toggle Commands
+      toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
+      toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
+
+      //Drive With Joystick
+      driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
+      driveSystem.setDefaultCommand(driveWithJoystick);
 
     // Configure the button bindings
     configureButtonBindings();
 
+   //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
     SmartDashboard.putData(driveSystem);
   }
 
