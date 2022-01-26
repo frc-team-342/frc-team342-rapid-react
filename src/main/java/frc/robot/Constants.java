@@ -18,6 +18,12 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
     public final static class DriveConstants {
+        // Motor IDs
+        public static final int FRONT_LEFT_MOTOR = 1;
+        public static final int BACK_LEFT_MOTOR = 2;
+        public static final int FRONT_RIGHT_MOTOR = 3;
+        public static final int BACK_RIGHT_MOTOR = 4;
+
         // Wheel dimensions
         public static final double WHEEL_DIAMETER = Units.inchesToMeters(6);
         public static final double WHEEL_CIRCUMFERENCE = Units.inchesToMeters(6 * Math.PI);

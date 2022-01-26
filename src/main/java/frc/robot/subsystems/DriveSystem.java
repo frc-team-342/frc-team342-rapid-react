@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+
+// Static imports mean that variable names can be accessed without referencing the class name they came from
+import static frc.robot.Constants.DriveConstants.*;
 
 public class DriveSystem extends SubsystemBase {
 
@@ -49,16 +51,18 @@ public class DriveSystem extends SubsystemBase {
   private MecanumDriveOdometry odometry;
   private TrajectoryConfig trajectoryConfig;
 
-  private double speedMultiplier = 0.8;
+  private ProfiledPIDController rotationController;
 
+  private double speedMultiplier = 0.8;
   private boolean fieldOriented = true;
 
   /** Creates a new DriveSystem. */
   public DriveSystem() {
-    frontLeft = new CANSparkMax(1, MotorType.kBrushless);
-    backLeft = new CANSparkMax(2, MotorType.kBrushless);
-    frontRight = new CANSparkMax(3, MotorType.kBrushless);
-    backRight = new CANSparkMax(4, MotorType.kBrushless);
+    // Capitalized and underscored variable names are statically imported constants from Constants.java
+    frontLeft = new CANSparkMax(FRONT_LEFT_MOTOR, MotorType.kBrushless);
+    backLeft = new CANSparkMax(BACK_LEFT_MOTOR, MotorType.kBrushless);
+    frontRight = new CANSparkMax(FRONT_RIGHT_MOTOR, MotorType.kBrushless);
+    backRight = new CANSparkMax(BACK_RIGHT_MOTOR, MotorType.kBrushless);
 
     frontLeftController = frontLeft.getPIDController();
     backLeftController = backLeft.getPIDController();
@@ -74,8 +78,10 @@ public class DriveSystem extends SubsystemBase {
 
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
 
-    odometry = new MecanumDriveOdometry(Constants.DriveConstants.KINEMATICS, gyro.getRotation2d());
-    trajectoryConfig = new TrajectoryConfig(Constants.DriveConstants.MAX_SPEED, Constants.DriveConstants.MAX_ACCELERATION);
+    odometry = new MecanumDriveOdometry(KINEMATICS, gyro.getRotation2d());
+    trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
+
+    rotationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCELERATION));
   }
 
   /**
@@ -150,13 +156,13 @@ public class DriveSystem extends SubsystemBase {
       trajectory, // Path to follow
       this::getPose, // Current robot position
 
-      Constants.DriveConstants.KINEMATICS, // Distance from center of robot to each wheel
+      KINEMATICS, // Distance from center of robot to each wheel
 
       new PIDController(0, 0, 0), // PID controller on x-position
       new PIDController(0, 0, 0), // PID controller on y-position
-      new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0)), // PID controller on rotation
+      rotationController, // PID controller on rotation
 
-      Constants.DriveConstants.MAX_SPEED, // Maximum speed in m/s
+      MAX_SPEED, // Maximum speed in m/s
 
       this::mecanumDriveWheelSpeeds, // Method pointer to voltage output
       this // Command dependencies
