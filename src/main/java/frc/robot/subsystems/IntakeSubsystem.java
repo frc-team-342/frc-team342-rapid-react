@@ -12,25 +12,26 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class IntakeSubsystem extends SubsystemBase {
-WPI_TalonSRX intakeDeployMotor;
-WPI_TalonSRX intakeRollerMotor;
+  private WPI_TalonSRX deployMotor;
+  private WPI_TalonSRX rollerMotor;
 
-private DigitalInput intakeLimitSwitchU;
-private DigitalInput intakeLimitSwitchD;
+  private DigitalInput limitSwitchUp;
+  private DigitalInput limitSwitchDown;
 
-private final double intakeSpeed = 0.5;
-private final double deploySpeed = 0.2;
+  private final double intakeSpeed = 0.5;
+  private final double deploySpeed = 0.2;
 
 
 
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-    intakeDeployMotor = new WPI_TalonSRX(0);
-    intakeRollerMotor = new WPI_TalonSRX(1);
+    deployMotor = new WPI_TalonSRX(0);
+    rollerMotor = new WPI_TalonSRX(1);
 
-    intakeLimitSwitchU = new DigitalInput(0);
-    intakeLimitSwitchD = new DigitalInput(1);
+
+    limitSwitchUp = new DigitalInput(0);
+    limitSwitchDown = new DigitalInput(1);
   }
 
   @Override
@@ -43,28 +44,28 @@ private final double deploySpeed = 0.2;
   */
   public void deployIntake()
   {
-    if(intakeLimitSwitchD.get())
+    if(limitSwitchDown.get())
     {
-      intakeDeployMotor.set(0);
+      deployMotor.set(0);
     }
     else
     {
-      intakeDeployMotor.set(deploySpeed);
+      deployMotor.set(deploySpeed);
     }
   }
 
   /** 
   * Retracts the intake device
   */
-  public void retractIntake()
-  {
-    if(intakeLimitSwitchU.get())
+  public void retractIntake(){
+  
+    if(limitSwitchUp.get())
     {
-      intakeDeployMotor.set(0);
+      deployMotor.set(0);
     }
     else
     {
-      intakeDeployMotor.set(deploySpeed * -1);
+      deployMotor.set(deploySpeed * -1);
     }
   }
 
@@ -73,7 +74,7 @@ private final double deploySpeed = 0.2;
    */
   public void intakeCargo()
   {
-    intakeRollerMotor.set(intakeSpeed);
+    rollerMotor.set(intakeSpeed);
   }
 
   /**
@@ -81,6 +82,6 @@ private final double deploySpeed = 0.2;
    */
   public void reverseIntakeCargo()
   {
-    intakeRollerMotor.set(intakeSpeed * -1);
+    rollerMotor.set(intakeSpeed * -1);
   }
 }
