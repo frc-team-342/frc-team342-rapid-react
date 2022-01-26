@@ -37,6 +37,10 @@ private final double deploySpeed = 0.2;
   public void periodic() {
     // This method will be called once per scheduler run
   }
+
+  /** 
+  * Deploys the intake device for picking up cargo
+  */
   public void deployIntake()
   {
     if(intakeLimitSwitchD.get())
@@ -45,10 +49,13 @@ private final double deploySpeed = 0.2;
     }
     else
     {
-    intakeDeployMotor.set(deploySpeed);
+      intakeDeployMotor.set(deploySpeed);
     }
   }
 
+  /** 
+  * Retracts the intake device
+  */
   public void retractIntake()
   {
     if(intakeLimitSwitchU.get())
@@ -61,12 +68,18 @@ private final double deploySpeed = 0.2;
     }
   }
 
-  public void activateIntake()
+  /**
+   * Activates the intake rollers to collect cargo
+   */
+  public void intakeCargo()
   {
     intakeRollerMotor.set(intakeSpeed);
   }
 
-  public void reverseIntake()
+  /**
+   * Reverses the intake system to remove jammed cargo
+   */
+  public void reverseIntakeCargo()
   {
     intakeRollerMotor.set(intakeSpeed * -1);
   }

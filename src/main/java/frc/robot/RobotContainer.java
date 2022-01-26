@@ -48,11 +48,16 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    
+    // Instantiates all of the necessary Instant Commands
+  
     retractIntakeCommand = new InstantCommand(intakeSystem::retractIntake, intakeSystem);
     extendIntakeCommand = new InstantCommand(intakeSystem::deployIntake, intakeSystem);
-    intakeCargoCommand = new InstantCommand(intakeSystem::activateIntake, intakeSystem);
-    reverseIntakeCommand = new InstantCommand(intakeSystem::reverseIntake, intakeSystem);
+    intakeCargoCommand = new InstantCommand(intakeSystem::intakeCargo, intakeSystem);
+    reverseIntakeCommand = new InstantCommand(intakeSystem::reverseIntakeCargo, intakeSystem);
 
+    
+     // Instantiates all of the necessary joystick buttons
     reverseIntakeButton = new JoystickButton(driverController, 1);
     extendIntakeButton = new JoystickButton(driverController, 2);
     intakeCargoButton = new JoystickButton(driverController, 3);
