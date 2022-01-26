@@ -7,12 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.DriveWithJoystick;
+import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.subsystems.DriveSystem;
-import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -22,53 +23,43 @@ import frc.robot.subsystems.IntakeSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private DriveWithJoystick driveWithJoystick;
-
   private DriveSystem driveSystem;
 
-  private IntakeSubsystem intakeSystem;
+  private InstantCommand toggleFieldOriented; 
+  private InstantCommand toggleSlowMode;
 
-  private InstantCommand retractIntakeCommand;
+  private DriveWithJoystick driveWithJoystick;
 
-  private InstantCommand extendIntakeCommand;
-
-  private InstantCommand intakeCargoCommand;
-
-  private InstantCommand reverseIntakeCommand;
-
-  private Joystick driverController;
-
-  private JoystickButton reverseIntakeButton;
-
-  private JoystickButton extendIntakeButton;
-
-  private JoystickButton intakeCargoButton;
-
-  private JoystickButton retractIntakeButton;
-
+  private Joystick driver;
+  private JoystickButton toggleFieldOrientedBtn;
+  private JoystickButton toggleSlowModeBtn;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    
-    // Instantiates all of the necessary Instant Commands
-  
-    retractIntakeCommand = new InstantCommand(intakeSystem::retractIntake, intakeSystem);
-    extendIntakeCommand = new InstantCommand(intakeSystem::deployIntake, intakeSystem);
-    intakeCargoCommand = new InstantCommand(intakeSystem::intakeCargo, intakeSystem);
-    reverseIntakeCommand = new InstantCommand(intakeSystem::reverseIntakeCargo, intakeSystem);
 
-    
-     // Instantiates all of the necessary joystick buttons
-    reverseIntakeButton = new JoystickButton(driverController, 1);
-    extendIntakeButton = new JoystickButton(driverController, 2);
-    intakeCargoButton = new JoystickButton(driverController, 3);
-    retractIntakeButton = new JoystickButton(driverController, 4);
+    //Subsystems
+    driveSystem = new DriveSystem();
 
+    //Joystick
+    driver = new Joystick(0);
 
-    
+    //Buttons
+      toggleFieldOrientedBtn = new JoystickButton(driver, 5);
+      toggleSlowModeBtn = new JoystickButton(driver, 7);
+
+    //Commands 
+      //Toggle Commands
+      toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
+      toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
+
+      //Drive With Joystick
+      driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
+      driveSystem.setDefaultCommand(driveWithJoystick);
+
     // Configure the button bindings
     configureButtonBindings();
 
-  
+   //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
+    SmartDashboard.putData(driveSystem);
   }
 
   /**
@@ -78,10 +69,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    reverseIntakeButton.whileHeld(reverseIntakeCommand);
-    intakeCargoButton.whileHeld(intakeCargoCommand);
-    extendIntakeButton.whenHeld(extendIntakeCommand);
-    retractIntakeButton.whenHeld(retractIntakeCommand);
+    toggleFieldOrientedBtn.whenPressed(toggleFieldOriented);
+    toggleSlowModeBtn.whenPressed(toggleSlowMode);
   }
 
   /**
