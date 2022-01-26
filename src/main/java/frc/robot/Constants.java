@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.util.Units;
@@ -34,9 +33,9 @@ public final class Constants {
         public static final double TRACK_WIDTH = Units.inchesToMeters(26.22);
 
         /**
-         * Feedforward control for path following.
+         * The maximum speed of the robot used during trajectory following.
          */
-        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0, 0, 0);
+        public static final double MAX_SPEED = 0;
 
         /**
          * Distance from the center of the robot to each of the wheels.

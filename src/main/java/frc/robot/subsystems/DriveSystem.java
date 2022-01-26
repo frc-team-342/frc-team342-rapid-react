@@ -4,15 +4,15 @@
 
 package frc.robot.subsystems;
 
-import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -32,15 +32,19 @@ public class DriveSystem extends SubsystemBase {
   private CANSparkMax frontRight;
   private CANSparkMax backRight;
 
+  private SparkMaxPIDController frontLeftController;
+  private SparkMaxPIDController backLeftController;
+  private SparkMaxPIDController frontRightController;
+  private SparkMaxPIDController backRightController;
+
   private RelativeEncoder frontLeftEncoder;
   private RelativeEncoder backLeftEncoder;
   private RelativeEncoder frontRightEncoder;
   private RelativeEncoder backRightEncoder;
 
   private MecanumDrive mecanumDrive;
-  private MecanumDriveOdometry odometry;
 
-  private TrajectoryConfig trajectoryConfig;
+  private MecanumDriveOdometry odometry;
 
   private double speedMultiplier = 0.8;
 
@@ -54,7 +58,18 @@ public class DriveSystem extends SubsystemBase {
     frontRight = new CANSparkMax(3, MotorType.kBrushless);
     backRight = new CANSparkMax(4, MotorType.kBrushless);
 
+    frontLeftController = frontLeft.getPIDController();
+    backLeftController = backLeft.getPIDController();
+    frontRightController = frontRight.getPIDController();
+    backRightController = backRight.getPIDController();
+
+    frontLeftEncoder = frontLeft.getEncoder();
+    backLeftEncoder = backLeft.getEncoder();
+    frontRightEncoder = frontRight.getEncoder();
+    backRightEncoder = backRight.getEncoder();
+
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
+
     gyro = new ADXRS450_Gyro();
   }
 
@@ -71,8 +86,7 @@ public class DriveSystem extends SubsystemBase {
     double y = yVelocity * speedMultiplier;
     double rotation = rotationVelocity * speedMultiplier;
 
-    if (fieldOriented) 
-    {
+    if (fieldOriented) {
       mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
     } else {
       mecanumDrive.driveCartesian(y, x, rotation);
@@ -98,13 +112,16 @@ public class DriveSystem extends SubsystemBase {
     );
   }
 
-  private void driveVolts(MecanumDriveMotorVoltages voltages) {
-    // "yeah can i get a uhhh MecanumDriveMotorVoltages"
-    // ^^ statements dreamed up by the utterly DERANGED
-    frontLeft.setVoltage(voltages.frontLeftVoltage);
-    backLeft.setVoltage(voltages.rearLeftVoltage);
-    frontRight.setVoltage(voltages.frontRightVoltage);
-    backRight.setVoltage(voltages.rearRightVoltage);
+  /**
+   * Drive the wheel motors at specific velocities, using PID on each motor.
+   * 
+   * @param speeds the speeds at which to drive the wheels
+   */
+  private void mecanumDriveWheelSpeeds(MecanumDriveWheelSpeeds speeds) {
+    frontLeftController.setReference(speeds.frontLeftMetersPerSecond, ControlType.kVelocity);
+    backLeftController.setReference(speeds.rearLeftMetersPerSecond, ControlType.kVelocity);
+    frontRightController.setReference(speeds.frontRightMetersPerSecond, ControlType.kVelocity);
+    backRightController.setReference(speeds.rearRightMetersPerSecond, ControlType.kVelocity);
   }
 
   /**
@@ -119,22 +136,15 @@ public class DriveSystem extends SubsystemBase {
       trajectory, // Path to follow
       this::getPose, // Current robot position
 
-      Constants.DriveConstants.FEEDFORWARD, // Feedforward control
       Constants.DriveConstants.KINEMATICS, // Distance from center of robot to each wheel
 
       new PIDController(0, 0, 0), // PID controller on x-position
       new PIDController(0, 0, 0), // PID controller on y-position
       new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0)), // PID controller on rotation
 
-      0, // Maximum speed in m/s
+      Constants.DriveConstants.MAX_SPEED, // Maximum speed in m/s
 
-      new PIDController(0, 0, 0), // Front left velocity controller
-      new PIDController(0, 0, 0), // Back left velocity controller
-      new PIDController(0, 0, 0), // Front right velocity controller
-      new PIDController(0, 0, 0), // Back right velocity controller
-
-      this::getWheelSpeeds, // Method pointer to getter for current wheel speeds
-      this::driveVolts, // Method pointer to voltage output
+      this::mecanumDriveWheelSpeeds, // Method pointer to voltage output
       this // Command dependencies
     );
   }
@@ -152,6 +162,9 @@ public class DriveSystem extends SubsystemBase {
     speedMultiplier = (speedMultiplier == 0.8) ? 0.4 : 0.8;
   }
 
+  /**
+   * @return the current multiplier for the robot speed, used for slow mode.
+   */
   private double getSpeedMultiplier() {
     return speedMultiplier;
   }
@@ -159,6 +172,10 @@ public class DriveSystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    odometry.update(
+      gyro.getRotation2d(),
+      getWheelSpeeds()
+    );
   }
 
   @Override
