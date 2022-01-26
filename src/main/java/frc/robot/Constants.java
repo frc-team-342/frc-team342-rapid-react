@@ -35,7 +35,12 @@ public final class Constants {
         /**
          * The maximum speed of the robot used during trajectory following.
          */
-        public static final double MAX_SPEED = 0;
+        public static final double MAX_SPEED = 1.0;
+
+        /**
+         * The maximum acceleration of the robot used during trajectory following.
+         */
+        public static final double MAX_ACCELERATION = 1.0;
 
         /**
          * Distance from the center of the robot to each of the wheels.

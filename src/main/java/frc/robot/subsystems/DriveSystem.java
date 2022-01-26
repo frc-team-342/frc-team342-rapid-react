@@ -42,14 +42,16 @@ public class DriveSystem extends SubsystemBase {
   private RelativeEncoder frontRightEncoder;
   private RelativeEncoder backRightEncoder;
 
+  private ADXRS450_Gyro gyro;
+
   private MecanumDrive mecanumDrive;
 
   private MecanumDriveOdometry odometry;
+  private TrajectoryConfig trajectoryConfig;
 
   private double speedMultiplier = 0.8;
 
   private boolean fieldOriented = true;
-  private ADXRS450_Gyro gyro;
 
   /** Creates a new DriveSystem. */
   public DriveSystem() {
@@ -68,9 +70,12 @@ public class DriveSystem extends SubsystemBase {
     frontRightEncoder = frontRight.getEncoder();
     backRightEncoder = backRight.getEncoder();
 
+    gyro = new ADXRS450_Gyro();
+
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
 
-    gyro = new ADXRS450_Gyro();
+    odometry = new MecanumDriveOdometry(Constants.DriveConstants.KINEMATICS, gyro.getRotation2d());
+    trajectoryConfig = new TrajectoryConfig(Constants.DriveConstants.MAX_SPEED, Constants.DriveConstants.MAX_ACCELERATION);
   }
 
   /**
@@ -125,13 +130,22 @@ public class DriveSystem extends SubsystemBase {
   }
 
   /**
+   * Get the default configuration for trajectory following commands, which includes the max velocity and max acceleration. <br/>
+   * Can be changed to move backwards with the {@link edu.wpi.first.math.trajectory.TrajectoryConfig#setReversed(boolean) setReversed(boolean)} method.
+   * 
+   * @return the trajectory configuration
+   */
+  public TrajectoryConfig getTrajectoryConfig() {
+    return this.trajectoryConfig;
+  }
+
+  /**
    * Generate a command for following a trajectory.
    * 
    * @param trajectory the trajectory to follow in the command
-   * @param reversed whether the robot drives backwards during the trajectory or not
    * @return the command that follows the path
    */
-  public MecanumControllerCommand trajectoryCommand(Trajectory trajectory, boolean reversed) {
+  public MecanumControllerCommand trajectoryCommand(Trajectory trajectory) {
     return new MecanumControllerCommand(
       trajectory, // Path to follow
       this::getPose, // Current robot position
