@@ -12,22 +12,34 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 /** Add your docs here. */
 public class PhotonVision implements Sendable {
 
+    public enum PipelineMode {
+        BLUE(5), 
+        RED(6), 
+        NONE(1);
+
+        public final int pipelineIndex;
+        private PipelineMode(int pipelineIndex) {
+            this.pipelineIndex = pipelineIndex;
+        }
+    }
+
     private boolean driverMode = true;
-    private int pipelineIndex = 0;
+    private PipelineMode pipeline;
 
     //Microsoft Camera
-    PhotonCamera msCam;
+    private PhotonCamera msCam;
 
     public PhotonVision(String table) {
         msCam = new PhotonCamera(table);
+        setPipeline(PipelineMode.NONE);
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("PhotonVision");
         builder.addBooleanProperty("Driver Mode", this::getDriverMode, null);
-        builder.addStringProperty("Pipeline Index", this::getPipeline, this::setPipeline);
     }
+
     /**
      * Gets the current state of the camera's Driver Mode
      * @return
@@ -36,39 +48,16 @@ public class PhotonVision implements Sendable {
         return driverMode;
     }
 
-    /**
-     * Sets the pipeline of the Microsoft Camera based on the string inputs given in the Shuffleboard
-     * @param color color is what color team we are on during the match
-     */
-    public void setPipeline(String color) {
-        String team = color.toLowerCase();
-        if (team.equals("blue")) {
-            msCam.setPipelineIndex(5);
-            pipelineIndex = 5;
-        }
-        else if (team.equals("red")) {
-            msCam.setPipelineIndex(6);
-            pipelineIndex = 6;
-        }
-        else {
-            msCam.setPipelineIndex(1);
-            pipelineIndex = 1;
-        }
+    public void toggleDriverMode() {
+        driverMode = !driverMode;
+    }
+    
+    public void setPipeline(PipelineMode mode) {
+        this.pipeline = mode;
+        msCam.setPipelineIndex(pipeline.pipelineIndex);
     }
 
-    /**
-     * Gets the current state of the Pipeline of the Microsoft Camera and returns which color cargo we are targeting
-     * @return
-     */
-    public String getPipeline() {
-        if (pipelineIndex == 5) {
-            return "Blue";
-        }
-        else if (pipelineIndex == 6) {
-            return "Red";
-        }
-        else {
-            return "null";
-        }
+    public PipelineMode getPipeline() {
+        return pipeline;
     }
 }
