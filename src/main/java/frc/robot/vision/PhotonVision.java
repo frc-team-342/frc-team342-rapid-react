@@ -6,6 +6,7 @@ package frc.robot.vision;
 
 import org.photonvision.PhotonCamera;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
@@ -31,7 +32,14 @@ public class PhotonVision implements Sendable {
 
     public PhotonVision(String table) {
         msCam = new PhotonCamera(table);
-        setPipeline(PipelineMode.NONE);
+
+        // Initialize the pipeline mode depending on which alliance
+        boolean redAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
+        if (redAlliance) {
+            setPipeline(PipelineMode.RED);
+        } else {
+            setPipeline(PipelineMode.BLUE);
+        }
     }
 
     @Override
