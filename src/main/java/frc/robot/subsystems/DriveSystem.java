@@ -128,7 +128,7 @@ public class DriveSystem extends SubsystemBase {
    * 
    * @param speeds the speeds at which to drive the wheels
    */
-  private void mecanumDriveWheelSpeeds(MecanumDriveWheelSpeeds speeds) {
+  private void drive(MecanumDriveWheelSpeeds speeds) {
     frontLeftController.setReference(speeds.frontLeftMetersPerSecond, ControlType.kVelocity);
     backLeftController.setReference(speeds.rearLeftMetersPerSecond, ControlType.kVelocity);
     frontRightController.setReference(speeds.frontRightMetersPerSecond, ControlType.kVelocity);
@@ -164,7 +164,7 @@ public class DriveSystem extends SubsystemBase {
 
       MAX_SPEED, // Maximum speed in m/s
 
-      this::mecanumDriveWheelSpeeds, // Method pointer to voltage output
+      this::drive, // Method pointer to voltage output
       this // Command dependencies
     );
   }
