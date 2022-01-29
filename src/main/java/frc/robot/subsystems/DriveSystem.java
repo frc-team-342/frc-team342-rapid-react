@@ -4,41 +4,84 @@
 
 package frc.robot.subsystems;
 
-import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+// Static imports mean that variable names can be accessed without referencing the class name they came from
+import static frc.robot.Constants.DriveConstants.*;
 
 public class DriveSystem extends SubsystemBase {
 
-  private MecanumDrive mecanumDrive;
   private CANSparkMax frontLeft;
   private CANSparkMax backLeft;
   private CANSparkMax frontRight;
   private CANSparkMax backRight;
 
-  private double speedMultiplier = 0.8;
+  private SparkMaxPIDController frontLeftController;
+  private SparkMaxPIDController backLeftController;
+  private SparkMaxPIDController frontRightController;
+  private SparkMaxPIDController backRightController;
 
-  private boolean fieldOriented = true;
+  private RelativeEncoder frontLeftEncoder;
+  private RelativeEncoder backLeftEncoder;
+  private RelativeEncoder frontRightEncoder;
+  private RelativeEncoder backRightEncoder;
+
   private ADXRS450_Gyro gyro;
 
+  private MecanumDrive mecanumDrive;
+
+  private MecanumDriveOdometry odometry;
+  private TrajectoryConfig trajectoryConfig;
+
+  private ProfiledPIDController rotationController;
+
+  private double speedMultiplier = 0.8;
+  private boolean fieldOriented = true;
+
   /** Creates a new DriveSystem. */
-  public DriveSystem() 
-  {
-    frontLeft = new CANSparkMax(1, MotorType.kBrushless);
-    backLeft = new CANSparkMax(2, MotorType.kBrushless);
-    frontRight = new CANSparkMax(3, MotorType.kBrushless);
-    backRight = new CANSparkMax(4, MotorType.kBrushless);
+  public DriveSystem() {
+    // Capitalized and underscored variable names are statically imported constants from Constants.java
+    frontLeft = new CANSparkMax(FRONT_LEFT_MOTOR, MotorType.kBrushless);
+    backLeft = new CANSparkMax(BACK_LEFT_MOTOR, MotorType.kBrushless);
+    frontRight = new CANSparkMax(FRONT_RIGHT_MOTOR, MotorType.kBrushless);
+    backRight = new CANSparkMax(BACK_RIGHT_MOTOR, MotorType.kBrushless);
+
+    frontLeftController = frontLeft.getPIDController();
+    backLeftController = backLeft.getPIDController();
+    frontRightController = frontRight.getPIDController();
+    backRightController = backRight.getPIDController();
+
+    frontLeftEncoder = frontLeft.getEncoder();
+    backLeftEncoder = backLeft.getEncoder();
+    frontRightEncoder = frontRight.getEncoder();
+    backRightEncoder = backRight.getEncoder();
+
+    gyro = new ADXRS450_Gyro();
 
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
-    gyro = new ADXRS450_Gyro();
+
+    odometry = new MecanumDriveOdometry(KINEMATICS, gyro.getRotation2d());
+    trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
+
+    rotationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCELERATION));
   }
 
   /**
@@ -54,12 +97,76 @@ public class DriveSystem extends SubsystemBase {
     double y = yVelocity * speedMultiplier;
     double rotation = rotationVelocity * speedMultiplier;
 
-    if (fieldOriented) 
-    {
+    if (fieldOriented) {
       mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
     } else {
       mecanumDrive.driveCartesian(y, x, rotation);
     }
+  }
+
+  private Pose2d getPose() {
+    return odometry.getPoseMeters();
+  }
+
+  /**
+   * Get the current speeds of the wheel as a MecanumDriveWheelSpeeds object. <br/>
+   * Units are RPM.
+   * 
+   * @return the current wheel speeds
+   */
+  private MecanumDriveWheelSpeeds getWheelSpeeds() {
+    return new MecanumDriveWheelSpeeds(
+      frontLeftEncoder.getVelocity(),
+      backLeftEncoder.getVelocity(),
+      frontRightEncoder.getVelocity(),
+      backRightEncoder.getVelocity()
+    );
+  }
+
+  /**
+   * Drive the wheel motors at specific velocities, using PID on each motor.
+   * 
+   * @param speeds the speeds at which to drive the wheels
+   */
+  private void drive(MecanumDriveWheelSpeeds speeds) {
+    frontLeftController.setReference(speeds.frontLeftMetersPerSecond, ControlType.kVelocity);
+    backLeftController.setReference(speeds.rearLeftMetersPerSecond, ControlType.kVelocity);
+    frontRightController.setReference(speeds.frontRightMetersPerSecond, ControlType.kVelocity);
+    backRightController.setReference(speeds.rearRightMetersPerSecond, ControlType.kVelocity);
+  }
+
+  /**
+   * Get the default configuration for trajectory following commands, which includes the max velocity and max acceleration. <br/>
+   * Can be changed to move backwards with the {@link edu.wpi.first.math.trajectory.TrajectoryConfig#setReversed(boolean) setReversed(boolean)} method.
+   * 
+   * @return the trajectory configuration
+   */
+  public TrajectoryConfig getTrajectoryConfig() {
+    return this.trajectoryConfig;
+  }
+
+  /**
+   * Generate a command for following a trajectory.
+   * 
+   * @param trajectory the trajectory to follow in the command
+   * @return the command that follows the path
+   */
+  public MecanumControllerCommand trajectoryCommand(Trajectory trajectory) {
+    return new MecanumControllerCommand(
+      trajectory, // Path to follow
+      this::getPose, // Current robot position
+
+      KINEMATICS, // Distance from center of robot to each wheel
+
+      new PIDController(0, 0, 0), // PID controller on x-position
+      new PIDController(0, 0, 0), // PID controller on y-position
+      rotationController, // PID controller on rotation
+
+      MAX_SPEED, // Maximum speed in m/s
+
+      this::drive, // Method pointer to voltage output
+      this // Command dependencies
+    );
   }
 
   public void toggleFieldOriented() {
@@ -75,6 +182,9 @@ public class DriveSystem extends SubsystemBase {
     speedMultiplier = (speedMultiplier == 0.8) ? 0.4 : 0.8;
   }
 
+  /**
+   * @return the current multiplier for the robot speed, used for slow mode.
+   */
   private double getSpeedMultiplier() {
     return speedMultiplier;
   }
@@ -82,6 +192,10 @@ public class DriveSystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    odometry.update(
+      gyro.getRotation2d(),
+      getWheelSpeeds()
+    );
   }
 
   @Override
