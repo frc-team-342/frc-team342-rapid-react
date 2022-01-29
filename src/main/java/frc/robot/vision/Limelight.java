@@ -81,6 +81,15 @@ public class Limelight implements Sendable{
     
     }
 
+    public boolean isLookingLeft() {
+        if (getHorizontalOffset() < 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Limelight");
