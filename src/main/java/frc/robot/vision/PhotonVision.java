@@ -5,29 +5,53 @@
 package frc.robot.vision;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 /** Add your docs here. */
 public class PhotonVision implements Sendable {
 
+    public enum PipelineMode {
+        BLUE(5), 
+        RED(6), 
+        NONE(1);
+
+        public final int pipelineIndex;
+        private PipelineMode(int pipelineIndex) {
+            this.pipelineIndex = pipelineIndex;
+        }
+    }
+
     private boolean driverMode = true;
-    private int pipelineIndex = 0;
+    private PipelineMode pipeline;
+    
 
     //Microsoft Camera
-    PhotonCamera msCam;
+    private PhotonCamera msCam;
 
     public PhotonVision(String table) {
         msCam = new PhotonCamera(table);
+
+        // Initialize the pipeline mode depending on which alliance
+        boolean redAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
+        if (redAlliance) {
+            setPipeline(PipelineMode.RED);
+        } else {
+            setPipeline(PipelineMode.BLUE);
+        }
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("PhotonVision");
         builder.addBooleanProperty("Driver Mode", this::getDriverMode, null);
-        builder.addStringProperty("Pipeline Index", this::getPipeline, this::setPipeline);
     }
+
     /**
      * Gets the current state of the camera's Driver Mode
      * @return
@@ -37,38 +61,92 @@ public class PhotonVision implements Sendable {
     }
 
     /**
-     * Sets the pipeline of the Microsoft Camera based on the string inputs given in the Shuffleboard
-     * @param color color is what color team we are on during the match
+     * Sets the driver mode 
+     * 
+     * @param mode True; Driver mode is selected False; Driver mode not selected
      */
-    public void setPipeline(String color) {
-        String team = color.toLowerCase();
-        if (team.equals("blue")) {
-            msCam.setPipelineIndex(5);
-            pipelineIndex = 5;
-        }
-        else if (team.equals("red")) {
-            msCam.setPipelineIndex(6);
-            pipelineIndex = 6;
-        }
-        else {
-            msCam.setPipelineIndex(1);
-            pipelineIndex = 1;
-        }
+    public void setDriverMode(boolean mode) {
+        driverMode = mode;
+        msCam.setDriverMode(driverMode);
     }
 
     /**
-     * Gets the current state of the Pipeline of the Microsoft Camera and returns which color cargo we are targeting
-     * @return
+     * Sets driver mode to the opposite of its current mode
      */
-    public String getPipeline() {
-        if (pipelineIndex == 5) {
-            return "Blue";
-        }
-        else if (pipelineIndex == 6) {
-            return "Red";
-        }
-        else {
-            return "null";
-        }
+    public void toggleDriverMode() {
+        driverMode = !driverMode;
+        setDriverMode(driverMode);
     }
+    
+    /**
+     * Sets pipeline mode
+     * @param mode {@link PipelineMode}
+     */
+    public void setPipeline(PipelineMode mode) {
+        this.pipeline = mode;
+        msCam.setPipelineIndex(pipeline.pipelineIndex);
+    }
+
+    /**
+     * Gets current pipeline mode
+     * @return Pipeline mode
+     */
+    public PipelineMode getPipeline() {
+        return pipeline;
+    }
+
+    /**
+     * Checks to see if photonvision has any targets
+     * @return True if targets detected; False if no targets detected
+     */
+    public boolean hasTargets() {
+        PhotonPipelineResult result = msCam.getLatestResult();
+        return result.hasTargets();
+    }
+
+    /**
+     * Gets horizontal offset from crosshair to target. 
+     * @return Angle measure of offset
+     */
+    public double getHorizontalOffset() {
+        PhotonPipelineResult result = msCam.getLatestResult();
+        
+        if(result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            return target.getYaw();
+        }
+
+       return Double.NaN;
+    }
+
+    /**
+     * Gets vertical offset from crosshair to target.
+     * @return Angle measure of offset 
+     */
+    public double getVerticalOffset() {
+        PhotonPipelineResult result = msCam.getLatestResult();
+
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            return target.getPitch();   
+        }
+
+        return Double.NaN;
+    }
+
+    /**
+     * Represents movement needed to get to target
+     * @return Trajectory
+     */
+    public Transform2d transformToTarget() {
+        PhotonPipelineResult result = msCam.getLatestResult();
+        
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            return target.getCameraToTarget();
+        }
+        
+        return null;
+    }
+    
 }
