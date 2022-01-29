@@ -54,5 +54,9 @@ public class ClimbSubsystem extends SubsystemBase {
     climbMotor2.set(ControlMode.PercentOutput, 0);
   }
 
+  public boolean limitSwitchTriggered(){
+    return(limitSwitch1.get() && limitSwitch2.get());
+  }
+
 
 }
