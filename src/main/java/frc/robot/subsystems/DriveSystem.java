@@ -7,10 +7,10 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
@@ -27,7 +27,7 @@ public class DriveSystem extends SubsystemBase {
   private double speedMultiplier = 0.8;
 
   private boolean fieldOriented = true;
-  private ADXRS450_Gyro gyro;
+  private ADIS16470_IMU gyro;
 
   /** Creates a new DriveSystem. */
   public DriveSystem() 
@@ -38,7 +38,7 @@ public class DriveSystem extends SubsystemBase {
     backRight = new CANSparkMax(4, MotorType.kBrushless);
 
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
-    gyro = new ADXRS450_Gyro();
+    gyro = new ADIS16470_IMU();
   }
 
   /**
@@ -77,6 +77,32 @@ public class DriveSystem extends SubsystemBase {
 
   private double getSpeedMultiplier() {
     return speedMultiplier;
+  }
+
+  /**
+   * 
+   * @param targetAngle takes an angle between 0-360 degrees
+   * This method rotates clockwise if targetAngle is between 0 and 180 degrees, and rotates counterclockwise if targetAngle is between 181 and 360 degrees.
+   * It also updates the currentAngle variable to the new angle after rotating.
+   */
+  public void rotateToAngle(double targetAngle)
+  {
+    double desiredAngle = targetAngle;
+    double currentAngle = gyro.getAngle();
+    
+    if(currentAngle != (desiredAngle - 5) || currentAngle != (desiredAngle + 5))
+    {
+        if(desiredAngle <= 180)
+      {
+        mecanumDrive.driveCartesian(0, 0, 0.4);
+      }
+      else if(desiredAngle > 180)
+      {
+      mecanumDrive.driveCartesian(0, 0, -0.4);
+      }
+    }
+
+    currentAngle = gyro.getAngle();
   }
 
   @Override
