@@ -26,15 +26,19 @@ public class OuttakeSubsystem extends SubsystemBase {
 
   }
 
+   /**
+    * Sets speed of motors in order to shoot in low goal
+    */
   public void shootLow(){
 
     feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
     shootMotor1.set(ControlMode.PercentOutput, 0.4);
     shootMotor2.set(ControlMode.PercentOutput, 0.4);
-
-
   }
 
+  /**
+    * Sets speed of motors in order to shoot in high goal
+    */
   public void shootHigh(){
 
     feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
@@ -43,14 +47,15 @@ public class OuttakeSubsystem extends SubsystemBase {
 
   }
 
+  /**
+   * Sets speed of motors to 0 to stop motor's shooting
+   */
   public void stopShooter(){
 
     feederMotor.set(0);
     shootMotor1.set(0);
     shootMotor2.set(0);
   }
-
-
 
   @Override
   public void periodic() {
