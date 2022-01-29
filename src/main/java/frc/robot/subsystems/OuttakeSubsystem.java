@@ -43,6 +43,13 @@ public class OuttakeSubsystem extends SubsystemBase {
 
   }
 
+  public void stopShooter(){
+
+    feederMotor.set(0);
+    shootMotor1.set(0);
+    shootMotor2.set(0);
+  }
+
 
 
   @Override
