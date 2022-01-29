@@ -31,12 +31,11 @@ public class ClimbSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
   }
-
   
-  
-
+/**
+ * will only run if both switches are not triggered
+ */
   public void activateClimb(){
-
 
     if (!limitSwitch1.get() && !limitSwitch2.get()){
       climbMotor1.set(ControlMode.PercentOutput, 1);
@@ -45,7 +44,7 @@ public class ClimbSubsystem extends SubsystemBase {
       deactivateClimb();
     }
 
-
+    
   }
 
   public void deactivateClimb(){
