@@ -77,6 +77,8 @@ public class Limelight implements Sendable{
      */
     public void setCamMode(int mode) {
         camMode.setNumber(mode);
+
+    
     }
 
     @Override

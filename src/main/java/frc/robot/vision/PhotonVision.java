@@ -5,7 +5,10 @@
 package frc.robot.vision;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -26,6 +29,7 @@ public class PhotonVision implements Sendable {
 
     private boolean driverMode = true;
     private PipelineMode pipeline;
+    
 
     //Microsoft Camera
     private PhotonCamera msCam;
@@ -56,8 +60,14 @@ public class PhotonVision implements Sendable {
         return driverMode;
     }
 
+    public void setDriverMode(boolean mode) {
+        driverMode = mode;
+        msCam.setDriverMode(driverMode);
+    }
+
     public void toggleDriverMode() {
         driverMode = !driverMode;
+        setDriverMode(driverMode);
     }
     
     public void setPipeline(PipelineMode mode) {
@@ -68,4 +78,43 @@ public class PhotonVision implements Sendable {
     public PipelineMode getPipeline() {
         return pipeline;
     }
+
+    public boolean hasTargets() {
+        PhotonPipelineResult result = msCam.getLatestResult();
+        return result.hasTargets();
+    }
+
+    public double getHorizontalOffset() {
+        PhotonPipelineResult result = msCam.getLatestResult();
+        
+        if(result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            return target.getYaw();
+        }
+
+       return Double.NaN;
+    }
+
+    public double getVerticalOffset() {
+        PhotonPipelineResult result = msCam.getLatestResult();
+
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            return target.getPitch();   
+        }
+
+        return Double.NaN;
+    }
+
+    public Transform2d transformToTarget() {
+        PhotonPipelineResult result = msCam.getLatestResult();
+        
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            return target.getCameraToTarget();
+        }
+        
+        return null;
+    }
+    
 }
