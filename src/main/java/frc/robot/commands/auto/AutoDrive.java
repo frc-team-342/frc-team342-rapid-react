@@ -8,15 +8,15 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSystem;
 
-public class ExitTarmac extends CommandBase {
+public class AutoDrive extends CommandBase {
 
   private DriveSystem subsystem;
   private Timer timer;
 
   private final int seconds = 2;
 
-  /** Creates a new ExitTarmac. */
-  public ExitTarmac(DriveSystem subsystem) {
+  /** Creates a new AutoDrive. */
+  public AutoDrive(DriveSystem subsystem) {
     this.subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.subsystem);
