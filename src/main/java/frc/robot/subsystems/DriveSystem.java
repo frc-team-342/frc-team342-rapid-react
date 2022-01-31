@@ -55,8 +55,6 @@ public class DriveSystem extends SubsystemBase {
 
   private ProfiledPIDController rotationController;
 
-  private ProfiledPIDController targetingController;
-
   private double speedMultiplier = 0.8;
 
   /** Creates a new DriveSystem. */
@@ -84,8 +82,6 @@ public class DriveSystem extends SubsystemBase {
     trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
     rotationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCELERATION));
-
-    targetingController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCELERATION));
   }
 
   /**
@@ -224,7 +220,7 @@ public class DriveSystem extends SubsystemBase {
   }
 
   public void driveWithTargeting(double x, double y, double targetAngle) {
-    drive(x / 2, y / 2, (targetingController.calculate(getGyro(), getGyro() - targetAngle)));
+    drive(x / 2, y / 2, (rotationController.calculate(getGyro(), getGyro() - targetAngle)));
   }
 
   @Override

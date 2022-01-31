@@ -82,12 +82,7 @@ public class Limelight implements Sendable{
     }
 
     public boolean isLookingLeft() {
-        if (getHorizontalOffset() < 0) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return getHorizontalOffset() < 0;
     }
 
     @Override
