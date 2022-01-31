@@ -80,7 +80,11 @@ public class Limelight implements Sendable{
 
     
     }
-
+    
+    /**
+     * Looks to see if the crosshair is on the leftside of the target
+     * @return True or False, if the crosshair is looking left
+     */
     public boolean isLookingLeft() {
         return getHorizontalOffset() < 0;
     }

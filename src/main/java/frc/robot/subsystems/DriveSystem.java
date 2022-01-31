@@ -190,10 +190,9 @@ public class DriveSystem extends SubsystemBase {
   }
 
   /**
-   * 
-   * @param targetAngle takes an angle between 0-360 degrees
    * This method rotates clockwise if targetAngle is between 0 and 180 degrees, and rotates counterclockwise if targetAngle is between 181 and 360 degrees.
    * It also updates the currentAngle variable to the new angle after rotating.
+   * @param targetAngle takes an angle between 0-360 degrees
    */
   public void rotateToAngle(double targetAngle)
   {
@@ -215,10 +214,19 @@ public class DriveSystem extends SubsystemBase {
     currentAngle = gyro.getAngle();
   }
 
+  /**
+   * Returns the angle given by the gyro
+   */
   public double getGyro() {
     return gyro.getAngle();
   }
-
+  
+  /**
+   * Method that allows the robot to drive while targeting (cargo or reflective tape)
+   * @param X x speed of robot
+   * @param Y y speed of robot
+   * @param targetAngle Angle, in degrees, from camera
+   */
   public void driveWithTargeting(double x, double y, double targetAngle) {
     drive(x / 2, y / 2, (rotationController.calculate(getGyro(), getGyro() - targetAngle)));
   }
