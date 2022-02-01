@@ -13,13 +13,14 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,7 +45,8 @@ public class DriveSystem extends SubsystemBase {
   private RelativeEncoder frontRightEncoder;
   private RelativeEncoder backRightEncoder;
 
-  private ADXRS450_Gyro gyro;
+  private boolean fieldOriented = true;
+  private ADIS16470_IMU gyro;
 
   private MecanumDrive mecanumDrive;
 
@@ -54,7 +56,6 @@ public class DriveSystem extends SubsystemBase {
   private ProfiledPIDController rotationController;
 
   private double speedMultiplier = 0.8;
-  private boolean fieldOriented = true;
 
   /** Creates a new DriveSystem. */
   public DriveSystem() {
@@ -74,11 +75,10 @@ public class DriveSystem extends SubsystemBase {
     frontRightEncoder = frontRight.getEncoder();
     backRightEncoder = backRight.getEncoder();
 
-    gyro = new ADXRS450_Gyro();
-
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
+    gyro = new ADIS16470_IMU();
 
-    odometry = new MecanumDriveOdometry(KINEMATICS, gyro.getRotation2d());
+    odometry = new MecanumDriveOdometry(KINEMATICS, new Rotation2d(gyro.getAngle()));
     trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
     rotationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCELERATION));
@@ -189,11 +189,53 @@ public class DriveSystem extends SubsystemBase {
     return speedMultiplier;
   }
 
+  /**
+   * This method rotates clockwise if targetAngle is between 0 and 180 degrees, and rotates counterclockwise if targetAngle is between 181 and 360 degrees.
+   * It also updates the currentAngle variable to the new angle after rotating.
+   * @param targetAngle takes an angle between 0-360 degrees
+   */
+  public void rotateToAngle(double targetAngle)
+  {
+    double desiredAngle = targetAngle;
+    double currentAngle = gyro.getAngle();
+    
+    if(currentAngle != (desiredAngle - 5) || currentAngle != (desiredAngle + 5))
+    {
+        if(desiredAngle <= 180)
+      {
+        mecanumDrive.driveCartesian(0, 0, 0.4);
+      }
+      else if(desiredAngle > 180)
+      {
+      mecanumDrive.driveCartesian(0, 0, -0.4);
+      }
+    }
+
+    currentAngle = gyro.getAngle();
+  }
+
+  /**
+   * Returns the angle given by the gyro
+   */
+  public double getGyro() {
+    return gyro.getAngle();
+  }
+  
+  /**
+   * Method that allows the robot to drive while targeting (cargo or reflective tape)
+   * @param X x speed of robot
+   * @param Y y speed of robot
+   * @param targetAngle Angle, in degrees, from camera
+   */
+  public void driveWithTargeting(double x, double y, double targetAngle) {
+    drive(x / 2, y / 2, (rotationController.calculate(getGyro(), getGyro() - targetAngle)));
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     odometry.update(
-      gyro.getRotation2d(),
+      new Rotation2d(gyro.getAngle()),
       getWheelSpeeds()
     );
   }
