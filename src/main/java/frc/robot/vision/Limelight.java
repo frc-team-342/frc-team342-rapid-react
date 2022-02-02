@@ -19,6 +19,7 @@ public class Limelight implements Sendable{
     private NetworkTableEntry verticalOffset;
     private NetworkTableEntry targetArea;
     private NetworkTableEntry camMode;
+    private NetworkTableEntry robotPosition;
 
     public Limelight() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -27,6 +28,7 @@ public class Limelight implements Sendable{
         verticalOffset = table.getEntry("ty");
         targetArea = table.getEntry("ta");
         camMode = table.getEntry("camMode");
+        robotPosition = table.getEntry("cam-tran");
     }
 
     /**
@@ -87,6 +89,15 @@ public class Limelight implements Sendable{
      */
     public boolean isLookingLeft() {
         return getHorizontalOffset() < 0;
+    }
+
+    /**
+     * Gives us access to the position of the robot in a 3D field environment
+     * @return The position of the robot with Translation (X,Y,Z) and Rotation (Pitch, Yaw, Roll) through a network table entry
+     */
+    public NetworkTableEntry getRobotPosition()
+    {
+        return robotPosition;
     }
 
     @Override
