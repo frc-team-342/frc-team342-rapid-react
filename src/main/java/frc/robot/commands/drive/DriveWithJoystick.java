@@ -37,7 +37,7 @@ public class DriveWithJoystick extends CommandBase {
     double deadBandY = MathUtil.applyDeadband(driver.getY(), 0.15);
     double deadBandZ = MathUtil.applyDeadband(driver.getZ(), 0.15);
 
-    driveSystem.drive(deadBandX, deadBandY, deadBandZ);
+    driveSystem.drive(-deadBandX, deadBandY, -deadBandZ);
 
   }
 
