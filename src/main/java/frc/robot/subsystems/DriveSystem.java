@@ -98,9 +98,9 @@ public class DriveSystem extends SubsystemBase {
     double rotation = rotationVelocity * speedMultiplier;
 
     if (fieldOriented) {
-      mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
+      mecanumDrive.driveCartesian(y, -x, -rotation, -gyro.getAngle());
     } else {
-      mecanumDrive.driveCartesian(y, x, rotation);
+      mecanumDrive.driveCartesian(y, -x, -rotation);
     }
   }
 
@@ -203,11 +203,11 @@ public class DriveSystem extends SubsystemBase {
     {
         if(desiredAngle <= 180)
       {
-        mecanumDrive.driveCartesian(0, 0, 0.4);
+        this.drive(0, 0, 0.4);
       }
       else if(desiredAngle > 180)
       {
-      mecanumDrive.driveCartesian(0, 0, -0.4);
+        this.drive(0, 0, -0.4);
       }
     }
 
