@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -85,5 +88,27 @@ public class RobotContainer {
 
     // command to follow that trajectory
     return driveSystem.trajectoryCommand(trajectory);
+  }
+
+  public void sendTestResults() {
+    // individual subsystem test results
+    Map<String, Boolean> driveResults = driveSystem.test();
+
+    Map<String, Boolean> results = new HashMap<>();
+    results.putAll(driveResults);
+    
+    // name of every test failure
+    String failures = "";
+
+    // iterate over all results
+    for(Map.Entry<String, Boolean> entry: results.entrySet()) {
+      // test mode failures will be false
+      if (entry.getValue().booleanValue() == false) {
+        failures += entry.getKey() + " ";
+      }
+    }
+  
+    // send results to dashboard
+    SmartDashboard.putString("Test Mode Failures", failures);
   }
 }

@@ -25,7 +25,9 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // Static imports mean that variable names can be accessed without referencing the class name they came from
 import static frc.robot.Constants.DriveConstants.*;
@@ -251,25 +253,19 @@ public class DriveSystem extends SubsystemBase {
 
 
   /**
-   * woaoaoaoaoaoaoh
+   * Checks whether each motor controller is physically connected to the robot.
    * 
-   * @throws
+   * @return a map of each motor and true if it is present
    */
-  public void test() throws Exception {
-    //
-    List<String> firmwareVersions = List.of(
-      frontLeft.getFirmwareString(),
-      backLeft.getFirmwareString(),
-      frontRight.getFirmwareString(),
-      backRight.getFirmwareString()
-    );
+  public Map<String, Boolean> test() {
+    HashMap<String, Boolean> motors = new HashMap<>();
 
-    //
-    for (String version: firmwareVersions) {
-      // If firmware version is v0.0.0, the motor controller is not connected
-      if (version.equals("v0.0.0")) {
-        throw new Exception();
-      }
-    }
+    // Name of motor controller and whether it is physically connected
+    motors.put("Front left", frontLeft.getFirmwareString() != "v0.0.0");
+    motors.put("Back left", backLeft.getFirmwareString() != "v0.0.0");
+    motors.put("Front right", frontRight.getFirmwareString() != "v0.0.0");
+    motors.put("Back right", backRight.getFirmwareString() != "v0.0.0");
+    
+    return motors;
   }
 }
