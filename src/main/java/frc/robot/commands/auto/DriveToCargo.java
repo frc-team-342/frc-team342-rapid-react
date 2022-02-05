@@ -26,6 +26,8 @@ public class DriveToCargo extends SequentialCommandGroup {
     this.subsystem = subsystem;
     this.photon = photon;
 
+    addRequirements(subsystem);
+
     // inside a command so they are evaluated at runtime rather than instantiation
     InstantCommand generateTrajectory = new InstantCommand(
       () -> {
