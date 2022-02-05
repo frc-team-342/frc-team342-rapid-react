@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.Intake.Deploy;
 import frc.robot.commands.Intake.Retract;
 import frc.robot.commands.drive.DriveWithJoystick;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
@@ -34,6 +35,7 @@ public class RobotContainer {
   private DriveSystem driveSystem;
   private IntakeSubsystem intake;
   private OuttakeSubsystem outtake;
+  private ClimbSubsystem climb;
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
@@ -54,6 +56,7 @@ public class RobotContainer {
     driveSystem = new DriveSystem();
     intake = new IntakeSubsystem();
     outtake = new OuttakeSubsystem();
+    climb = new ClimbSubsystem();
 
     //Joystick
     driver = new Joystick(0);
@@ -113,10 +116,14 @@ public class RobotContainer {
     // individual subsystem test results
     Map<String, Boolean> driveResults = driveSystem.test();
     Map<String, Boolean> outtakeResults = outtake.test();
+    Map<String, Boolean> intakeResults = intake.test();
+    Map<String, Boolean> climbResults = climb.test();
 
     Map<String, Boolean> results = new HashMap<>();
     results.putAll(driveResults);
     results.putAll(outtakeResults);
+    results.putAll(intakeResults);
+    results.putAll(climbResults);
     
     // name of every test failure
     String failures = "";

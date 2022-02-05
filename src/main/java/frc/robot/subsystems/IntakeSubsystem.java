@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -24,8 +28,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-    deployMotor = new WPI_TalonSRX(0);
-    rollerMotor = new WPI_TalonSRX(1);
+    deployMotor = new WPI_TalonSRX(8);
+    rollerMotor = new WPI_TalonSRX(9);
 
 
     limitSwitchUp = new DigitalInput(0);
@@ -81,5 +85,17 @@ public class IntakeSubsystem extends SubsystemBase {
   public void reverseIntakeCargo()
   {
     rollerMotor.set(intakeSpeed * -1);
+  }
+
+  public Map<String, Boolean> test() {
+    var motors = new HashMap<String, Boolean>();
+
+    deployMotor.getBusVoltage();
+    motors.put("Deploy motor", deployMotor.getLastError() == ErrorCode.OK);
+
+    rollerMotor.getBusVoltage();
+    motors.put("Roller motor", rollerMotor.getLastError() == ErrorCode.OK);
+    
+    return motors;
   }
 }

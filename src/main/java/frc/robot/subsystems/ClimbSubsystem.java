@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -20,10 +24,10 @@ public class ClimbSubsystem extends SubsystemBase {
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
 
-    TalonSRX climbMotor1 = new TalonSRX(8);
-    TalonSRX climbMotor2 = new TalonSRX(8);
-    DigitalInput limitSwitch1 = new DigitalInput(0);
-    DigitalInput limitSwitch2 = new DigitalInput(1);
+    climbMotor1 = new TalonSRX(10);
+    climbMotor2 = new TalonSRX(11);
+    limitSwitch1 = new DigitalInput(5);
+    limitSwitch2 = new DigitalInput(6);
 
   }
   
@@ -57,5 +61,16 @@ public class ClimbSubsystem extends SubsystemBase {
     return(limitSwitch1.get() && limitSwitch2.get());
   }
 
+  public Map<String, Boolean> test() {
+    var motors = new HashMap<String, Boolean>();
+
+    climbMotor1.getBusVoltage();
+    motors.put("Climb motor 1", climbMotor1.getLastError() == ErrorCode.OK);
+
+    climbMotor2.getBusVoltage();
+    motors.put("Climb motor 2", climbMotor2.getLastError() == ErrorCode.OK);
+    
+    return motors;
+  }
 
 }
