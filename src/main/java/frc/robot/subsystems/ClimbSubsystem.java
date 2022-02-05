@@ -14,6 +14,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import static frc.robot.Constants.ClimbConstants.*;
+
 public class ClimbSubsystem extends SubsystemBase {
 
   private TalonSRX climbMotor1;
@@ -23,11 +25,11 @@ public class ClimbSubsystem extends SubsystemBase {
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
+    climbMotor1 = new TalonSRX(CLIMB_MOTOR_1);
+    climbMotor2 = new TalonSRX(CLIMB_MOTOR_2);
 
-    climbMotor1 = new TalonSRX(10);
-    climbMotor2 = new TalonSRX(11);
-    limitSwitch1 = new DigitalInput(5);
-    limitSwitch2 = new DigitalInput(6);
+    limitSwitch1 = new DigitalInput(LIMIT_SWITCH_1);
+    limitSwitch2 = new DigitalInput(LIMIT_SWITCH_2);
 
   }
   

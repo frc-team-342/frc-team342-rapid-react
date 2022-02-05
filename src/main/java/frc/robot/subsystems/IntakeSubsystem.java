@@ -13,7 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
+import static frc.robot.Constants.IntakeConstants.*;
 
 public class IntakeSubsystem extends SubsystemBase {
   private WPI_TalonSRX deployMotor;
@@ -28,12 +28,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-    deployMotor = new WPI_TalonSRX(8);
-    rollerMotor = new WPI_TalonSRX(9);
+    // capital variable names are statically imported constants
+    deployMotor = new WPI_TalonSRX(DEPLOY_MOTOR);
+    rollerMotor = new WPI_TalonSRX(ROLLER_MOTOR);
 
-
-    limitSwitchUp = new DigitalInput(0);
-    limitSwitchDown = new DigitalInput(1);
+    limitSwitchUp = new DigitalInput(LIMIT_SWITCH_UP);
+    limitSwitchDown = new DigitalInput(LIMIT_SWITCH_DOWN);
   }
 
   @Override
