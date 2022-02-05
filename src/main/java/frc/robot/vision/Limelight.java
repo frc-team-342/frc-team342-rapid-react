@@ -126,17 +126,21 @@ public class Limelight implements Sendable{
         double robotPositionZ = robotPosition.getDouble(0.0f);
 
         //Gets the Pitch value from the "cam-tran" network table entry
-        double robotPositionPitch = robotPosition.getDouble(0.0f);
+        double robotRotationPitch = robotPosition.getDouble(0.0f);
+        double robotRotationPitchRadians = Math.toRadians(robotRotationPitch);
 
         //Gets the Yaw value from the "cam-tran" network table entry
-        double robotPositionYaw = robotPosition.getDouble(0.0f);
+        double robotRotationYaw = robotPosition.getDouble(0.0f);
+        double robotRotationYawRadians = Math.toRadians(robotRotationYaw);
 
         //Gets the Roll value from the "cam-tran" network table entry
-        double robotPositionRoll = robotPosition.getDouble(0.0f);
+        double robotRotationRoll = robotPosition.getDouble(0.0f);
+
+        
 
         //Creates a Translation2d and a Rotation2d for use in a Transform2d value
         Translation2d limelightTranslation2d = new Translation2d(robotPositionX, robotPositionY);
-        Rotation2d limelightRotation2d = new Rotation2d(robotPositionX, robotPositionY);
+        Rotation2d limelightRotation2d = new Rotation2d(robotRotationPitchRadians, robotRotationYawRadians);
 
         //Creates a transform2d for use by the limelight
         Transform2d limelightTransform2d = new Transform2d(limelightTranslation2d, limelightRotation2d);
