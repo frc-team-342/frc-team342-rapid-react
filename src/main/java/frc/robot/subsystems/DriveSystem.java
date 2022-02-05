@@ -261,10 +261,10 @@ public class DriveSystem extends SubsystemBase {
     HashMap<String, Boolean> motors = new HashMap<>();
 
     // Name of motor controller and whether it is physically connected
-    motors.put("Front left", frontLeft.getFirmwareString() != "v0.0.0");
-    motors.put("Back left", backLeft.getFirmwareString() != "v0.0.0");
-    motors.put("Front right", frontRight.getFirmwareString() != "v0.0.0");
-    motors.put("Back right", backRight.getFirmwareString() != "v0.0.0");
+    motors.put("Front left", !frontLeft.getFirmwareString().equals("v0.0.0"));
+    motors.put("Back left", !backLeft.getFirmwareString().equals("v0.0.0"));
+    motors.put("Front right", !frontRight.getFirmwareString().equals("v0.0.0"));
+    motors.put("Back right", !backRight.getFirmwareString().equals("v0.0.0"));
     
     return motors;
   }
