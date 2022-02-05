@@ -87,6 +87,11 @@ public class IntakeSubsystem extends SubsystemBase {
     rollerMotor.set(intakeSpeed * -1);
   }
 
+  /**
+   * Test that each motor controller is connected.
+   * 
+   * @return a map of the motor's name and a boolean with true if it is connected
+   */
   public Map<String, Boolean> test() {
     var motors = new HashMap<String, Boolean>();
 

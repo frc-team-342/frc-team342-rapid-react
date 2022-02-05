@@ -63,6 +63,11 @@ public class ClimbSubsystem extends SubsystemBase {
     return(limitSwitch1.get() && limitSwitch2.get());
   }
 
+  /**
+   * Test that each motor controller is connected.
+   * 
+   * @return a map of the motor's name and a boolean with true if it is connected
+   */
   public Map<String, Boolean> test() {
     var motors = new HashMap<String, Boolean>();
 

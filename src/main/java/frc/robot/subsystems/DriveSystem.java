@@ -255,7 +255,7 @@ public class DriveSystem extends SubsystemBase {
   /**
    * Checks whether each motor controller is physically connected to the robot.
    * 
-   * @return a map of each motor and true if it is present
+   * @return a map of the name of each motor and true if it is present
    */
   public Map<String, Boolean> test() {
     HashMap<String, Boolean> motors = new HashMap<>();

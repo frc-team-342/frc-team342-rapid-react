@@ -66,6 +66,11 @@ public class OuttakeSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
+  /**
+   * Test that each motor controller is connected.
+   * 
+   * @return a map of the motor's name and a boolean with true if it is connected
+   */
   public Map<String, Boolean> test() {
     Map<String, Boolean> motors = new HashMap<>();
 
