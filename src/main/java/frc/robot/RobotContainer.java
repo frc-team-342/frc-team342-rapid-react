@@ -21,6 +21,7 @@ import frc.robot.commands.Intake.Retract;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.OuttakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,6 +33,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSystem driveSystem;
   private IntakeSubsystem intake;
+  private OuttakeSubsystem outtake;
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
@@ -51,6 +53,7 @@ public class RobotContainer {
     //Subsystems
     driveSystem = new DriveSystem();
     intake = new IntakeSubsystem();
+    outtake = new OuttakeSubsystem();
 
     //Joystick
     driver = new Joystick(0);
@@ -109,9 +112,11 @@ public class RobotContainer {
   public void sendTestResults() {
     // individual subsystem test results
     Map<String, Boolean> driveResults = driveSystem.test();
+    Map<String, Boolean> outtakeResults = outtake.test();
 
     Map<String, Boolean> results = new HashMap<>();
     results.putAll(driveResults);
+    results.putAll(outtakeResults);
     
     // name of every test failure
     String failures = "";
@@ -120,7 +125,7 @@ public class RobotContainer {
     for(Map.Entry<String, Boolean> entry: results.entrySet()) {
       // test mode failures will be false
       if (entry.getValue().booleanValue() == false) {
-        failures += entry.getKey() + " ";
+        failures += entry.getKey() + ", ";
       }
     }
   

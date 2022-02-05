@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -60,5 +64,21 @@ public class OuttakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public Map<String, Boolean> test() {
+    Map<String, Boolean> motors = new HashMap<>();
+
+    // Name of motor controller and whether it is physically connected
+    shootMotor1.getBusVoltage();
+    motors.put("Shooter motor 1", shootMotor1.getLastError() == ErrorCode.OK);
+    
+    shootMotor2.getBusVoltage();
+    motors.put("Shooter motor 2", shootMotor2.getLastError() == ErrorCode.OK);
+
+    feederMotor.getBusVoltage();
+    motors.put("Feeder motor", feederMotor.getLastError() == ErrorCode.OK);
+
+    return motors;
   }
 }
