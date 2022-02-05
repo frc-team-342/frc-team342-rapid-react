@@ -4,6 +4,9 @@
 
 package frc.robot.vision;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.sendable.Sendable;
@@ -19,7 +22,7 @@ public class Limelight implements Sendable{
     private NetworkTableEntry verticalOffset;
     private NetworkTableEntry targetArea;
     private NetworkTableEntry camMode;
-    private NetworkTableEntry robotPosition;
+    private NetworkTableEntry robotPosition3D;
 
     public Limelight() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -28,7 +31,7 @@ public class Limelight implements Sendable{
         verticalOffset = table.getEntry("ty");
         targetArea = table.getEntry("ta");
         camMode = table.getEntry("camMode");
-        robotPosition = table.getEntry("cam-tran");
+        robotPosition3D = table.getEntry("cam-tran");
     }
 
     /**
@@ -95,10 +98,53 @@ public class Limelight implements Sendable{
      * Gives us access to the position of the robot in a 3D field environment
      * @return The position of the robot with Translation (X,Y,Z) and Rotation (Pitch, Yaw, Roll) through a network table entry
      */
-    public NetworkTableEntry getRobotPosition()
+    public NetworkTableEntry getRobotPosition3D()
     {
-        return robotPosition;
+        return robotPosition3D;
     }
+
+
+    /**
+     * Gives limelight access to a transform2d
+     * Creates variables for the all the "cam-tran" network table entry values
+     * Creates a translation2d and rotation2d for the limelight to use
+     * Uses the translation2d and rotation2d to create a transform2d
+     * @return The limelight instance of a transform2d
+     */
+    public Transform2d generateTransform()
+    {
+        //Gets a network table entry containing the X,Y,Z, pitch, yaw, and roll values from the limelight network table
+        NetworkTableEntry robotPosition = getRobotPosition3D();
+
+        //Gets the X-value from the "cam-tran" network table entry
+        double robotPositionX = robotPosition.getDouble(0.0f);
+        
+        //Gets the Y-value from the "cam-tran" network table entry
+        double robotPositionY = robotPosition.getDouble(0.0f);
+
+        //Gets the Z-value from the "cam-tran" network table entry
+        double robotPositionZ = robotPosition.getDouble(0.0f);
+
+        //Gets the Pitch value from the "cam-tran" network table entry
+        double robotPositionPitch = robotPosition.getDouble(0.0f);
+
+        //Gets the Yaw value from the "cam-tran" network table entry
+        double robotPositionYaw = robotPosition.getDouble(0.0f);
+
+        //Gets the Roll value from the "cam-tran" network table entry
+        double robotPositionRoll = robotPosition.getDouble(0.0f);
+
+        //Creates a Translation2d and a Rotation2d for use in a Transform2d value
+        Translation2d limelightTranslation2d = new Translation2d(robotPositionX, robotPositionY);
+        Rotation2d limelightRotation2d = new Rotation2d(robotPositionX, robotPositionY);
+
+        //Creates a transform2d for use by the limelight
+        Transform2d limelightTransform2d = new Transform2d(limelightTranslation2d, limelightRotation2d);
+
+        //Returns the limelight instance of Transform2d
+        return limelightTransform2d;
+    }
+
 
     @Override
     public void initSendable(SendableBuilder builder) {
