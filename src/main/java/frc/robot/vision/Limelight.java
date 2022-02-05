@@ -113,30 +113,39 @@ public class Limelight implements Sendable{
      */
     public Transform2d generateTransform()
     {
-        //Gets a network table entry containing the X,Y,Z, pitch, yaw, and roll values from the limelight network table
-        NetworkTableEntry robotPosition = getRobotPosition3D();
+        //Default position and rotation values
+        Number[] defaultValues =
+        {
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f
+        };
 
+        //Retrieve NumberArray from limelight networkTable
+        Number[] robotPositionValues = getRobotPosition3D().getNumberArray(defaultValues);
+        
         //Gets the X-value from the "cam-tran" network table entry
-        double robotPositionX = robotPosition.getDouble(0.0f);
+        double robotPositionX = robotPositionValues[0].doubleValue();
         
         //Gets the Y-value from the "cam-tran" network table entry
-        double robotPositionY = robotPosition.getDouble(0.0f);
+        double robotPositionY = robotPositionValues[1].doubleValue();
 
         //Gets the Z-value from the "cam-tran" network table entry
-        double robotPositionZ = robotPosition.getDouble(0.0f);
+        double robotPositionZ = robotPositionValues[2].doubleValue();
 
         //Gets the Pitch value from the "cam-tran" network table entry
-        double robotRotationPitch = robotPosition.getDouble(0.0f);
+        double robotRotationPitch = robotPositionValues[3].doubleValue();
         double robotRotationPitchRadians = Math.toRadians(robotRotationPitch);
 
         //Gets the Yaw value from the "cam-tran" network table entry
-        double robotRotationYaw = robotPosition.getDouble(0.0f);
+        double robotRotationYaw = robotPositionValues[4].doubleValue();
         double robotRotationYawRadians = Math.toRadians(robotRotationYaw);
 
         //Gets the Roll value from the "cam-tran" network table entry
-        double robotRotationRoll = robotPosition.getDouble(0.0f);
-
-        
+        double robotRotationRoll = robotPositionValues[5].doubleValue();
 
         //Creates a Translation2d and a Rotation2d for use in a Transform2d value
         Translation2d limelightTranslation2d = new Translation2d(robotPositionX, robotPositionY);
