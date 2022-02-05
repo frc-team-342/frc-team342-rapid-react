@@ -22,8 +22,6 @@ public class IntakeSubsystem extends SubsystemBase {
   private final double deploySpeed = 0.2;
 
 
-
-
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     deployMotor = new WPI_TalonSRX(0);
