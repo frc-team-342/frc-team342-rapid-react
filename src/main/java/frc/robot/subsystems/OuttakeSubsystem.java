@@ -10,6 +10,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import static frc.robot.Constants.OuttakeConstants.*;
+
 public class OuttakeSubsystem extends SubsystemBase {
 
   private WPI_TalonFX shootMotor1;
@@ -17,6 +19,12 @@ public class OuttakeSubsystem extends SubsystemBase {
   private WPI_TalonSRX feederMotor;
 
   private final double LOAD_SPEED = 0.8;
+
+  /** The current setpoint */
+  private double setpoint = 0;
+
+  /** RPM within the setpoint to be counted as up to speed */
+  private double setpointError = 15;
 
   /** Creates a new OuttakeSubsystem. */
   public OuttakeSubsystem() {
@@ -44,8 +52,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     // Open loop control is used on feed motors
     feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
 
-    // Units is encoder ticks / 100 ms
-    shootMotor1.set(ControlMode.Velocity, 0);
+    // idk  bruh
+    setpoint = 100;
   }
 
   /**
@@ -53,29 +61,36 @@ public class OuttakeSubsystem extends SubsystemBase {
    */
   public void shootHigh(){
     feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
-    shootMotor1.set(ControlMode.PercentOutput, 0.8);
+
+    setpoint = 200;
   }
 
   /**
    * Sets speed of motors to 0 to stop motor's shooting
    */
   public void stopShooter(){
-    feederMotor.set(0);
-    shootMotor1.set(0);
+    setpoint = 0;
   }
 
   /**
+   * Check if the shooter is at its setpoint, within the error margin set by setpointError.
    * 
-   * 
-   * @return
+   * @return true if it is within the margin of error
    */
   public boolean upToSpeed() {
-    // TODO: fix it bruh
-    return false;
+    // Units are in encoder units per 100 ms right now
+    double velocity = shootMotor1.getSensorCollection().getIntegratedSensorVelocity();
+
+    // dimensional analysis????????????????
+    double rpm = velocity * 29.296875;
+
+    // check if rpm is within tolerance
+    return rpm >= (setpoint - setpointError) && rpm <= (setpoint + setpointError);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    shootMotor1.set(ControlMode.Velocity, setpoint);
   }
 }
