@@ -13,11 +13,12 @@ public class AutoDrive extends CommandBase {
   private DriveSystem subsystem;
   private Timer timer;
 
-  private final int seconds = 2;
+  private final double seconds;
 
   /** Creates a new AutoDrive. */
-  public AutoDrive(DriveSystem subsystem) {
+  public AutoDrive(DriveSystem subsystem, double sec) {
     this.subsystem = subsystem;
+    seconds = sec;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.subsystem);
     timer = new Timer();
