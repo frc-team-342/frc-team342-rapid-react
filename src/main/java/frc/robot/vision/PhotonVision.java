@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
+
 /** Add your docs here. */
 public class PhotonVision implements Sendable {
 
