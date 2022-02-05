@@ -14,15 +14,26 @@ public class AutoDrive extends CommandBase {
   private Timer timer;
 
   private final double seconds;
+  private double speed = 0.8;
 
   /** Creates a new AutoDrive. */
-  public AutoDrive(DriveSystem subsystem, double sec) {
+  public AutoDrive(DriveSystem subsystem, double seconds) {
     this.subsystem = subsystem;
-    seconds = sec;
+    this.seconds = seconds;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.subsystem);
     timer = new Timer();
   }
+
+  public AutoDrive(DriveSystem subsystem, double speed, double seconds) {
+    this.subsystem = subsystem;
+    this.seconds = seconds;
+    this.speed = speed;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(this.subsystem);
+    timer = new Timer();
+  }
+
 
   // Called when the command is initially scheduled.
   @Override
@@ -34,7 +45,7 @@ public class AutoDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.drive(.8,0,0);
+    subsystem.drive(speed,0,0);
   }
 
   // Called once the command ends or is interrupted.

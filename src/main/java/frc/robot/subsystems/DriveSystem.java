@@ -199,13 +199,13 @@ public class DriveSystem extends SubsystemBase {
     double desiredAngle = targetAngle;
     double currentAngle = gyro.getAngle();
     
-    if(currentAngle != (desiredAngle - 5) || currentAngle != (desiredAngle + 5))
+    if(currentAngle <= (desiredAngle + 5.0) || currentAngle >= (desiredAngle - 5.0))
     {
-        if(desiredAngle <= 180)
+        if(desiredAngle <= 180.0)
       {
         mecanumDrive.driveCartesian(0, 0, 0.4);
       }
-      else if(desiredAngle > 180)
+      else if(desiredAngle > 180.0)
       {
       mecanumDrive.driveCartesian(0, 0, -0.4);
       }
