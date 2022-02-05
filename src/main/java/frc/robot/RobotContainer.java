@@ -112,6 +112,9 @@ public class RobotContainer {
     return driveSystem.trajectoryCommand(trajectory);
   }
 
+  /**
+   * Test each subsystem with a test method and display the results on the dashboard
+   */
   public void sendTestResults() {
     // individual subsystem test results
     Map<String, Boolean> driveResults = driveSystem.test();
