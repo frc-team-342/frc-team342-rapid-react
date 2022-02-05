@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.util.Units;
@@ -66,5 +68,17 @@ public final class Constants {
 
         /** Counts per revolution for the Falcon encoder. */
         public static final double CPR = 2048;
+
+        /** RPM to shoot for low hub. */
+        public static final double LOW_RPM = 1000;
+
+        /** RPM to shoot for upper hub. */
+        public static final double HIGH_RPM = 2000;
+
+        /** P constant for the shooter PID loop. */
+        public static final double P = 0.0;
+
+        /** D constant for the shooter PID loop. */
+        public static final double D = 0.0;
     }
 }

@@ -28,18 +28,17 @@ public class OuttakeSubsystem extends SubsystemBase {
 
   /** Creates a new OuttakeSubsystem. */
   public OuttakeSubsystem() {
-    shootMotor1 = new WPI_TalonFX(5);
-    shootMotor2 = new WPI_TalonFX(6);
-    feederMotor = new WPI_TalonSRX(7);
+    shootMotor1 = new WPI_TalonFX(SHOOT_MOTOR_1);
+    shootMotor2 = new WPI_TalonFX(SHOOT_MOTOR_2);
+    feederMotor = new WPI_TalonSRX(FEEDER_MOTOR);
 
     shootMotor2.follow(shootMotor1);
 
-    // TODO: move to constants
-    shootMotor1.config_kP(1, 0.0);
-    shootMotor2.config_kP(1, 0.0);
+    shootMotor1.config_kP(1, P);
+    shootMotor2.config_kP(1, P);
 
-    shootMotor1.config_kD(1, 0.0);
-    shootMotor2.config_kD(1, 0.0);
+    shootMotor1.config_kD(1, D);
+    shootMotor2.config_kD(1, D);
 
     shootMotor1.selectProfileSlot(1, 0);
     shootMotor2.selectProfileSlot(1, 0);
@@ -53,7 +52,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
 
     // idk  bruh
-    setpoint = 100;
+    setpoint = LOW_RPM;
   }
 
   /**
@@ -62,7 +61,7 @@ public class OuttakeSubsystem extends SubsystemBase {
   public void shootHigh(){
     feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
 
-    setpoint = 200;
+    setpoint = HIGH_RPM;
   }
 
   /**
