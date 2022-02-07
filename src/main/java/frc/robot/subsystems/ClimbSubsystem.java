@@ -6,24 +6,25 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimbSubsystem extends SubsystemBase {
 
-  private TalonSRX climbMotor1;
-  private TalonSRX climbMotor2;
+  private WPI_TalonFX climbMotor1;
+  private WPI_TalonFX climbMotor2;
   private DigitalInput limitSwitch1;
   private DigitalInput limitSwitch2;
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
 
-    TalonSRX climbMotor1 = new TalonSRX(8);
-    TalonSRX climbMotor2 = new TalonSRX(8);
-    DigitalInput limitSwitch1 = new DigitalInput(0);
-    DigitalInput limitSwitch2 = new DigitalInput(1);
+    climbMotor1 = new WPI_TalonFX(8);
+    climbMotor2 = new WPI_TalonFX(8);
+    limitSwitch1 = new DigitalInput(0);
+    limitSwitch2 = new DigitalInput(1);
 
   }
   
