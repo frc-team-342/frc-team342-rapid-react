@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.DriveWithJoystick;
+import frc.robot.commands.outtake.OuttakeHigh;
 import frc.robot.subsystems.DriveSystem;
+import frc.robot.subsystems.OuttakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,11 +27,14 @@ import frc.robot.subsystems.DriveSystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSystem driveSystem;
+  private OuttakeSubsystem outtake;
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
 
   private DriveWithJoystick driveWithJoystick;
+
+  private OuttakeHigh outtakeHigh;
 
   private Joystick driver;
   private JoystickButton toggleFieldOrientedBtn;
@@ -39,22 +44,25 @@ public class RobotContainer {
 
     //Subsystems
     driveSystem = new DriveSystem();
+    outtake = new OuttakeSubsystem();
 
     //Joystick
     driver = new Joystick(0);
 
     //Buttons
-      toggleFieldOrientedBtn = new JoystickButton(driver, 5);
-      toggleSlowModeBtn = new JoystickButton(driver, 7);
+    toggleFieldOrientedBtn = new JoystickButton(driver, 5);
+    toggleSlowModeBtn = new JoystickButton(driver, 7);
 
     //Commands 
-      //Toggle Commands
-      toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
-      toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
+    //Toggle Commands
+    toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
+    toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
 
-      //Drive With Joystick
-      driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
-      driveSystem.setDefaultCommand(driveWithJoystick);
+    //Drive With Joystick
+    driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
+    driveSystem.setDefaultCommand(driveWithJoystick);
+
+    outtakeHigh = new OuttakeHigh(outtake);
 
     // Configure the button bindings
     configureButtonBindings();

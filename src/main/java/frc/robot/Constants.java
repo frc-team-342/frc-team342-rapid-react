@@ -76,7 +76,7 @@ public final class Constants {
         public static final double HIGH_RPM = 2000;
 
         /** P constant for the shooter PID loop. */
-        public static final double P = 0.0;
+        public static final double P = 1.0;
 
         /** D constant for the shooter PID loop. */
         public static final double D = 0.0;
