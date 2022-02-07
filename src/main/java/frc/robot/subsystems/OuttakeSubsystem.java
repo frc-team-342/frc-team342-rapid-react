@@ -49,7 +49,10 @@ public class OuttakeSubsystem extends SubsystemBase {
     */
   public void shootLow(){
     // Open loop control is used on feed motors
-    feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
+    if (upToSpeed()) {
+      // Only feed is the shooter is ready
+      feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
+    }
 
     // idk  bruh
     setpoint = LOW_RPM;
@@ -59,7 +62,9 @@ public class OuttakeSubsystem extends SubsystemBase {
    * Sets speed of motors in order to shoot in high goal
    */
   public void shootHigh(){
-    feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
+    if (upToSpeed()) {
+      feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
+    }
 
     setpoint = HIGH_RPM;
   }
