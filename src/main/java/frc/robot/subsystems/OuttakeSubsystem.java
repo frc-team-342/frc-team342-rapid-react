@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.OuttakeConstants.*;
@@ -92,9 +93,23 @@ public class OuttakeSubsystem extends SubsystemBase {
     return rpm >= (setpoint - setpointError) && rpm <= (setpoint + setpointError);
   }
 
+  /**
+   * @return the current setpoint of the shooter
+   */
+  public double getSetpoint() {
+    return setpoint;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     shootMotor1.set(ControlMode.Velocity, setpoint);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("OuttakeSubsystem");
+    builder.addBooleanProperty("Up to speed", this::upToSpeed, null);
+    builder.addDoubleProperty("Setpoint", this::getSetpoint, null);
   }
 }
