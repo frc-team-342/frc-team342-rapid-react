@@ -23,6 +23,8 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
+import frc.robot.vision.Limelight;
+import frc.robot.vision.PhotonVision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,6 +38,9 @@ public class RobotContainer {
   private IntakeSubsystem intake;
   private OuttakeSubsystem outtake;
   private ClimbSubsystem climb;
+
+  private PhotonVision photon;
+  private Limelight limelight;
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
@@ -57,6 +62,9 @@ public class RobotContainer {
     intake = new IntakeSubsystem();
     outtake = new OuttakeSubsystem();
     climb = new ClimbSubsystem();
+
+    photon = new PhotonVision("camera");
+    limelight = new Limelight();
 
     //Joystick
     driver = new Joystick(0);
@@ -122,11 +130,16 @@ public class RobotContainer {
     Map<String, Boolean> intakeResults = intake.test();
     Map<String, Boolean> climbResults = climb.test();
 
+    Map<String, Boolean> photonResults = photon.test();
+    Map<String, Boolean> limelightResults = limelight.test();
+
     Map<String, Boolean> results = new HashMap<>();
     results.putAll(driveResults);
     results.putAll(outtakeResults);
     results.putAll(intakeResults);
     results.putAll(climbResults);
+    results.putAll(photonResults);
+    results.putAll(limelightResults);
     
     // name of every test failure
     String failures = "";

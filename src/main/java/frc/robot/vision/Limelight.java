@@ -4,6 +4,9 @@
 
 package frc.robot.vision;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -157,5 +160,15 @@ public class Limelight implements Sendable{
         builder.addDoubleProperty("Horizontal Offset", this::getHorizontalOffset, null);
         builder.addDoubleProperty("Vertical Offset", this::getVerticalOffset, null);
         builder.addDoubleProperty("Cam Mode", this::getCamMode, null);
+    }
+
+    public Map<String, Boolean> test() {
+        Map<String, Boolean> results = new HashMap<>();
+        
+        // if camera mode equals random default value outside bounds, it is not connected
+        var result = camMode.getNumber(2304).intValue();
+        results.put("Limelight", result == 2304);
+
+        return results;
     }
 }

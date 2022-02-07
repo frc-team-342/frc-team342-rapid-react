@@ -4,6 +4,9 @@
 
 package frc.robot.vision;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -12,7 +15,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-
 
 /** Add your docs here. */
 public class PhotonVision implements Sendable {
@@ -30,13 +32,15 @@ public class PhotonVision implements Sendable {
 
     private boolean driverMode = true;
     private PipelineMode pipeline;
-    
 
+    private String name;
+    
     //Microsoft Camera
     private PhotonCamera msCam;
 
     public PhotonVision(String table) {
         msCam = new PhotonCamera(table);
+        this.name = table;
 
         // Initialize the pipeline mode depending on which alliance
         boolean redAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
@@ -150,4 +154,15 @@ public class PhotonVision implements Sendable {
         return null;
     }
     
+    public Map<String, Boolean> test() {
+        Map<String, Boolean> results = new HashMap<>();
+
+        var table = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable(name);
+
+        // Check if pipeline is equal to default value that is some random number it will never equal
+        var entry = table.getEntry("pipelineIndex").getNumber(1576);
+        results.put("Photon Camera", entry.intValue() == 1576);
+
+        return results;
+    }
 }
