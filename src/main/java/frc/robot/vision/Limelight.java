@@ -167,7 +167,7 @@ public class Limelight implements Sendable{
         
         // if camera mode equals random default value outside bounds, it is not connected
         var result = camMode.getNumber(2304).intValue();
-        results.put("Limelight", result == 2304);
+        results.put("Limelight", result != 2304);
 
         return results;
     }

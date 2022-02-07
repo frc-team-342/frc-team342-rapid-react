@@ -159,9 +159,9 @@ public class PhotonVision implements Sendable {
 
         var table = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable(name);
 
-        // Check if pipeline is equal to default value that is some random number it will never equal
-        var entry = table.getEntry("pipelineIndex").getNumber(1576);
-        results.put("Photon Camera", entry.intValue() == 1576);
+        // Check if latency value is present bc it should never be zero
+        var entry = table.getEntry("latencyMillis").getNumber(0);
+        results.put("Photon Camera", entry.intValue() != 0);
 
         return results;
     }
