@@ -5,13 +5,16 @@
 package frc.robot.vision;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import frc.robot.Constants;
 
 
 /** Add your docs here. */
@@ -30,7 +33,11 @@ public class PhotonVision implements Sendable {
 
     private boolean driverMode = true;
     private PipelineMode pipeline;
-    
+
+    private double camHeight = Constants.VisionConstants.CAM_HEIGHT;
+    private double targetHeight = Constants.VisionConstants.TARGET_HEIGHT;
+    private double camAngle = Constants.VisionConstants.CAM_ANGLE;
+
 
     //Microsoft Camera
     private PhotonCamera msCam;
@@ -150,4 +157,16 @@ public class PhotonVision implements Sendable {
         return null;
     }
     
+    public double getDistance() {
+        PhotonPipelineResult result = msCam.getLatestResult();
+
+        if (result.hasTargets()) {
+            return PhotonUtils.calculateDistanceToTargetMeters(
+                camHeight,
+                targetHeight, 
+                camAngle,
+                Units.degreesToRadians(result.getBestTarget().getPitch()));
+        }
+        return -1;
+    }
 }
