@@ -60,6 +60,15 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        
+
+        public static final double CAM_HEIGHT = Units.inchesToMeters(31.15); 
+
+        /** 
+         * Height of cam subtracted from height of the hub (converted to inches) 
+         * */ 
+        public static final double TARGET_HEIGHT = 72.5; 
+
+        public static final double CAM_ANGLE = 45; // Unit is degrees
+
     }
 }

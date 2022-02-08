@@ -162,7 +162,7 @@ public class Limelight implements Sendable{
     public double getDistance() {
  
         double actAngle = getVerticalOffset() + camAngle;
-        double hDistance = Units.inchesToMeters(targetHeight / (Math.tan(Math.toRadians(actAngle))));
+        double hDistance = targetHeight / (Math.tan(Math.toRadians(actAngle)));
         
         return hDistance;
     }
