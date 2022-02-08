@@ -86,7 +86,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     // Units are in encoder units per 100 ms right now
     double velocity = shootMotor1.getSensorCollection().getIntegratedSensorVelocity();
 
-    // dimensional analysis????????????????
+    // converting from encoder ticks / 100 ms to rotations per minutes
+    // ((velocity * 10 ms) * 60 s) / 2048 ticks
     double rpm = velocity * 29.296875;
 
     // check if rpm is within tolerance
