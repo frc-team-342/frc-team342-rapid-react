@@ -58,4 +58,8 @@ public final class Constants {
             new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)
         );
     }
+
+    public static final class VisionConstants {
+        
+    }
 }

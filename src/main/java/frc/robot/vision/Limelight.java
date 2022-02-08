@@ -7,10 +7,12 @@ package frc.robot.vision;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import frc.robot.Constants;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /** Add your docs here. */
@@ -23,6 +25,9 @@ public class Limelight implements Sendable{
     private NetworkTableEntry targetArea;
     private NetworkTableEntry camMode;
     private NetworkTableEntry robotPosition3D;
+
+    double camAngle = Constants.VisionConstants.CAM_ANGLE;
+    double targetHeight = Constants.VisionConstants.TARGET_HEIGHT;
 
     public Limelight() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -149,6 +154,18 @@ public class Limelight implements Sendable{
         return limelightTransform2d;
     }
 
+    /**
+     * First finds the actual angle based on angling of the camera and vertical offset
+     * Then finds distance from camera to target using trigonometry 
+     * @return Horizontal distance converted to meters
+     */
+    public double getDistance() {
+ 
+        double actAngle = getVerticalOffset() + camAngle;
+        double hDistance = Units.inchesToMeters(targetHeight / (Math.tan(Math.toRadians(actAngle))));
+        
+        return hDistance;
+    }
 
     @Override
     public void initSendable(SendableBuilder builder) {
