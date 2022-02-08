@@ -35,6 +35,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     shootMotor2.follow(shootMotor1);
 
+    // P and D are statically imported constants
     shootMotor1.config_kP(1, P);
     shootMotor2.config_kP(1, P);
 
@@ -55,7 +56,6 @@ public class OuttakeSubsystem extends SubsystemBase {
       feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
     }
 
-    // idk  bruh
     setpoint = LOW_RPM;
   }
 
