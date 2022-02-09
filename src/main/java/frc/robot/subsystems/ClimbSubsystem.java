@@ -7,8 +7,6 @@ package frc.robot.subsystems;
 import javax.lang.model.util.ElementScanner6;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -23,10 +21,12 @@ public class ClimbSubsystem extends SubsystemBase {
   private DigitalInput limitSwitch1;
   private DigitalInput limitSwitch2;
   
-  //Converts the rotation ticks from the stage 2 encoders to degrees
+  //Sets the second stage climb initial angle using the rotation ticks from the hex bore encoder
   private double secondStageInitialAngle = (2048 / 8192) * 360;
-  private double secondStageMaximumPositiveAngle;
-  private double secondStageMaximumNegativeAngle;
+
+  private double secondStageMaximumAngle = 115.0;
+  private double secondStageMinimumAngle = 62.5;
+  private double currentAngle;
 
 
   /** Creates a new ClimbSubsystem. */
@@ -44,6 +44,7 @@ public class ClimbSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    currentAngle = (secondStageMotor1.getSelectedSensorPosition() / 8192) * 360;
   }
   
 /**
@@ -70,38 +71,43 @@ public class ClimbSubsystem extends SubsystemBase {
   public boolean limitSwitchTriggered(){
     return(limitSwitch1.get() && limitSwitch2.get());
   }
+  
+
+  /**
+   * Allows the second stage climber to rotate forward
+   */
+  public void stage2RotateForward()
+  {
+    if(currentAngle >= secondStageMinimumAngle && currentAngle <= secondStageMaximumAngle)
+    {
+      secondStageMotor1.set(ControlMode.PercentOutput, 0.5);
+      secondStageMotor2.set(ControlMode.PercentOutput, 0.5);
+    }
+    else
+    {
+      secondStageMotor1.set(ControlMode.PercentOutput, 0);
+      secondStageMotor2.set(ControlMode.PercentOutput, 0);
+    }
+  }
 
 
   /**
-   * Checks if the second stage climber is the appropriate angle range
-   * Moves the climber to the appropriate location depending on the determined range
-   * If outside the determined range, stops the second stage climber
+   * Allows the second stage climber to rotate forward
    */
-  public void activateStage2()
+  public void stage2RotateBackwards()
   {
-    if((secondStageMotor1.getSelectedSensorPosition() <= secondStageInitialAngle + 5 || 
-    secondStageMotor1.getSelectedSensorPosition() >= secondStageInitialAngle - 5) 
-    && (secondStageMotor1.getSelectedSensorPosition() <= secondStageMaximumPositiveAngle + 5 
-    || secondStageMotor1.getSelectedSensorPosition() >= secondStageMaximumPositiveAngle - 5))
+    if(currentAngle >= secondStageMinimumAngle && currentAngle <= secondStageMaximumAngle)
     {
-      secondStageMotor1.set(ControlMode.PercentOutput, 1);
-      secondStageMotor2.set(ControlMode.PercentOutput, 1);
+      secondStageMotor1.set(ControlMode.PercentOutput, -0.5);
+      secondStageMotor2.set(ControlMode.PercentOutput, -0.5);
     }
-
-    else if((secondStageMotor1.getSelectedSensorPosition() >= secondStageInitialAngle + 5 ||
-    secondStageMotor1.getSelectedSensorPosition() >= secondStageInitialAngle - 5) && 
-    (secondStageMotor1.getSelectedSensorPosition() <= secondStageMaximumNegativeAngle + 5 ||
-    secondStageMotor1.getSelectedSensorPosition() >= secondStageMaximumNegativeAngle - 5))
-    {
-      secondStageMotor1.set(ControlMode.PercentOutput, -1);
-      secondStageMotor2.set(ControlMode.PercentOutput, -1);
-    }
-
     else
     {
-      deactivateStage2();
+      secondStageMotor1.set(ControlMode.PercentOutput, 0);
+      secondStageMotor2.set(ControlMode.PercentOutput, 0);
     }
   }
+  
 
   //Stops the second stage climber
   public void deactivateStage2()
