@@ -63,4 +63,25 @@ public final class Constants {
             new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)
         );
     }
+
+    public static final class OuttakeConstants {
+        public static final int SHOOT_MOTOR_1 = 5;
+        public static final int SHOOT_MOTOR_2 = 6;
+        public static final int FEEDER_MOTOR = 7;
+
+        /** Counts per revolution for the Falcon encoder. */
+        public static final double CPR = 2048;
+
+        /** RPM to shoot for low hub. */
+        public static final double LOW_RPM = 1000;
+
+        /** RPM to shoot for upper hub. */
+        public static final double HIGH_RPM = 2000;
+
+        /** P constant for the shooter PID loop. */
+        public static final double P = 1.0;
+
+        /** D constant for the shooter PID loop. */
+        public static final double D = 0.0;
+    }
 }

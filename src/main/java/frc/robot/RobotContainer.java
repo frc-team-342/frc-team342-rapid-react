@@ -16,8 +16,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.Intake.Deploy;
 import frc.robot.commands.Intake.Retract;
 import frc.robot.commands.drive.DriveWithJoystick;
+import frc.robot.commands.outtake.OuttakeHigh;
 import frc.robot.subsystems.DriveSystem;
+import frc.robot.subsystems.OuttakeSubsystem;
+
 import frc.robot.subsystems.IntakeSubsystem;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,7 +32,9 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSystem driveSystem;
+  private OuttakeSubsystem outtake;
   private IntakeSubsystem intake;
+
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
@@ -36,6 +42,8 @@ public class RobotContainer {
   private Command retract;
 
   private DriveWithJoystick driveWithJoystick;
+
+  private OuttakeHigh outtakeHigh;
 
   private Joystick driver;
   private JoystickButton toggleFieldOrientedBtn;
@@ -47,35 +55,45 @@ public class RobotContainer {
 
     //Subsystems
     driveSystem = new DriveSystem();
+    outtake = new OuttakeSubsystem();
     intake = new IntakeSubsystem();
 
     //Joystick
     driver = new Joystick(0);
 
     //Buttons
-      toggleFieldOrientedBtn = new JoystickButton(driver, 5);
-      toggleSlowModeBtn = new JoystickButton(driver, 7);
-      deployButton = new JoystickButton(driver, 6);
+    toggleFieldOrientedBtn = new JoystickButton(driver, 5);
+    toggleSlowModeBtn = new JoystickButton(driver, 7);
+    deployButton = new JoystickButton(driver, 6);
+
 
     //Commands 
-      //Toggle Commands
-      toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
-      toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
+    //Toggle Commands
+    toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
+    toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
 
-      //Intake Commands
-      deploy = new Deploy(intake);
-      retract = new Retract(intake);
-      intake.setDefaultCommand(retract);
+    //Drive With Joystick
+    driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
+    driveSystem.setDefaultCommand(driveWithJoystick);
 
-      //Drive With Joystick
-      driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
-      driveSystem.setDefaultCommand(driveWithJoystick);
+
+    outtakeHigh = new OuttakeHigh(outtake);
+    
+    //Intake Commands
+    deploy = new Deploy(intake);
+    retract = new Retract(intake);
+    intake.setDefaultCommand(retract);
+
+    //Drive With Joystick
+    driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
+    driveSystem.setDefaultCommand(driveWithJoystick);
 
     // Configure the button bindings
     configureButtonBindings();
 
-   //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
+    //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
     SmartDashboard.putData(driveSystem);
+    SmartDashboard.putData(outtake);
   }
 
   /**
