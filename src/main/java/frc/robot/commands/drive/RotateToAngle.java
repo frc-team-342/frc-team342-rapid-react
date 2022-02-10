@@ -4,26 +4,22 @@
 
 package frc.robot.commands.drive;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSystem;
 
-public class DriveWithJoystick extends CommandBase {
+public class RotateToAngle extends CommandBase {
+  private DriveSystem rotateToAngleDrive;
+  private double targetAngle;
   
-  DriveSystem driveSystem;
-  Joystick driver;
-  
-  /** Creates a new DriveWithJoystick. */
-  public DriveWithJoystick(DriveSystem drive, Joystick j) {
-
-    addRequirements(drive);
-    this.driveSystem = drive;
-    this.driver = j;
+  /** Creates a new RotateToAngle. */
+  public RotateToAngle(DriveSystem rotateToAngleDrive, double targetAngle) {
+    this.rotateToAngleDrive = rotateToAngleDrive;
+    this.targetAngle = targetAngle;
+    
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(rotateToAngleDrive);
   }
-  
-  
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {}
@@ -31,22 +27,12 @@ public class DriveWithJoystick extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
-    // Checks whether joystick is within a deadzone and returns val
-    double deadBandX = MathUtil.applyDeadband(driver.getX(), 0.15);
-    double deadBandY = MathUtil.applyDeadband(driver.getY(), 0.15);
-    double deadBandZ = MathUtil.applyDeadband(driver.getZ(), 0.15);
-
-    driveSystem.drive(-deadBandX, deadBandY, -deadBandZ / 2);
-
+    rotateToAngleDrive.rotateToAngle(targetAngle);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    
-    driveSystem.drive(0, 0, 0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
