@@ -52,7 +52,7 @@ public class OuttakeSubsystem extends SubsystemBase {
   public void shootLow(){
     // Open loop control is used on feed motors
     if (upToSpeed()) {
-      // Only feed is the shooter is ready
+      // Only feed if the shooter is ready
       feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
     }
 
