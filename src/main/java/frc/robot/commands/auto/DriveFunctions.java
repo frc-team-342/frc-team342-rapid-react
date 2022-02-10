@@ -14,11 +14,11 @@ import frc.robot.subsystems.OuttakeSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class DriveFunctions extends SequentialCommandGroup {
 
-  DriveSystem drive;
-  OuttakeSubsystem outtake;
+  private DriveSystem drive;
+  private OuttakeSubsystem outtake;
 
 
-  AutoDrive exitTarmac;
+  private AutoDrive exitTarmac;
   /** Creates a new DriveFunctions. */
   public DriveFunctions() {
     exitTarmac = new AutoDrive(drive, 2);
