@@ -88,7 +88,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // converting from encoder ticks / 100 ms to rotations per minutes
     // ((velocity * 10 ms) * 60 s) / 2048 ticks
-    double rpm = velocity * 29.296875;
+    double rpm = (velocity * 60 * 10) / 2048;
 
     // check if rpm is within tolerance
     return rpm >= (setpoint - setpointError) && rpm <= (setpoint + setpointError);
