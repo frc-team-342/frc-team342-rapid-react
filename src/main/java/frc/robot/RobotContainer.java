@@ -13,10 +13,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.Intake.Deploy;
+import frc.robot.commands.Intake.Retract;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.OuttakeSubsystem;
+
+import frc.robot.subsystems.IntakeSubsystem;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,9 +33,13 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSystem driveSystem;
   private OuttakeSubsystem outtake;
+  private IntakeSubsystem intake;
+
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
+  private Command deploy;
+  private Command retract;
 
   private DriveWithJoystick driveWithJoystick;
 
@@ -39,12 +48,15 @@ public class RobotContainer {
   private Joystick driver;
   private JoystickButton toggleFieldOrientedBtn;
   private JoystickButton toggleSlowModeBtn;
+  private JoystickButton deployButton;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
     //Subsystems
     driveSystem = new DriveSystem();
     outtake = new OuttakeSubsystem();
+    intake = new IntakeSubsystem();
 
     //Joystick
     driver = new Joystick(0);
@@ -52,6 +64,8 @@ public class RobotContainer {
     //Buttons
     toggleFieldOrientedBtn = new JoystickButton(driver, 5);
     toggleSlowModeBtn = new JoystickButton(driver, 7);
+    deployButton = new JoystickButton(driver, 6);
+
 
     //Commands 
     //Toggle Commands
@@ -62,13 +76,24 @@ public class RobotContainer {
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
     driveSystem.setDefaultCommand(driveWithJoystick);
 
+
     outtakeHigh = new OuttakeHigh(outtake);
+    
+    //Intake Commands
+    deploy = new Deploy(intake);
+    retract = new Retract(intake);
+    intake.setDefaultCommand(retract);
+
+    //Drive With Joystick
+    driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
+    driveSystem.setDefaultCommand(driveWithJoystick);
 
     // Configure the button bindings
     configureButtonBindings();
 
-   //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
+    //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
     SmartDashboard.putData(driveSystem);
+    SmartDashboard.putData(outtake);
   }
 
   /**
@@ -80,6 +105,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     toggleFieldOrientedBtn.whenPressed(toggleFieldOriented);
     toggleSlowModeBtn.whenPressed(toggleSlowMode);
+    deployButton.whileHeld(deploy);
   }
 
   /**
