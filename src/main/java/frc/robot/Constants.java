@@ -65,8 +65,8 @@ public final class Constants {
          * Height of cam subtracted from height of the hub (converted to meters) 
          * */ 
         public static final double CAM_HEIGHT = Units.inchesToMeters(31.15); 
-
-        public static final double TARGET_HEIGHT = 72.5; 
+        
+        public static final double TARGET_HEIGHT = Units.inchesToMeters(72.85); 
 
         public static final double CAM_ANGLE = 45; // Unit is degrees
 
