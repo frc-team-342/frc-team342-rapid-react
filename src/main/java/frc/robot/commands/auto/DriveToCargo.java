@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.drive;
+package frc.robot.commands.auto;
 
 import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,6 +25,8 @@ public class DriveToCargo extends SequentialCommandGroup {
   public DriveToCargo(DriveSystem subsystem, PhotonVision photon) {
     this.subsystem = subsystem;
     this.photon = photon;
+
+    addRequirements(subsystem);
 
     // inside a command so they are evaluated at runtime rather than instantiation
     InstantCommand generateTrajectory = new InstantCommand(

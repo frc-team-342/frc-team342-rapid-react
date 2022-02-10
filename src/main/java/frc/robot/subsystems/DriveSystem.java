@@ -65,11 +65,31 @@ public class DriveSystem extends SubsystemBase {
     frontRight = new CANSparkMax(FRONT_RIGHT_MOTOR, MotorType.kBrushless);
     backRight = new CANSparkMax(BACK_RIGHT_MOTOR, MotorType.kBrushless);
 
+    // Current limits on breakers are set to 40 Amps
+    frontLeft.setSmartCurrentLimit(CURRENT_LIMIT);
+    backLeft.setSmartCurrentLimit(CURRENT_LIMIT);
+    frontRight.setSmartCurrentLimit(CURRENT_LIMIT);
+    backRight.setSmartCurrentLimit(CURRENT_LIMIT);
+
+    // Voltage compensation in volts
+    frontLeft.enableVoltageCompensation(NOMINAL_VOLTAGE);
+    backLeft.enableVoltageCompensation(NOMINAL_VOLTAGE);
+    frontRight.enableVoltageCompensation(NOMINAL_VOLTAGE);
+    backRight.enableVoltageCompensation(NOMINAL_VOLTAGE);
+
+    // Time in seconds to reach max velocity in open loop
+    frontLeft.setOpenLoopRampRate(RAMP_RATE);
+    backLeft.setOpenLoopRampRate(RAMP_RATE);
+    frontRight.setOpenLoopRampRate(RAMP_RATE);
+    backRight.setOpenLoopRampRate(RAMP_RATE);
+
+    // PID Controllers
     frontLeftController = frontLeft.getPIDController();
     backLeftController = backLeft.getPIDController();
     frontRightController = frontRight.getPIDController();
     backRightController = backRight.getPIDController();
 
+    // Encoders
     frontLeftEncoder = frontLeft.getEncoder();
     backLeftEncoder = backLeft.getEncoder();
     frontRightEncoder = frontRight.getEncoder();
@@ -81,7 +101,7 @@ public class DriveSystem extends SubsystemBase {
     odometry = new MecanumDriveOdometry(KINEMATICS, new Rotation2d(gyro.getAngle()));
     trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
-    rotationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCELERATION));
+    rotationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
   }
 
   /**
@@ -199,15 +219,15 @@ public class DriveSystem extends SubsystemBase {
     double desiredAngle = targetAngle;
     double currentAngle = gyro.getAngle();
     
-    if(currentAngle != (desiredAngle - 5) || currentAngle != (desiredAngle + 5))
+    if(currentAngle <= (desiredAngle + 5.0) || currentAngle >= (desiredAngle - 5.0))
     {
-        if(desiredAngle <= 180)
+        if(desiredAngle <= 180.0)
       {
-        mecanumDrive.driveCartesian(0, 0, 0.4);
+        this.drive(0, 0, 0.4);
       }
-      else if(desiredAngle > 180)
+      else if(desiredAngle > 180.0)
       {
-      mecanumDrive.driveCartesian(0, 0, -0.4);
+        this.drive(0, 0, -0.4);
       }
     }
 
