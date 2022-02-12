@@ -84,15 +84,11 @@ public class RobotContainer {
 
     //Buttons
     toggleFieldOrientedBtn = new JoystickButton(driver, FIELD_ORIENTED_BTN); // left trigger
-    toggleSlowModeBtn = new JoystickButton(driver, 7); // Select Button
-    deployButton = new JoystickButton(driver, 6); // right trigger
-    stage2ForwardButton = new JoystickButton(driver, 4); // Y button
-    stage2BackwardButton = new JoystickButton(driver, 3); // X button
+    toggleSlowModeBtn = new JoystickButton(driver, SLOW_MODE_BTN); // Select Button
+    deployButton = new JoystickButton(driver, INTAKE_DEPLOY_BTN); // right trigger
+    stage2ForwardButton = new JoystickButton(driver, STAGE_TWO_FORWARD_BTN); // Y button
+    stage2BackwardButton = new JoystickButton(driver, STAGE_TWO_BACKWARD_BTN); // X button
     
-
-    toggleFieldOrientedBtn = new JoystickButton(driver, FIELD_ORIENTED_BTN);
-    toggleSlowModeBtn = new JoystickButton(driver, SLOW_MODE_BTN);
-    deployButton = new JoystickButton(driver, INTAKE_DEPLOY_BTN);
 
     //Commands 
     //Toggle Commands
