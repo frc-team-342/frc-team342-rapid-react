@@ -11,20 +11,24 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.Intake.Deploy;
-import frc.robot.commands.Intake.Retract;
+
+import frc.robot.commands.intake.Deploy;
+import frc.robot.commands.intake.Retract;
 import frc.robot.commands.drive.DriveWithJoystick;
+import frc.robot.commands.outtake.OuttakeHigh;
+
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
+
 import frc.robot.vision.Limelight;
 import frc.robot.vision.PhotonVision;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,6 +39,7 @@ import frc.robot.vision.PhotonVision;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSystem driveSystem;
+  private OuttakeSubsystem outtake;
   private IntakeSubsystem intake;
   private OuttakeSubsystem outtake;
   private ClimbSubsystem climb;
@@ -42,12 +47,15 @@ public class RobotContainer {
   private PhotonVision photon;
   private Limelight limelight;
 
+
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
   private Command deploy;
   private Command retract;
 
   private DriveWithJoystick driveWithJoystick;
+
+  private OuttakeHigh outtakeHigh;
 
   private Joystick driver;
   private JoystickButton toggleFieldOrientedBtn;
@@ -59,6 +67,7 @@ public class RobotContainer {
 
     //Subsystems
     driveSystem = new DriveSystem();
+    outtake = new OuttakeSubsystem();
     intake = new IntakeSubsystem();
     outtake = new OuttakeSubsystem();
     climb = new ClimbSubsystem();
@@ -70,29 +79,38 @@ public class RobotContainer {
     driver = new Joystick(0);
 
     //Buttons
-      toggleFieldOrientedBtn = new JoystickButton(driver, 5);
-      toggleSlowModeBtn = new JoystickButton(driver, 7);
-      deployButton = new JoystickButton(driver, 6);
+    toggleFieldOrientedBtn = new JoystickButton(driver, 5);
+    toggleSlowModeBtn = new JoystickButton(driver, 7);
+    deployButton = new JoystickButton(driver, 6);
+
 
     //Commands 
-      //Toggle Commands
-      toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
-      toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
+    //Toggle Commands
+    toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
+    toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
 
-      //Intake Commands
-      deploy = new Deploy(intake);
-      retract = new Retract(intake);
-      intake.setDefaultCommand(retract);
+    //Drive With Joystick
+    driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
+    driveSystem.setDefaultCommand(driveWithJoystick);
 
-      //Drive With Joystick
-      driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
-      driveSystem.setDefaultCommand(driveWithJoystick);
+
+    outtakeHigh = new OuttakeHigh(outtake);
+    
+    //Intake Commands
+    deploy = new Deploy(intake);
+    retract = new Retract(intake);
+    intake.setDefaultCommand(retract);
+
+    //Drive With Joystick
+    driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
+    driveSystem.setDefaultCommand(driveWithJoystick);
 
     // Configure the button bindings
     configureButtonBindings();
 
-   //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
+    //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
     SmartDashboard.putData(driveSystem);
+    SmartDashboard.putData(outtake);
   }
 
   /**

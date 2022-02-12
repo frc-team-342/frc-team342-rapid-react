@@ -12,6 +12,7 @@ public class OuttakeHigh extends CommandBase {
 
   /** Creates a new OuttakeHigh. */
   public OuttakeHigh(OuttakeSubsystem subsystem) {
+    this.subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.subsystem);
   }
