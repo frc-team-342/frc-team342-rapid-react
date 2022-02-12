@@ -4,13 +4,18 @@
 
 package frc.robot.subsystems;
 
+import java.util.HashMap;
+import java.util.Map;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static frc.robot.Constants.ClimbConstants.*;
 
 public class ClimbSubsystem extends SubsystemBase {
 
@@ -31,13 +36,14 @@ public class ClimbSubsystem extends SubsystemBase {
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
+    climbMotor1 = new WPI_TalonFX(CLIMB_MOTOR_1);
+    climbMotor2 = new WPI_TalonFX(CLIMB_MOTOR_2);
 
-    climbMotor1 = new WPI_TalonFX(8);
-    climbMotor2 = new WPI_TalonFX(7);
-    limitSwitch1 = new DigitalInput(0);
-    limitSwitch2 = new DigitalInput(1);
-    secondStageMotor1 = new WPI_TalonSRX(6);
-    secondStageMotor2 = new WPI_TalonSRX(5);
+    secondStageMotor1 = new WPI_TalonSRX(CLIMB_SECOND_MOTOR_1);
+    secondStageMotor2 = new WPI_TalonSRX(CLIMB_SECOND_MOTOR_2);
+
+    limitSwitch1 = new DigitalInput(LIMIT_SWITCH_1);
+    limitSwitch2 = new DigitalInput(LIMIT_SWITCH_2);
 
   }
   
@@ -116,5 +122,21 @@ public class ClimbSubsystem extends SubsystemBase {
     secondStageMotor2.set(ControlMode.PercentOutput, 0);
   }
 
+  /**
+   * Test that each motor controller is connected.
+   * 
+   * @return a map of the motor's name and a boolean with true if it is connected
+   */
+  public Map<String, Boolean> test() {
+    var motors = new HashMap<String, Boolean>();
+
+    climbMotor1.getBusVoltage();
+    motors.put("Climb motor 1", climbMotor1.getLastError() == ErrorCode.OK);
+
+    climbMotor2.getBusVoltage();
+    motors.put("Climb motor 2", climbMotor2.getLastError() == ErrorCode.OK);
+    
+    return motors;
+  }
 
 }
