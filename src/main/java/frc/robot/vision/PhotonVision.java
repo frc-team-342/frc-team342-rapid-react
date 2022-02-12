@@ -4,6 +4,9 @@
 
 package frc.robot.vision;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -15,7 +18,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.Constants;
-
 
 /** Add your docs here. */
 public class PhotonVision implements Sendable {
@@ -38,12 +40,14 @@ public class PhotonVision implements Sendable {
     private double targetHeight = Constants.VisionConstants.TARGET_HEIGHT;
     private double camAngle = Constants.VisionConstants.CAM_ANGLE;
 
-
+    private String name;
+    
     //Microsoft Camera
     private PhotonCamera msCam;
 
     public PhotonVision(String table) {
         msCam = new PhotonCamera(table);
+        this.name = table;
 
         // Initialize the pipeline mode depending on which alliance
         boolean redAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
@@ -168,5 +172,17 @@ public class PhotonVision implements Sendable {
                 Units.degreesToRadians(result.getBestTarget().getPitch()));
         }
         return -1;
+    }
+    
+    public Map<String, Boolean> test() {
+        Map<String, Boolean> results = new HashMap<>();
+
+        var table = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable(name);
+
+        // Check if latency value is present bc it should never be zero
+        var entry = table.getEntry("latencyMillis").getNumber(0);
+        results.put("Photon Camera", entry.intValue() != 0);
+
+        return results;
     }
 }

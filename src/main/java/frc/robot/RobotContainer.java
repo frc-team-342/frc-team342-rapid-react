@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -12,15 +15,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
 import frc.robot.commands.intake.Deploy;
 import frc.robot.commands.intake.Retract;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
+
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
 
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.vision.Limelight;
+import frc.robot.vision.PhotonVision;
 
+import static frc.robot.Constants.ControllerConstants.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,9 +40,12 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private DriveSystem driveSystem;
-  private OuttakeSubsystem outtake;
   private IntakeSubsystem intake;
+  private OuttakeSubsystem outtake;
+  private ClimbSubsystem climb;
 
+  private PhotonVision photon;
+  private Limelight limelight;
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
@@ -56,15 +68,19 @@ public class RobotContainer {
     driveSystem = new DriveSystem();
     outtake = new OuttakeSubsystem();
     intake = new IntakeSubsystem();
+    outtake = new OuttakeSubsystem();
+    climb = new ClimbSubsystem();
+
+    photon = new PhotonVision("camera");
+    limelight = new Limelight();
 
     //Joystick
-    driver = new Joystick(0);
+    driver = new Joystick(DRIVER_JOYSTICK);
 
     //Buttons
-    toggleFieldOrientedBtn = new JoystickButton(driver, 5);
-    toggleSlowModeBtn = new JoystickButton(driver, 7);
-    deployButton = new JoystickButton(driver, 6);
-
+    toggleFieldOrientedBtn = new JoystickButton(driver, FIELD_ORIENTED_BTN);
+    toggleSlowModeBtn = new JoystickButton(driver, SLOW_MODE_BTN);
+    deployButton = new JoystickButton(driver, INTAKE_DEPLOY_BTN);
 
     //Commands 
     //Toggle Commands
@@ -118,5 +134,41 @@ public class RobotContainer {
 
     // command to follow that trajectory
     return driveSystem.trajectoryCommand(trajectory);
+  }
+
+  /**
+   * Test each subsystem with a test method and display the results on the dashboard
+   */
+  public void sendTestResults() {
+    // individual subsystem test results
+    Map<String, Boolean> driveResults = driveSystem.test();
+    Map<String, Boolean> outtakeResults = outtake.test();
+    Map<String, Boolean> intakeResults = intake.test();
+    Map<String, Boolean> climbResults = climb.test();
+
+    Map<String, Boolean> photonResults = photon.test();
+    Map<String, Boolean> limelightResults = limelight.test();
+
+    Map<String, Boolean> results = new HashMap<>();
+    results.putAll(driveResults);
+    results.putAll(outtakeResults);
+    results.putAll(intakeResults);
+    results.putAll(climbResults);
+    results.putAll(photonResults);
+    results.putAll(limelightResults);
+    
+    // name of every test failure
+    String failures = "";
+
+    // iterate over all results
+    for(Map.Entry<String, Boolean> entry: results.entrySet()) {
+      // test mode failures will be false
+      if (entry.getValue().booleanValue() == false) {
+        failures += entry.getKey() + ", ";
+      }
+    }
+  
+    // send results to dashboard
+    SmartDashboard.putString("Test Mode Failures", failures);
   }
 }

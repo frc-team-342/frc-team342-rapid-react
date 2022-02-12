@@ -25,6 +25,10 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 // Static imports mean that variable names can be accessed without referencing the class name they came from
 import static frc.robot.Constants.DriveConstants.*;
 
@@ -265,5 +269,23 @@ public class DriveSystem extends SubsystemBase {
     builder.setSmartDashboardType("DriveSystem");
     builder.addBooleanProperty("Field Oriented", this::getFieldOriented, null);
     builder.addDoubleProperty("Speed Multiplier", this::getSpeedMultiplier, null);
+  }
+
+
+  /**
+   * Checks whether each motor controller is physically connected to the robot.
+   * 
+   * @return a map of the name of each motor and true if it is present
+   */
+  public Map<String, Boolean> test() {
+    HashMap<String, Boolean> motors = new HashMap<>();
+
+    // Name of motor controller and whether it is physically connected
+    motors.put("Front left drive motor", !frontLeft.getFirmwareString().equals("v0.0.0"));
+    motors.put("Back left drive motor", !backLeft.getFirmwareString().equals("v0.0.0"));
+    motors.put("Front right drive motor", !frontRight.getFirmwareString().equals("v0.0.0"));
+    motors.put("Back right drive motor", !backRight.getFirmwareString().equals("v0.0.0"));
+    
+    return motors;
   }
 }

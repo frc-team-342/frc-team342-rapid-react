@@ -96,4 +96,34 @@ public final class Constants {
         /** D constant for the shooter PID loop. */
         public static final double D = 0.0;
     }
+
+    public static final class ClimbConstants {
+        public static final int CLIMB_MOTOR_1 = 10;
+        public static final int CLIMB_MOTOR_2 = 11;
+
+        public static final int CLIMB_SECOND_MOTOR_1 = 12;
+        public static final int CLIMB_SECOND_MOTOR_2 = 13;
+
+        public static final int LIMIT_SWITCH_1 = 1;
+        public static final int LIMIT_SWITCH_2 = 2;
+    }
+
+    public static final class IntakeConstants {
+        public static final int DEPLOY_MOTOR = 8;
+        public static final int ROLLER_MOTOR = 9;
+
+        public static final int LIMIT_SWITCH_UP = 3;
+        public static final int LIMIT_SWITCH_DOWN = 4;
+    }
+
+    public static final class ControllerConstants {
+        // Joystick IDs
+        public static final int DRIVER_JOYSTICK = 0;
+
+        // Driver button IDs
+        public static final int FIELD_ORIENTED_BTN = 5;
+        public static final int SLOW_MODE_BTN = 7;
+        public static final int INTAKE_DEPLOY_BTN = 6;
+
+    }
 }
