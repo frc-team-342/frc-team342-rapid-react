@@ -60,7 +60,7 @@ public class Robot extends TimedRobot {
     if (commitFile.exists()) {
       try {
         // convert file to string
-        commit = new String(Files.readAllBytes(commitFile.toPath()));
+        commit = new String(Files.readAllBytes(commitFile.toPath())).trim();
       } catch (IOException e) {
         // readAllBytes throws an IOException
         System.err.println(e);
