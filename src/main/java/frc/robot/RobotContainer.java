@@ -18,9 +18,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.commands.intake.Deploy;
 import frc.robot.commands.intake.Retract;
+import frc.robot.commands.climb.ClimbStageTwoBackward;
+import frc.robot.commands.climb.ClimbStageTwoForward;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
-
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -51,6 +52,8 @@ public class RobotContainer {
   private InstantCommand toggleSlowMode;
   private Command deploy;
   private Command retract;
+  private Command stage2Backwards;
+  private Command stage2Forwards;
 
   private DriveWithJoystick driveWithJoystick;
 
@@ -60,6 +63,8 @@ public class RobotContainer {
   private JoystickButton toggleFieldOrientedBtn;
   private JoystickButton toggleSlowModeBtn;
   private JoystickButton deployButton;
+  private JoystickButton stage2ForwardButton;
+  private JoystickButton stage2BackwardButton;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -78,9 +83,12 @@ public class RobotContainer {
     driver = new Joystick(DRIVER_JOYSTICK);
 
     //Buttons
-    toggleFieldOrientedBtn = new JoystickButton(driver, FIELD_ORIENTED_BTN);
-    toggleSlowModeBtn = new JoystickButton(driver, SLOW_MODE_BTN);
-    deployButton = new JoystickButton(driver, INTAKE_DEPLOY_BTN);
+    toggleFieldOrientedBtn = new JoystickButton(driver, FIELD_ORIENTED_BTN); // left trigger
+    toggleSlowModeBtn = new JoystickButton(driver, SLOW_MODE_BTN); // Select Button
+    deployButton = new JoystickButton(driver, INTAKE_DEPLOY_BTN); // right trigger
+    stage2ForwardButton = new JoystickButton(driver, STAGE_TWO_FORWARD_BTN); // Y button
+    stage2BackwardButton = new JoystickButton(driver, STAGE_TWO_BACKWARD_BTN); // X button
+    
 
     //Commands 
     //Toggle Commands
@@ -91,7 +99,7 @@ public class RobotContainer {
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
     driveSystem.setDefaultCommand(driveWithJoystick);
 
-
+    //Outtake Commands
     outtakeHigh = new OuttakeHigh(outtake);
     
     //Intake Commands
@@ -102,6 +110,10 @@ public class RobotContainer {
     //Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
     driveSystem.setDefaultCommand(driveWithJoystick);
+
+    //Second stage climb commands
+    stage2Backwards = new ClimbStageTwoBackward(climb);
+    stage2Forwards = new ClimbStageTwoForward(climb);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -121,6 +133,8 @@ public class RobotContainer {
     toggleFieldOrientedBtn.whenPressed(toggleFieldOriented);
     toggleSlowModeBtn.whenPressed(toggleSlowMode);
     deployButton.whileHeld(deploy);
+    stage2ForwardButton.whileHeld(stage2Forwards);
+    stage2BackwardButton.whileHeld(stage2Backwards);
   }
 
   /**

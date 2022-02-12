@@ -109,8 +109,8 @@ public class ClimbSubsystem extends SubsystemBase {
     }
     else
     {
-      secondStageMotor1.set(ControlMode.PercentOutput, 0);
-      secondStageMotor2.set(ControlMode.PercentOutput, 0);
+      secondStageMotor1.set(ControlMode.PercentOutput, 0.0);
+      secondStageMotor2.set(ControlMode.PercentOutput, 0.0);
     }
   }
   
