@@ -130,6 +130,7 @@ public class ClimbSubsystem extends SubsystemBase {
     return currentAngle;
   }
 
+  @Override
   public void initSendable(SendableBuilder sendable)
   {
     sendable.setSmartDashboardType("Climbsubsystem");
