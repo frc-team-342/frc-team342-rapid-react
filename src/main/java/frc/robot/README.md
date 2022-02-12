@@ -19,7 +19,7 @@ organized code.
 
 
 ### vision:
-the vision folder includes limeLight and photonVision, which 
+the vision folder includes [limeLight](https://docs.limelightvision.io/en/latest/) and [photonVision](https://docs.photonvision.org/en/latest/), which 
 the robot uses to target the cargo and the hub.
 
 ### constants:
