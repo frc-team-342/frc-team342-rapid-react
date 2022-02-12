@@ -4,7 +4,13 @@
 
 package frc.robot;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -28,6 +34,43 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    // directory where git data is stored
+    File deployDir = Filesystem.getDeployDirectory();
+
+    // files where git data is stored
+    File branchFile = new File(deployDir, "branch.txt");
+    File commitFile = new File(deployDir, "commit.txt");
+
+    String branch = "";
+    String commit = "";
+
+    // check that file exists before access
+    if (branchFile.exists()) {
+      try {
+        // convert file to string
+        branch = new String(Files.readAllBytes(branchFile.toPath())).trim();
+      } catch (IOException e) {
+        // readAllBytes throws an IOException
+        System.err.println(e);
+        branch = "branch not found";
+      }
+    }
+
+    if (commitFile.exists()) {
+      try {
+        // convert file to string
+        commit = new String(Files.readAllBytes(commitFile.toPath()));
+      } catch (IOException e) {
+        // readAllBytes throws an IOException
+        System.err.println(e);
+        commit = "commit not found";
+      }
+    }
+    
+    // send to dashboard
+    SmartDashboard.putString("Git Branch", branch);
+    SmartDashboard.putString("Git Commit", commit);
   }
 
   /**
