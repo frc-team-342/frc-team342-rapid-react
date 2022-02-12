@@ -8,6 +8,8 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -102,8 +104,8 @@ public class ClimbSubsystem extends SubsystemBase {
     }
     else
     {
-      secondStageMotor1.set(ControlMode.PercentOutput, 0);
-      secondStageMotor2.set(ControlMode.PercentOutput, 0);
+      secondStageMotor1.set(ControlMode.PercentOutput, 0.0);
+      secondStageMotor2.set(ControlMode.PercentOutput, 0.0);
     }
   }
   
