@@ -12,10 +12,13 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ClimbConstants.*;
+
+
 
 public class ClimbSubsystem extends SubsystemBase {
 
@@ -120,6 +123,17 @@ public class ClimbSubsystem extends SubsystemBase {
   {
     secondStageMotor1.set(ControlMode.PercentOutput, 0);
     secondStageMotor2.set(ControlMode.PercentOutput, 0);
+  }
+
+  public double getCurrentAngle()
+  {
+    return currentAngle;
+  }
+
+  public void initSendable(SendableBuilder sendable)
+  {
+    sendable.setSmartDashboardType("Climbsubsystem");
+    sendable.addDoubleProperty("Current Angle", this::getCurrentAngle, null);
   }
 
   /**
