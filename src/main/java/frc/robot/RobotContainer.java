@@ -50,6 +50,7 @@ public class RobotContainer {
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
+  private InstantCommand zeroRotatingArm;
   private Command deploy;
   private Command retract;
   private Command stage2Backwards;
@@ -65,6 +66,7 @@ public class RobotContainer {
   private JoystickButton deployButton;
   private JoystickButton stage2ForwardButton;
   private JoystickButton stage2BackwardButton;
+  private JoystickButton zeroRotatingArmButton;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -88,6 +90,7 @@ public class RobotContainer {
     deployButton = new JoystickButton(driver, INTAKE_DEPLOY_BTN); // right trigger
     stage2ForwardButton = new JoystickButton(driver, STAGE_TWO_FORWARD_BTN); // Y button
     stage2BackwardButton = new JoystickButton(driver, STAGE_TWO_BACKWARD_BTN); // X button
+    zeroRotatingArmButton = new JoystickButton(driver, ZERO_ROTATING_ARM_BTN);
     
 
     //Commands 
@@ -114,6 +117,7 @@ public class RobotContainer {
     //Second stage climb commands
     stage2Backwards = new ClimbStageTwoBackward(climb);
     stage2Forwards = new ClimbStageTwoForward(climb);
+    zeroRotatingArm = new InstantCommand(climb::zeroRotatingArm, climb);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -121,6 +125,7 @@ public class RobotContainer {
     //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
     SmartDashboard.putData(driveSystem);
     SmartDashboard.putData(outtake);
+    SmartDashboard.putData(climb);
   }
 
   /**
@@ -135,6 +140,7 @@ public class RobotContainer {
     deployButton.whileHeld(deploy);
     stage2ForwardButton.whileHeld(stage2Forwards);
     stage2BackwardButton.whileHeld(stage2Backwards);
+    zeroRotatingArmButton.whenPressed(zeroRotatingArm);
   }
 
   /**

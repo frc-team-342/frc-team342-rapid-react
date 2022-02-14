@@ -128,6 +128,7 @@ public final class Constants {
         // Operator button IDs
         public static final int STAGE_TWO_BACKWARD_BTN = 3;
         public static final int STAGE_TWO_FORWARD_BTN = 4;
+        public static final int ZERO_ROTATING_ARM_BTN = 8;
 
     }
 }

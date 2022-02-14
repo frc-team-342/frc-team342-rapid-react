@@ -53,7 +53,7 @@ public class ClimbSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    currentAngle = (secondStageMotor1.getSelectedSensorPosition() / 8192) * 360;
+    currentAngle = (secondStageMotor2.getSelectedSensorPosition() / 8192) * 360 + 62.5;
   }
   
 /**
@@ -71,8 +71,7 @@ public class ClimbSubsystem extends SubsystemBase {
     
   }
 
-  public void deactivateClimb(){
-
+  public void deactivateClimb() {
     climbMotor1.set(ControlMode.PercentOutput, 0);
     climbMotor2.set(ControlMode.PercentOutput, 0);
   }
@@ -81,42 +80,37 @@ public class ClimbSubsystem extends SubsystemBase {
     return(limitSwitch1.get() && limitSwitch2.get());
   }
   
-
   /**
    * Allows the second stage climber to rotate forward
    */
   public void stage2RotateForward()
   {
-    if(currentAngle >= secondStageMinimumAngle && currentAngle <= secondStageMaximumAngle)
-    {
-      secondStageMotor1.set(ControlMode.PercentOutput, 0.5);
-      secondStageMotor2.set(ControlMode.PercentOutput, 0.5);
-    }
-    else
-    {
-      secondStageMotor1.set(ControlMode.PercentOutput, 0);
-      secondStageMotor2.set(ControlMode.PercentOutput, 0);
-    }
-  }
-
-
-  /**
-   * Allows the second stage climber to rotate forward
-   */
-  public void stage2RotateBackwards()
-  {
-    if(currentAngle >= secondStageMinimumAngle && currentAngle <= secondStageMaximumAngle)
+    if(currentAngle <= (secondStageMaximumAngle + 0.5f))
     {
       secondStageMotor1.set(ControlMode.PercentOutput, -0.5);
       secondStageMotor2.set(ControlMode.PercentOutput, -0.5);
     }
     else
     {
-      secondStageMotor1.set(ControlMode.PercentOutput, 0.0);
-      secondStageMotor2.set(ControlMode.PercentOutput, 0.0);
+      deactivateStage2();
     }
   }
-  
+
+  /**
+   * Allows the second stage climber to rotate forward
+   */
+  public void stage2RotateBackwards()
+  {
+    if(currentAngle >= (secondStageMinimumAngle - 0.5f))
+    {
+      secondStageMotor1.set(ControlMode.PercentOutput, 0.5);
+      secondStageMotor2.set(ControlMode.PercentOutput, 0.5);
+    }
+    else
+    {
+      deactivateStage2();
+    }
+  }
 
   //Stops the second stage climber
   public void deactivateStage2()
@@ -128,6 +122,11 @@ public class ClimbSubsystem extends SubsystemBase {
   public double getCurrentAngle()
   {
     return currentAngle;
+  }
+
+  public void zeroRotatingArm()
+  {
+    secondStageMotor2.setSelectedSensorPosition(0, 0, 0);
   }
 
   @Override
