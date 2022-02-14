@@ -91,10 +91,10 @@ public class RobotContainer {
     toggleSlowModeBtn = new JoystickButton(driver, SLOW_MODE_BTN);
 
     // Operator buttons
-    deployBtn = new JoystickButton(operator, INTAKE_DEPLOY_BTN); // right bumper
+    deployBtn = new JoystickButton(operator, XboxController.Button.kRightBumper.value); 
     outtakeBtn = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
-    stage2ForwardBtn = new JoystickButton(operator, STAGE_TWO_FORWARD_BTN); // Y button
-    stage2BackwardBtn = new JoystickButton(operator, STAGE_TWO_BACKWARD_BTN); // X button
+    stage2ForwardBtn = new JoystickButton(operator, XboxController.Button.kY.value);
+    stage2BackwardBtn = new JoystickButton(operator, XboxController.Button.kX.value); // X button
 
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
