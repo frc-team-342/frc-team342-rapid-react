@@ -118,11 +118,14 @@ public final class Constants {
 
     public static final class ControllerConstants {
         // Joystick IDs
-        public static final int DRIVER_JOYSTICK = 0;
+        public static final int DRIVER_PORT = 0;
+        public static final int OPERATOR_PORT = 1;
 
         // Driver button IDs
         public static final int FIELD_ORIENTED_BTN = 5;
         public static final int SLOW_MODE_BTN = 7;
+
+        // Operator buttons
         public static final int INTAKE_DEPLOY_BTN = 6;
         public static final int STAGE_TWO_FORWARD_BTN = 4;
         public static final int STAGE_TWO_BACKWARD_BTN = 3;

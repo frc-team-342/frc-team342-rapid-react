@@ -62,14 +62,17 @@ public class RobotContainer {
   private Joystick driver;
   private JoystickButton toggleFieldOrientedBtn;
   private JoystickButton toggleSlowModeBtn;
-  private JoystickButton deployButton;
-  private JoystickButton stage2ForwardButton;
-  private JoystickButton stage2BackwardButton;
+
+  private XboxController operator;
+  private JoystickButton deployBtn;
+  private JoystickButton outtakeBtn;
+  private JoystickButton stage2ForwardBtn;
+  private JoystickButton stage2BackwardBtn;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    //Subsystems
+    // Subsystems
     driveSystem = new DriveSystem();
     outtake = new OuttakeSubsystem();
     intake = new IntakeSubsystem();
@@ -79,39 +82,41 @@ public class RobotContainer {
     photon = new PhotonVision("camera");
     limelight = new Limelight();
 
-    //Joystick
-    driver = new Joystick(DRIVER_JOYSTICK);
+    // Joystick
+    driver = new Joystick(DRIVER_PORT);
+    operator = new XboxController(OPERATOR_PORT);
 
-    //Buttons
-    toggleFieldOrientedBtn = new JoystickButton(driver, FIELD_ORIENTED_BTN); // left trigger
-    toggleSlowModeBtn = new JoystickButton(driver, SLOW_MODE_BTN); // Select Button
-    deployButton = new JoystickButton(driver, INTAKE_DEPLOY_BTN); // right trigger
-    stage2ForwardButton = new JoystickButton(driver, STAGE_TWO_FORWARD_BTN); // Y button
-    stage2BackwardButton = new JoystickButton(driver, STAGE_TWO_BACKWARD_BTN); // X button
-    
+    // Driver buttons
+    toggleFieldOrientedBtn = new JoystickButton(driver, FIELD_ORIENTED_BTN);
+    toggleSlowModeBtn = new JoystickButton(driver, SLOW_MODE_BTN);
 
-    //Commands 
-    //Toggle Commands
+    // Operator buttons
+    deployBtn = new JoystickButton(operator, INTAKE_DEPLOY_BTN); // right bumper
+    outtakeBtn = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
+    stage2ForwardBtn = new JoystickButton(operator, STAGE_TWO_FORWARD_BTN); // Y button
+    stage2BackwardBtn = new JoystickButton(operator, STAGE_TWO_BACKWARD_BTN); // X button
+
+    // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
     toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
 
-    //Drive With Joystick
+    // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
     driveSystem.setDefaultCommand(driveWithJoystick);
 
-    //Outtake Commands
+    // Outtake Commands
     outtakeHigh = new OuttakeHigh(outtake);
     
-    //Intake Commands
+    // Intake Commands
     deploy = new Deploy(intake);
     retract = new Retract(intake);
     intake.setDefaultCommand(retract);
 
-    //Drive With Joystick
+    // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
     driveSystem.setDefaultCommand(driveWithJoystick);
 
-    //Second stage climb commands
+    // Second stage climb commands
     stage2Backwards = new ClimbStageTwoBackward(climb);
     stage2Forwards = new ClimbStageTwoForward(climb);
 
@@ -121,6 +126,9 @@ public class RobotContainer {
     //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
     SmartDashboard.putData(driveSystem);
     SmartDashboard.putData(outtake);
+
+    SmartDashboard.putData(limelight);
+    SmartDashboard.putData(photon);
   }
 
   /**
@@ -130,11 +138,15 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Driver
     toggleFieldOrientedBtn.whenPressed(toggleFieldOriented);
     toggleSlowModeBtn.whenPressed(toggleSlowMode);
-    deployButton.whileHeld(deploy);
-    stage2ForwardButton.whileHeld(stage2Forwards);
-    stage2BackwardButton.whileHeld(stage2Backwards);
+
+    // Operator
+    deployBtn.whileHeld(deploy);
+    outtakeBtn.toggleWhenPressed(outtakeHigh);
+    stage2ForwardBtn.whileHeld(stage2Forwards);
+    stage2BackwardBtn.whileHeld(stage2Backwards);
   }
 
   /**
