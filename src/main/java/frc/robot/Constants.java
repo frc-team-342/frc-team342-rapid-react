@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -122,7 +123,13 @@ public final class Constants {
         public static final int OPERATOR_PORT = 1;
 
         // Driver button IDs
-        public static final int FIELD_ORIENTED_BTN = 5;
-        public static final int SLOW_MODE_BTN = 7;
+        public static final int DRIVER_FIELD_ORIENTED_BTN = 5;
+        public static final int DRIVER_SLOW_MODE_BTN = 7;
+
+        // Operator button IDs
+        public static final int OP_DEPLOY_INTAKE_BTN = XboxController.Button.kRightBumper.value;
+        public static final int OP_OUTTAKE_HIGH_BTN = XboxController.Button.kLeftBumper.value;
+        public static final int OP_CLIMB_STAGE2_REVERSE_BTN = XboxController.Button.kY.value;
+        public static final int OP_CLIMB_STAGE2_FORWARD_BTN = XboxController.Button.kX.value;
     }
 }
