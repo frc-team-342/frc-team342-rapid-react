@@ -87,14 +87,14 @@ public class RobotContainer {
     operator = new XboxController(OPERATOR_PORT);
 
     // Driver buttons
-    toggleFieldOrientedBtn = new JoystickButton(driver, DRIVER_FIELD_ORIENTED_BTN); // statically imported constants
-    toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN);
+    toggleFieldOrientedBtn = new JoystickButton(driver, DRIVER_FIELD_ORIENTED_BTN); // Button 5
+    toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 7
 
     // Operator buttons
-    deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); 
-    outtakeBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN);
-    stage2ForwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_FORWARD_BTN);
-    stage2BackwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_REVERSE_BTN);
+    deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
+    outtakeBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
+    stage2ForwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_FORWARD_BTN); // X button
+    stage2BackwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_REVERSE_BTN); // Y button
 
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
@@ -139,14 +139,14 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Driver
-    toggleFieldOrientedBtn.whenPressed(toggleFieldOriented);
-    toggleSlowModeBtn.whenPressed(toggleSlowMode);
+    toggleFieldOrientedBtn.whenPressed(toggleFieldOriented); // Button 5
+    toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
 
     // Operator
-    deployBtn.whileHeld(deploy);
-    outtakeBtn.toggleWhenPressed(outtakeHigh);
-    stage2ForwardBtn.whileHeld(stage2Forwards);
-    stage2BackwardBtn.whileHeld(stage2Backwards);
+    deployBtn.whileHeld(deploy); // Right bumper
+    outtakeBtn.toggleWhenPressed(outtakeHigh); // Left bumper
+    stage2ForwardBtn.whileHeld(stage2Forwards); // X button
+    stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
   }
 
   /**
