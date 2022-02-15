@@ -34,9 +34,10 @@ import static frc.robot.Constants.DriveConstants.*;
 public class DriveSystem extends SubsystemBase {
 
   private enum Mode {
-    TURBO(1.0),
-    NORMAL(0.8), 
-    SLOW(0.4);
+    // speeds are statically imported constants
+    TURBO(TURBO_SPEED),
+    NORMAL(NORMAL_SPEED), 
+    SLOW(SLOW_SPEED);
 
     public final double speedMultiplier;
 
@@ -71,8 +72,6 @@ public class DriveSystem extends SubsystemBase {
   private TrajectoryConfig trajectoryConfig;
 
   private ProfiledPIDController rotationController;
-
-  private double speedMultiplier = 0.8;
 
   /** Creates a new DriveSystem. */
   public DriveSystem() {
@@ -130,9 +129,9 @@ public class DriveSystem extends SubsystemBase {
    **/
   public void drive(double xVelocity, double yVelocity, double rotationVelocity) {
     // Used for slow mode 
-    double x = xVelocity * speedMultiplier;
-    double y = yVelocity * speedMultiplier;
-    double rotation = rotationVelocity * speedMultiplier;
+    double x = xVelocity * currentMode.speedMultiplier;
+    double y = yVelocity * currentMode.speedMultiplier;
+    double rotation = rotationVelocity * currentMode.speedMultiplier;
 
     if (fieldOriented) {
       mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
@@ -214,6 +213,10 @@ public class DriveSystem extends SubsystemBase {
     return fieldOriented;
   }
 
+  /**
+   * If slow is not active, switch into slow.
+   * If slow is active, switch to normal mode.
+   */
   public void toggleSlowMode() {
     if (currentMode != Mode.SLOW) {
       // if not currently in slow, turn on slow mode
@@ -225,10 +228,23 @@ public class DriveSystem extends SubsystemBase {
   }
 
   /**
+   * If turbo is not active, switch into turbo. <br>
+   * If turbo is active, switch to normal mode.
+   */
+  public void toggleTurboMode() {
+    if (currentMode != Mode.TURBO) {
+      currentMode = Mode.TURBO;
+    } else {
+      // dont preserve previous state
+      currentMode = Mode.NORMAL;
+    }
+  }
+
+  /**
    * @return the current multiplier for the robot speed, used for slow mode.
    */
   private double getSpeedMultiplier() {
-    return speedMultiplier;
+    return currentMode.speedMultiplier;
   }
 
   /**
@@ -280,9 +296,6 @@ public class DriveSystem extends SubsystemBase {
       new Rotation2d(gyro.getAngle()),
       getWheelSpeeds()
     );
-
-    // update speed multipler to match current state every periodic loop
-    speedMultiplier = currentMode.speedMultiplier;
   }
 
   @Override

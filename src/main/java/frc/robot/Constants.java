@@ -25,6 +25,11 @@ public final class Constants {
         public static final int FRONT_RIGHT_MOTOR = 3;
         public static final int BACK_RIGHT_MOTOR = 4;
 
+        // Speeds for different modes
+        public static final double TURBO_SPEED = 1.0;
+        public static final double NORMAL_SPEED = 0.8;
+        public static final double SLOW_SPEED = 0.4;
+
         /** Maximum current that each motor can draw without triggering breakers. */
         public static final int CURRENT_LIMIT = 40;
 
