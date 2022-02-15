@@ -50,6 +50,8 @@ public class RobotContainer {
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
+  private InstantCommand toggleTurboMode;
+
   private InstantCommand zeroRotatingArm;
   private Command deploy;
   private Command retract;
@@ -103,6 +105,7 @@ public class RobotContainer {
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
     toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
+    toggleTurboMode = new InstantCommand(driveSystem::toggleTurboMode, driveSystem);
 
     // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);

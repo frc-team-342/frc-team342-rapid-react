@@ -26,13 +26,27 @@ import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 // Static imports mean that variable names can be accessed without referencing the class name they came from
 import static frc.robot.Constants.DriveConstants.*;
 
 public class DriveSystem extends SubsystemBase {
+
+  private enum Mode {
+    // speeds are statically imported constants
+    TURBO(TURBO_SPEED),
+    NORMAL(NORMAL_SPEED), 
+    SLOW(SLOW_SPEED);
+
+    public final double speedMultiplier;
+
+    private Mode(double speedMultiplier) {
+      this.speedMultiplier = speedMultiplier;
+    }
+  }
+
+  private Mode currentMode = Mode.NORMAL;
 
   private CANSparkMax frontLeft;
   private CANSparkMax backLeft;
@@ -58,8 +72,6 @@ public class DriveSystem extends SubsystemBase {
   private TrajectoryConfig trajectoryConfig;
 
   private ProfiledPIDController rotationController;
-
-  private double speedMultiplier = 0.8;
 
   /** Creates a new DriveSystem. */
   public DriveSystem() {
@@ -117,9 +129,9 @@ public class DriveSystem extends SubsystemBase {
    **/
   public void drive(double xVelocity, double yVelocity, double rotationVelocity) {
     // Used for slow mode 
-    double x = xVelocity * speedMultiplier;
-    double y = yVelocity * speedMultiplier;
-    double rotation = rotationVelocity * speedMultiplier;
+    double x = xVelocity * currentMode.speedMultiplier;
+    double y = yVelocity * currentMode.speedMultiplier;
+    double rotation = rotationVelocity * currentMode.speedMultiplier;
 
     if (fieldOriented) {
       mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
@@ -201,16 +213,38 @@ public class DriveSystem extends SubsystemBase {
     return fieldOriented;
   }
 
+  /**
+   * If slow is not active, switch into slow.
+   * If slow is active, switch to normal mode.
+   */
   public void toggleSlowMode() {
-    //If speedMultiplier is not on full speed, it sets it full speed and the inverse
-    speedMultiplier = (speedMultiplier == 0.8) ? 0.4 : 0.8;
+    if (currentMode != Mode.SLOW) {
+      // if not currently in slow, turn on slow mode
+      currentMode = Mode.SLOW;
+    } else {
+      // exit back into normal mode after slow instead of previous state
+      currentMode = Mode.NORMAL;
+    }
+  }
+
+  /**
+   * If turbo is not active, switch into turbo. <br>
+   * If turbo is active, switch to normal mode.
+   */
+  public void toggleTurboMode() {
+    if (currentMode != Mode.TURBO) {
+      currentMode = Mode.TURBO;
+    } else {
+      // dont preserve previous state
+      currentMode = Mode.NORMAL;
+    }
   }
 
   /**
    * @return the current multiplier for the robot speed, used for slow mode.
    */
   private double getSpeedMultiplier() {
-    return speedMultiplier;
+    return currentMode.speedMultiplier;
   }
 
   /**
