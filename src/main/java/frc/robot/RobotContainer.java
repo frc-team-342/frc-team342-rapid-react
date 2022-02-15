@@ -50,6 +50,7 @@ public class RobotContainer {
 
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
+  private InstantCommand zeroRotatingArm;
   private Command deploy;
   private Command retract;
   private Command stage2Backwards;
@@ -68,6 +69,8 @@ public class RobotContainer {
   private JoystickButton outtakeBtn;
   private JoystickButton stage2ForwardBtn;
   private JoystickButton stage2BackwardBtn;
+  private JoystickButton zeroRotatingArmBtn;
+
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -95,6 +98,7 @@ public class RobotContainer {
     outtakeBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
     stage2ForwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_FORWARD_BTN); // X button
     stage2BackwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_REVERSE_BTN); // Y button
+    zeroRotatingArmBtn = new JoystickButton(driver, ZERO_ROTATING_ARM_BTN); 
 
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
@@ -119,6 +123,7 @@ public class RobotContainer {
     // Second stage climb commands
     stage2Backwards = new ClimbStageTwoBackward(climb);
     stage2Forwards = new ClimbStageTwoForward(climb);
+    zeroRotatingArm = new InstantCommand(climb::zeroRotatingArm, climb);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -126,9 +131,9 @@ public class RobotContainer {
     //Documentation for sendables: https://docs.wpilib.org/en/latest/docs/software/telemetry/robot-telemetry-with-sendable.html
     SmartDashboard.putData(driveSystem);
     SmartDashboard.putData(outtake);
-
     SmartDashboard.putData(limelight);
     SmartDashboard.putData(photon);
+    SmartDashboard.putData(climb);
   }
 
   /**
@@ -147,6 +152,7 @@ public class RobotContainer {
     outtakeBtn.toggleWhenPressed(outtakeHigh); // Left bumper
     stage2ForwardBtn.whileHeld(stage2Forwards); // X button
     stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
+    zeroRotatingArmBtn.whenPressed(zeroRotatingArm);
   }
 
   /**

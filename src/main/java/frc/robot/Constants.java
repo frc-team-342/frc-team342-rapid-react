@@ -131,5 +131,6 @@ public final class Constants {
         public static final int OP_OUTTAKE_HIGH_BTN = XboxController.Button.kLeftBumper.value;
         public static final int OP_CLIMB_STAGE2_REVERSE_BTN = XboxController.Button.kY.value;
         public static final int OP_CLIMB_STAGE2_FORWARD_BTN = XboxController.Button.kX.value;
+        public static final int ZERO_ROTATING_ARM_BTN = 8;
     }
 }
