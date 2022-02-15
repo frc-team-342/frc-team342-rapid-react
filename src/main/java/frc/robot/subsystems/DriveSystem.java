@@ -26,13 +26,26 @@ import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 // Static imports mean that variable names can be accessed without referencing the class name they came from
 import static frc.robot.Constants.DriveConstants.*;
 
 public class DriveSystem extends SubsystemBase {
+
+  private enum Mode {
+    TURBO(1.0),
+    NORMAL(0.8), 
+    SLOW(0.4);
+
+    public final double speedMultiplier;
+
+    private Mode(double speedMultiplier) {
+      this.speedMultiplier = speedMultiplier;
+    }
+  }
+
+  private Mode currentMode = Mode.NORMAL;
 
   private CANSparkMax frontLeft;
   private CANSparkMax backLeft;
@@ -202,8 +215,13 @@ public class DriveSystem extends SubsystemBase {
   }
 
   public void toggleSlowMode() {
-    //If speedMultiplier is not on full speed, it sets it full speed and the inverse
-    speedMultiplier = (speedMultiplier == 0.8) ? 0.4 : 0.8;
+    if (currentMode != Mode.SLOW) {
+      // if not currently in slow, turn on slow mode
+      currentMode = Mode.SLOW;
+    } else {
+      // exit back into normal mode after slow instead of previous state
+      currentMode = Mode.NORMAL;
+    }
   }
 
   /**
@@ -262,6 +280,9 @@ public class DriveSystem extends SubsystemBase {
       new Rotation2d(gyro.getAngle()),
       getWheelSpeeds()
     );
+
+    // update speed multipler to match current state every periodic loop
+    speedMultiplier = currentMode.speedMultiplier;
   }
 
   @Override
