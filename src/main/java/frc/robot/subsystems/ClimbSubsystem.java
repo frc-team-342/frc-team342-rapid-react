@@ -83,7 +83,7 @@ public class ClimbSubsystem extends SubsystemBase {
   /**
    * Allows the second stage climber to rotate forward
    */
-  public void stage2RotateForward()
+  public void stage2RotateBackwards()
   {
     if(currentAngle <= (secondStageMaximumAngle + 0.5f))
     {
@@ -99,7 +99,7 @@ public class ClimbSubsystem extends SubsystemBase {
   /**
    * Allows the second stage climber to rotate forward
    */
-  public void stage2RotateBackwards()
+  public void stage2RotateForwards()
   {
     if(currentAngle >= (secondStageMinimumAngle - 0.5f))
     {

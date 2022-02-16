@@ -24,7 +24,7 @@ public class ClimbStageTwoForward extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    stage2Subsystem.stage2RotateForward();
+    stage2Subsystem.stage2RotateForwards();
   }
 
   // Called once the command ends or is interrupted.
