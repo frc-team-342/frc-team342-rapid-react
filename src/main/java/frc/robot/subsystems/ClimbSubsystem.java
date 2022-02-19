@@ -39,8 +39,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
-    climbMotor1 = new WPI_TalonFX(CLIMB_MOTOR_1);
-    climbMotor2 = new WPI_TalonFX(CLIMB_MOTOR_2);
+    climbMotor1 = new WPI_TalonFX(CLIMB_LEFT_MOTOR);
+    climbMotor2 = new WPI_TalonFX(CLIMB_RIGHT_MOTOR);
 
     secondStageMotor1 = new WPI_TalonSRX(CLIMB_SECOND_MOTOR_1);
     secondStageMotor2 = new WPI_TalonSRX(CLIMB_SECOND_MOTOR_2);

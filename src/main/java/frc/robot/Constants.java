@@ -104,10 +104,10 @@ public final class Constants {
     }
 
     public static final class ClimbConstants {
-        public static final int CLIMB_MOTOR_1 = 10;
-        public static final int CLIMB_MOTOR_2 = 11;
+        public static final int CLIMB_LEFT_MOTOR = 11;
+        public static final int CLIMB_RIGHT_MOTOR = 12;
 
-        public static final int CLIMB_SECOND_MOTOR_1 = 12;
+        public static final int CLIMB_SECOND_MOTOR_1 = 14;
         public static final int CLIMB_SECOND_MOTOR_2 = 13;
 
         public static final int LIMIT_SWITCH_1 = 1;
@@ -115,8 +115,9 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int DEPLOY_MOTOR = 8;
-        public static final int ROLLER_MOTOR = 9;
+        public static final int DEPLOY_LEFT_MOTOR = 8;
+        public static final int DEPLOY_RIGHT_MOTOR = 9;
+        public static final int ROLLER_MOTOR = 10;
 
         public static final int LIMIT_SWITCH_UP = 3;
         public static final int LIMIT_SWITCH_DOWN = 4;

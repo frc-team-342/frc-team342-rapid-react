@@ -16,7 +16,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.IntakeConstants.*;
 
 public class IntakeSubsystem extends SubsystemBase {
-  private WPI_TalonSRX deployMotor;
+  private WPI_TalonSRX deployLeft;
+  private WPI_TalonSRX deployRight;
+  
   private WPI_TalonSRX rollerMotor;
 
   private DigitalInput limitSwitchUp;
@@ -29,7 +31,12 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     // capital variable names are statically imported constants
-    deployMotor = new WPI_TalonSRX(DEPLOY_MOTOR);
+    deployLeft = new WPI_TalonSRX(DEPLOY_LEFT_MOTOR);
+    deployRight = new WPI_TalonSRX(DEPLOY_RIGHT_MOTOR);
+
+    // i dont want to change all the methods to set both motors
+    deployRight.follow(deployLeft);
+
     rollerMotor = new WPI_TalonSRX(ROLLER_MOTOR);
 
     limitSwitchUp = new DigitalInput(LIMIT_SWITCH_UP);
@@ -48,11 +55,11 @@ public class IntakeSubsystem extends SubsystemBase {
   {
     if(limitSwitchDown.get())
     {
-      deployMotor.set(0);
+      deployLeft.set(0);
     }
     else
     {
-      deployMotor.set(deploySpeed);
+      deployLeft.set(deploySpeed);
     }
   }
 
@@ -63,11 +70,11 @@ public class IntakeSubsystem extends SubsystemBase {
   
     if(limitSwitchUp.get())
     {
-      deployMotor.set(0);
+      deployLeft.set(0);
     }
     else
     {
-      deployMotor.set(deploySpeed * -1);
+      deployLeft.set(deploySpeed * -1);
     }
   }
 
@@ -95,8 +102,11 @@ public class IntakeSubsystem extends SubsystemBase {
   public Map<String, Boolean> test() {
     var motors = new HashMap<String, Boolean>();
 
-    deployMotor.getBusVoltage();
-    motors.put("Deploy motor", deployMotor.getLastError() == ErrorCode.OK);
+    deployLeft.getBusVoltage();
+    motors.put("Deploy left motor", deployLeft.getLastError() == ErrorCode.OK);
+
+    deployRight.getBusVoltage();
+    motors.put("Deploy right motor", deployRight.getLastError() == ErrorCode.OK);
 
     rollerMotor.getBusVoltage();
     motors.put("Roller motor", rollerMotor.getLastError() == ErrorCode.OK);
