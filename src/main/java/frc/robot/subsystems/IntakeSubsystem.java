@@ -103,7 +103,10 @@ public class IntakeSubsystem extends SubsystemBase {
     var motors = new HashMap<String, Boolean>();
 
     deployLeft.getBusVoltage();
-    motors.put("Deploy motor", deployLeft.getLastError() == ErrorCode.OK);
+    motors.put("Deploy left motor", deployLeft.getLastError() == ErrorCode.OK);
+
+    deployRight.getBusVoltage();
+    motors.put("Deploy right motor", deployRight.getLastError() == ErrorCode.OK);
 
     rollerMotor.getBusVoltage();
     motors.put("Roller motor", rollerMotor.getLastError() == ErrorCode.OK);
