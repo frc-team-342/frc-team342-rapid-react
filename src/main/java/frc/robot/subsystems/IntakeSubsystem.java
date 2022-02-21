@@ -95,6 +95,13 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   /**
+   * Stopes the intake rollers
+   */
+  public void stopIntake(){
+    rollerMotor.set(0);
+  }
+
+  /**
    * Test that each motor controller is connected.
    * 
    * @return a map of the motor's name and a boolean with true if it is connected

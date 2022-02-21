@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.commands.intake.Deploy;
 import frc.robot.commands.intake.Retract;
+import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.climb.ClimbStageTwoBackward;
 import frc.robot.commands.climb.ClimbStageTwoForward;
 import frc.robot.commands.drive.DriveWithJoystick;
@@ -55,6 +56,7 @@ public class RobotContainer {
   private InstantCommand zeroRotatingArm;
   private Command deploy;
   private Command retract;
+  private Command reverseIntake;
   private Command stage2Backwards;
   private Command stage2Forwards;
 
@@ -68,6 +70,7 @@ public class RobotContainer {
 
   private XboxController operator;
   private JoystickButton deployBtn;
+  private JoystickButton reverseIntakeBtn;
   private JoystickButton outtakeBtn;
   private JoystickButton stage2ForwardBtn;
   private JoystickButton stage2BackwardBtn;
@@ -98,9 +101,10 @@ public class RobotContainer {
     // Operator buttons
     deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
     outtakeBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
+    reverseIntakeBtn = new JoystickButton(operator, OP_REVERSE_INTAKE_BTN); // B Button
     stage2ForwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_FORWARD_BTN); // X button
     stage2BackwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_REVERSE_BTN); // Y button
-    zeroRotatingArmBtn = new JoystickButton(driver, ZERO_ROTATING_ARM_BTN); 
+    zeroRotatingArmBtn = new JoystickButton(driver, OP_ZERO_ROTATING_ARM_BTN); 
 
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
@@ -115,8 +119,9 @@ public class RobotContainer {
     outtakeHigh = new OuttakeHigh(outtake);
     
     // Intake Commands
-    deploy = new Deploy(intake);
     retract = new Retract(intake);
+    deploy = new Deploy(intake).andThen(retract);
+    reverseIntake = new ReverseIntake(intake).andThen(retract);
     intake.setDefaultCommand(retract);
 
     // Drive With Joystick
@@ -152,6 +157,7 @@ public class RobotContainer {
 
     // Operator
     deployBtn.whileHeld(deploy); // Right bumper
+    reverseIntakeBtn.whileHeld(reverseIntake); // B button
     outtakeBtn.toggleWhenPressed(outtakeHigh); // Left bumper
     stage2ForwardBtn.whileHeld(stage2Forwards); // X button
     stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
