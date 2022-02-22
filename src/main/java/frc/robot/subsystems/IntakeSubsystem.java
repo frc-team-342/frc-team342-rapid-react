@@ -22,9 +22,6 @@ public class IntakeSubsystem extends SubsystemBase {
   
   private WPI_TalonSRX rollerMotor;
 
-  private final double intakeSpeed = 0.5;
-  private final double deploySpeed = 0.3;
-
   private double currentAngleLeft;
   private double currentAngleRight;
 
@@ -64,8 +61,8 @@ public class IntakeSubsystem extends SubsystemBase {
     }
     else
     {
-      deployLeft.set(deploySpeed);
-      deployRight.set(deploySpeed);
+      deployLeft.set(DEPLOY_SPEED);
+      deployRight.set(DEPLOY_SPEED);
     }
   }
 
@@ -81,8 +78,8 @@ public class IntakeSubsystem extends SubsystemBase {
     }
     else
     {
-      deployLeft.set(deploySpeed * -1);
-      deployRight.set(deploySpeed * -1);
+      deployLeft.set(DEPLOY_SPEED * -1);
+      deployRight.set(DEPLOY_SPEED * -1);
     }
   }
 
@@ -91,7 +88,7 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public void intakeCargo()
   {
-    rollerMotor.set(intakeSpeed);
+    rollerMotor.set(INTAKE_SPEED);
   }
 
   /**
@@ -99,7 +96,7 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public void reverseIntakeCargo()
   {
-    rollerMotor.set(intakeSpeed * -1);
+    rollerMotor.set(INTAKE_SPEED * -1);
   }
 
   /**

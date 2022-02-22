@@ -87,6 +87,8 @@ public final class Constants {
         public static final int SHOOT_MOTOR_2 = 6;
         public static final int FEEDER_MOTOR = 7;
 
+        public static final double LOAD_SPEED = 0.8;
+
         /** Counts per revolution for the Falcon encoder. */
         public static final double CPR = 2048;
 
@@ -118,6 +120,9 @@ public final class Constants {
         public static final int DEPLOY_LEFT_MOTOR = 8;
         public static final int DEPLOY_RIGHT_MOTOR = 9;
         public static final int ROLLER_MOTOR = 10;
+
+        public static final double DEPLOY_SPEED = 0.3;
+        public static final double INTAKE_SPEED = 0.5;
 
         public static final int LIMIT_SWITCH_UP = 3;
         public static final int LIMIT_SWITCH_DOWN = 4;

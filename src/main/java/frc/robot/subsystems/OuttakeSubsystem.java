@@ -23,8 +23,6 @@ public class OuttakeSubsystem extends SubsystemBase {
   private WPI_TalonFX shootMotor2;
   private WPI_TalonSRX feederMotor;
 
-  private final double LOAD_SPEED = 0.8;
-
   /** The current setpoint */
   private double setpoint = 0;
 
