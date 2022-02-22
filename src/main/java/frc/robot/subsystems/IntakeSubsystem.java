@@ -45,8 +45,8 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / 8192) * 360;
-    currentAngleRight = (deployRight.getSelectedSensorPosition() / 8192) * 360;
+    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360;
+    currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360;
   }
 
   /** 
@@ -54,7 +54,7 @@ public class IntakeSubsystem extends SubsystemBase {
   */
   public void deployIntake()
   {
-    if(currentAngleLeft <= 0.25 && currentAngleRight <= 0.25)
+    if(currentAngleLeft <= MIN_INTAKE_ANGLE && currentAngleRight <= MIN_INTAKE_ANGLE)
     {
       deployLeft.set(0);
       deployRight.set(0);
@@ -62,12 +62,12 @@ public class IntakeSubsystem extends SubsystemBase {
     else
     {
       if (isDeployLeftBehind()) {
-        deployLeft.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * 0.05));
+        deployLeft.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * INTAKE_P));
         deployRight.set(DEPLOY_SPEED);
       }
       else if (isDeployRightBehind()) {
         deployLeft.set(DEPLOY_SPEED);
-        deployRight.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * 0.05));
+        deployRight.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * INTAKE_P));
       }
       else {
         deployLeft.set(DEPLOY_SPEED);
@@ -81,7 +81,7 @@ public class IntakeSubsystem extends SubsystemBase {
   */
   public void retractIntake(){
   
-    if(currentAngleLeft >= 62 && currentAngleRight >= 62)
+    if(currentAngleLeft >= MAX_INTAKE_ANGLE && currentAngleRight >= MAX_INTAKE_ANGLE)
     {
       deployLeft.set(0);
       deployRight.set(0);
@@ -89,12 +89,12 @@ public class IntakeSubsystem extends SubsystemBase {
     else
     {
       if (isDeployLeftBehind()) {
-        deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -0.05));
+        deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * (INTAKE_P * -1)));
         deployRight.set(DEPLOY_SPEED * -1);
       }
       else if (isDeployRightBehind()) {
         deployLeft.set(DEPLOY_SPEED * -1);
-        deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -0.05));
+        deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * (INTAKE_P * -1)));
       } else {
         deployLeft.set(DEPLOY_SPEED * -1);
         deployRight.set(DEPLOY_SPEED * -1);

@@ -121,6 +121,9 @@ public final class Constants {
         public static final int DEPLOY_RIGHT_MOTOR = 9;
         public static final int ROLLER_MOTOR = 10;
 
+        public static final double MIN_INTAKE_ANGLE = 0.25;
+        public static final double MAX_INTAKE_ANGLE = 62.0;
+
         public static final double DEPLOY_SPEED = 0.5;
         public static final double INTAKE_SPEED = 0.5;
 
@@ -129,6 +132,8 @@ public final class Constants {
 
         public static final int CURRENT_LIMIT = 5;
         public static final int CURRENT_DURATION = 500;
+
+        public static final int ENCODER_TICKS_PER_ROTATION = 8192;
     }
 
     public static final class ControllerConstants {
