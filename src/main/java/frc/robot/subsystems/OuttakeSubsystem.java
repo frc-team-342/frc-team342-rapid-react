@@ -23,8 +23,6 @@ public class OuttakeSubsystem extends SubsystemBase {
   private WPI_TalonFX shootMotor2;
   private WPI_TalonSRX feederMotor;
 
-  private final double LOAD_SPEED = 0.8;
-
   /** The current setpoint */
   private double setpoint = 0;
 
@@ -36,6 +34,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     shootMotor1 = new WPI_TalonFX(SHOOT_MOTOR_1);
     shootMotor2 = new WPI_TalonFX(SHOOT_MOTOR_2);
     feederMotor = new WPI_TalonSRX(FEEDER_MOTOR);
+
+    feederMotor.setInverted(true);
 
     shootMotor2.follow(shootMotor1);
 

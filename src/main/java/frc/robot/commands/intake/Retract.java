@@ -9,12 +9,12 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 public class Retract extends CommandBase {
   /** Creates a new Retract. */
-  IntakeSubsystem subsystem;
-  public Retract(IntakeSubsystem subsystem) {
+  IntakeSubsystem intake;
+  public Retract(IntakeSubsystem intake) {
 
-    this.subsystem = subsystem;
+    this.intake = intake;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
@@ -25,7 +25,7 @@ public class Retract extends CommandBase {
   @Override
   public void execute() {
 
-    subsystem.retractIntake();
+    intake.retractIntake();
     
   }
 
