@@ -124,6 +124,8 @@ public final class Constants {
         public static final double MIN_INTAKE_ANGLE = 0.25;
         public static final double MAX_INTAKE_ANGLE = 62.0;
 
+        public static final double INTAKE_P = 0.05;
+
         public static final double DEPLOY_SPEED = 0.5;
         public static final double INTAKE_SPEED = 0.5;
 
