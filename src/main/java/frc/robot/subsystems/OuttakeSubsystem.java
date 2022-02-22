@@ -37,6 +37,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     shootMotor2 = new WPI_TalonFX(SHOOT_MOTOR_2);
     feederMotor = new WPI_TalonSRX(FEEDER_MOTOR);
 
+    feederMotor.setInverted(true);
+
     shootMotor2.follow(shootMotor1);
 
     // P and D are statically imported constants

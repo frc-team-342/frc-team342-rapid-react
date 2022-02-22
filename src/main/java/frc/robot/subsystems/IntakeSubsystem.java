@@ -10,7 +10,8 @@ import java.util.Map;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.IntakeConstants.*;
@@ -21,11 +22,11 @@ public class IntakeSubsystem extends SubsystemBase {
   
   private WPI_TalonSRX rollerMotor;
 
-  private DigitalInput limitSwitchUp;
-  private DigitalInput limitSwitchDown;
-
   private final double intakeSpeed = 0.5;
-  private final double deploySpeed = 0.2;
+  private final double deploySpeed = 0.3;
+
+  private double currentAngleLeft;
+  private double currentAngleRight;
 
 
   /** Creates a new IntakeSubsystem. */
@@ -34,18 +35,21 @@ public class IntakeSubsystem extends SubsystemBase {
     deployLeft = new WPI_TalonSRX(DEPLOY_LEFT_MOTOR);
     deployRight = new WPI_TalonSRX(DEPLOY_RIGHT_MOTOR);
 
-    // i dont want to change all the methods to set both motors
-    deployRight.follow(deployLeft);
+    deployRight.setInverted(true);
+
+    deployLeft.configPeakCurrentLimit(CURRENT_LIMIT);
+    deployLeft.configPeakCurrentDuration(CURRENT_DURATION);
+    deployRight.configPeakCurrentLimit(CURRENT_LIMIT);
+    deployRight.configPeakCurrentDuration(CURRENT_DURATION);
 
     rollerMotor = new WPI_TalonSRX(ROLLER_MOTOR);
-
-    limitSwitchUp = new DigitalInput(LIMIT_SWITCH_UP);
-    limitSwitchDown = new DigitalInput(LIMIT_SWITCH_DOWN);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / 8192) * 360 + 62.5;
+    currentAngleRight = (deployLeft.getSelectedSensorPosition() / 8192) * 360 + 62.5;
   }
 
   /** 
@@ -53,13 +57,15 @@ public class IntakeSubsystem extends SubsystemBase {
   */
   public void deployIntake()
   {
-    if(limitSwitchDown.get())
+    if(currentAngleLeft >= 55.0 && currentAngleRight >= 55.0)
     {
       deployLeft.set(0);
+      deployRight.set(0);
     }
     else
     {
       deployLeft.set(deploySpeed);
+      deployRight.set(deploySpeed);
     }
   }
 
@@ -68,13 +74,15 @@ public class IntakeSubsystem extends SubsystemBase {
   */
   public void retractIntake(){
   
-    if(limitSwitchUp.get())
+    if(currentAngleLeft <= 0.0 && currentAngleRight >= 0.0)
     {
       deployLeft.set(0);
+      deployRight.set(0);
     }
     else
     {
       deployLeft.set(deploySpeed * -1);
+      deployRight.set(deploySpeed * -1);
     }
   }
 
@@ -100,6 +108,30 @@ public class IntakeSubsystem extends SubsystemBase {
   public void stopIntake(){
     rollerMotor.set(0);
   }
+
+  /**
+   * Returns current angle of the deployLeft encoder
+   * @return double value
+   */
+  public double getCurrentAngleLeft() {
+    return currentAngleLeft;
+  }
+
+  /**
+   * Returns the current angle of the deployRight encoder
+   * @return double value
+   */
+  public double getCurrentAngleRight() {
+    return currentAngleRight;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder sendable) {
+    sendable.setSmartDashboardType("Intake");
+    sendable.addDoubleProperty("Current Angle Left", this::getCurrentAngleLeft, null);
+    sendable.addDoubleProperty("Current Angle Right", this::getCurrentAngleRight, null);
+  }
+
 
   /**
    * Test that each motor controller is connected.

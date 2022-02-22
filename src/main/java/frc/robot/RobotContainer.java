@@ -120,8 +120,8 @@ public class RobotContainer {
     
     // Intake Commands
     retract = new Retract(intake);
-    deploy = new Deploy(intake).andThen(retract);
-    reverseIntake = new ReverseIntake(intake).andThen(retract);
+    deploy = new Deploy(intake).andThen(new Retract(intake));
+    reverseIntake = new ReverseIntake(intake).andThen(new Retract(intake));
     intake.setDefaultCommand(retract);
 
     // Drive With Joystick
@@ -129,9 +129,9 @@ public class RobotContainer {
     driveSystem.setDefaultCommand(driveWithJoystick);
 
     // Second stage climb commands
-    stage2Backwards = new ClimbStageTwoBackward(climb);
+    /*stage2Backwards = new ClimbStageTwoBackward(climb);
     stage2Forwards = new ClimbStageTwoForward(climb);
-    zeroRotatingArm = new InstantCommand(climb::zeroRotatingArm, climb);
+    zeroRotatingArm = new InstantCommand(climb::zeroRotatingArm, climb);*/
 
     // Configure the button bindings
     configureButtonBindings();
@@ -159,9 +159,9 @@ public class RobotContainer {
     deployBtn.whileHeld(deploy); // Right bumper
     reverseIntakeBtn.whileHeld(reverseIntake); // B button
     outtakeBtn.toggleWhenPressed(outtakeHigh); // Left bumper
-    stage2ForwardBtn.whileHeld(stage2Forwards); // X button
+    /*stage2ForwardBtn.whileHeld(stage2Forwards); // X button
     stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
-    zeroRotatingArmBtn.whenPressed(zeroRotatingArm);
+    zeroRotatingArmBtn.whenPressed(zeroRotatingArm);*/
   }
 
   /**

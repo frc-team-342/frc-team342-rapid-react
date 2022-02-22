@@ -121,6 +121,9 @@ public final class Constants {
 
         public static final int LIMIT_SWITCH_UP = 3;
         public static final int LIMIT_SWITCH_DOWN = 4;
+
+        public static final int CURRENT_LIMIT = 5;
+        public static final int CURRENT_DURATION = 500;
     }
 
     public static final class ControllerConstants {
