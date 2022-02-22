@@ -45,8 +45,8 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / 8192) * 360 + 62.5;
-    currentAngleRight = (deployLeft.getSelectedSensorPosition() / 8192) * 360 + 62.5;
+    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / 8192) * 360;
+    currentAngleRight = (deployRight.getSelectedSensorPosition() / 8192) * 360;
   }
 
   /** 
@@ -54,15 +54,25 @@ public class IntakeSubsystem extends SubsystemBase {
   */
   public void deployIntake()
   {
-    if(currentAngleLeft >= 55.0 && currentAngleRight >= 55.0)
+    if(currentAngleLeft <= 0.25 && currentAngleRight <= 0.25)
     {
       deployLeft.set(0);
       deployRight.set(0);
     }
     else
     {
-      deployLeft.set(DEPLOY_SPEED);
-      deployRight.set(DEPLOY_SPEED);
+      if (isDeployLeftBehind()) {
+        deployLeft.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * 0.05));
+        deployRight.set(DEPLOY_SPEED);
+      }
+      else if (isDeployRightBehind()) {
+        deployLeft.set(DEPLOY_SPEED);
+        deployRight.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * 0.05));
+      }
+      else {
+        deployLeft.set(DEPLOY_SPEED);
+        deployRight.set(DEPLOY_SPEED);
+      }
     }
   }
 
@@ -71,15 +81,24 @@ public class IntakeSubsystem extends SubsystemBase {
   */
   public void retractIntake(){
   
-    if(currentAngleLeft <= 0.0 && currentAngleRight >= 0.0)
+    if(currentAngleLeft >= 62 && currentAngleRight >= 62)
     {
       deployLeft.set(0);
       deployRight.set(0);
     }
     else
     {
-      deployLeft.set(DEPLOY_SPEED * -1);
-      deployRight.set(DEPLOY_SPEED * -1);
+      if (isDeployLeftBehind()) {
+        deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -0.05));
+        deployRight.set(DEPLOY_SPEED * -1);
+      }
+      else if (isDeployRightBehind()) {
+        deployLeft.set(DEPLOY_SPEED * -1);
+        deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -0.05));
+      } else {
+        deployLeft.set(DEPLOY_SPEED * -1);
+        deployRight.set(DEPLOY_SPEED * -1);
+      }
     }
   }
 
@@ -122,11 +141,46 @@ public class IntakeSubsystem extends SubsystemBase {
     return currentAngleRight;
   }
 
+  /**
+   * Gets the absolute value of the difference of the Deploy encoder angles
+   * @return double value
+   */
+  private double getDeltaDeployEncoders() {
+    return Math.abs(currentAngleLeft - currentAngleRight);
+  }
+
+  /**
+   * Checks to see if the left deploy encoder is less than the right deploy encoder
+   * @return boolean value
+   */
+  private boolean isDeployLeftBehind() {
+    if (currentAngleLeft < currentAngleRight - 0.1) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  /**
+   * Checks to see if the right deploy encoder is less than the left deploy encoder
+   * @return boolean value
+   */
+  private boolean isDeployRightBehind() {
+    if (currentAngleRight < currentAngleLeft - 0.1) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   @Override
   public void initSendable(SendableBuilder sendable) {
     sendable.setSmartDashboardType("Intake");
     sendable.addDoubleProperty("Current Angle Left", this::getCurrentAngleLeft, null);
     sendable.addDoubleProperty("Current Angle Right", this::getCurrentAngleRight, null);
+    sendable.addDoubleProperty("Delta Deploy Encoders", this::getDeltaDeployEncoders, null);
   }
 
 

@@ -121,7 +121,7 @@ public final class Constants {
         public static final int DEPLOY_RIGHT_MOTOR = 9;
         public static final int ROLLER_MOTOR = 10;
 
-        public static final double DEPLOY_SPEED = 0.3;
+        public static final double DEPLOY_SPEED = 0.5;
         public static final double INTAKE_SPEED = 0.5;
 
         public static final int LIMIT_SWITCH_UP = 3;
