@@ -175,22 +175,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
   }
 
-  private double getLeftPulseWidth() {
-    return deployLeft.getSensorCollection().getPulseWidthRiseToFallUs();
-  }
-
-  private double getRightPulseWidth() {
-    return deployRight.getSensorCollection().getPulseWidthRiseToFallUs();
-  }
-
   @Override
   public void initSendable(SendableBuilder sendable) {
     sendable.setSmartDashboardType("Intake");
     sendable.addDoubleProperty("Current Angle Left", this::getCurrentAngleLeft, null);
     sendable.addDoubleProperty("Current Angle Right", this::getCurrentAngleRight, null);
     sendable.addDoubleProperty("Delta Deploy Encoders", this::getDeltaDeployEncoders, null);
-    sendable.addDoubleProperty("Left Pulse Width", this::getLeftPulseWidth, null);
-    sendable.addDoubleProperty("Right Pulse Width", this::getRightPulseWidth, null);
   }
 
 
@@ -211,8 +201,9 @@ public class IntakeSubsystem extends SubsystemBase {
     rollerMotor.getBusVoltage();
     motors.put("Roller motor", rollerMotor.getLastError() == ErrorCode.OK);
 
-    motors.put("Deploy left encoder", getLeftPulseWidth() != 0.0);
-    motors.put("Deploy right encoder", getRightPulseWidth() != 0.0);
+    // still not 100% on this tbh
+    motors.put("Deploy left encoder", deployLeft.getSensorCollection().getPulseWidthRiseToFallUs() != 0);
+    motors.put("Deploy right encoder", deployRight.getSensorCollection().getPulseWidthRiseToFallUs() != 0);
     
     return motors;
   }
