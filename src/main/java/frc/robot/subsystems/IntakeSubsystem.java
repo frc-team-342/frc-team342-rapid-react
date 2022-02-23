@@ -200,6 +200,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     rollerMotor.getBusVoltage();
     motors.put("Roller motor", rollerMotor.getLastError() == ErrorCode.OK);
+
+    // still not 100% on this tbh
+    motors.put("Deploy left encoder", deployLeft.getSensorCollection().getPulseWidthRiseToFallUs() != 0);
+    motors.put("Deploy right encoder", deployRight.getSensorCollection().getPulseWidthRiseToFallUs() != 0);
     
     return motors;
   }

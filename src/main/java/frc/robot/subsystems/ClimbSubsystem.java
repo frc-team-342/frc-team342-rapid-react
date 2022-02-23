@@ -149,6 +149,15 @@ public class ClimbSubsystem extends SubsystemBase {
 
     climbMotor2.getBusVoltage();
     motors.put("Climb motor 2", climbMotor2.getLastError() == ErrorCode.OK);
+
+    secondStageMotor1.getBusVoltage();
+    motors.put("Second stage motor 1", secondStageMotor1.getLastError() == ErrorCode.OK);
+
+    secondStageMotor2.getBusVoltage();
+    motors.put("Second stage motor 2", secondStageMotor2.getLastError() == ErrorCode.OK);
+
+    // encoder check
+    motors.put("Climb rotation encoder", secondStageMotor2.getSensorCollection().getPulseWidthRiseToFallUs() != 0);
     
     return motors;
   }
