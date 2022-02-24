@@ -7,8 +7,10 @@ package frc.robot.subsystems;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
@@ -35,9 +37,9 @@ public class OuttakeSubsystem extends SubsystemBase {
     shootMotor2 = new WPI_TalonFX(SHOOT_MOTOR_2);
     feederMotor = new WPI_TalonSRX(FEEDER_MOTOR);
 
-    feederMotor.setInverted(true);
+    shootMotor2.setInverted(true);
 
-    shootMotor2.follow(shootMotor1);
+    feederMotor.setInverted(true);
 
     // P and D are statically imported constants
     shootMotor1.config_kP(1, P);
@@ -54,12 +56,6 @@ public class OuttakeSubsystem extends SubsystemBase {
     * Sets speed of motors in order to shoot in low goal
     */
   public void shootLow(){
-    // Open loop control is used on feed motors
-    if (upToSpeed()) {
-      // Only feed if the shooter is ready
-      feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
-    }
-
     setpoint = LOW_RPM;
   }
 
@@ -67,10 +63,6 @@ public class OuttakeSubsystem extends SubsystemBase {
    * Sets speed of motors in order to shoot in high goal
    */
   public void shootHigh(){
-    if (upToSpeed()) {
-      feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
-    }
-
     setpoint = HIGH_RPM;
   }
 
@@ -95,7 +87,12 @@ public class OuttakeSubsystem extends SubsystemBase {
     double rpm = (velocity * 60 * 10) / 2048;
 
     // check if rpm is within tolerance
-    return rpm >= (setpoint - setpointError) && rpm <= (setpoint + setpointError);
+    if (setpoint != 0) {  
+      return rpm >= (setpoint - setpointError) && rpm <= (setpoint + setpointError);
+    }
+    else {
+      return false;
+    }
   }
 
   /**
@@ -105,10 +102,30 @@ public class OuttakeSubsystem extends SubsystemBase {
     return setpoint;
   }
 
+  /**
+   * Setpoint adjusted to units used for CTRE motors
+   * 
+   * @return encoder ticks per 100 ms
+   */
+  public double getAdjustedSetpoint() {
+    // 2048 is encoder ticks per rotation
+    // 60 * 10 is minutes to seconds and seconds to 100 ms
+    return (setpoint * 2048) / 600;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    shootMotor1.set(ControlMode.Velocity, setpoint);
+   shootMotor1.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
+   shootMotor2.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
+
+    // Open loop control is used on feed motors
+    if (upToSpeed() && setpoint != 0) {
+      // Only feed if the shooter is ready
+      feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
+    } else {
+      feederMotor.set(ControlMode.PercentOutput, 0);
+    }
   }
 
   @Override
@@ -116,6 +133,7 @@ public class OuttakeSubsystem extends SubsystemBase {
     builder.setSmartDashboardType("OuttakeSubsystem");
     builder.addBooleanProperty("Up to speed", this::upToSpeed, null);
     builder.addDoubleProperty("Setpoint", this::getSetpoint, null);
+    builder.addDoubleProperty("Adjusted setpoint", this::getAdjustedSetpoint, null);
   }
 
   /**
