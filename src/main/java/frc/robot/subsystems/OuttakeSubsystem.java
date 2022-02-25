@@ -123,10 +123,18 @@ public class OuttakeSubsystem extends SubsystemBase {
     return (setpoint * 2048) / 600;
   }
 
+  /**
+   * Distance between both encoders
+   * 
+   * @return encoder ticks
+   */
   private double getEncoderDelta() {
     return encoder2.getIntegratedSensorPosition() + encoder1.getIntegratedSensorPosition();
   }
 
+  /**
+   * Set the position of both encoders to 0
+   */
   public void resetEncoders() {
     encoder1.setIntegratedSensorPosition(0, 10);
     encoder2.setIntegratedSensorPosition(0, 10);
@@ -138,6 +146,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     shootMotor1.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
     shootMotor2.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
 
+    // the velocity variable is updated in period by the upToSpeed() method
+
     // Open loop control is used on feed motors
     if (upToSpeed() && setpoint != 0) {
       // Only feed if the shooter is ready
@@ -147,6 +157,11 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Current velocity of the shooter motors
+   * 
+   * @return RPM
+   */
   private double getVelocity() {
     return (velocity * 600) / 2048;
   }
