@@ -99,7 +99,7 @@ public final class Constants {
         public static final double HIGH_RPM = 2000.0f;
 
         /** RPM tolerance for being considered up to speed. */
-        public static final double RPM_ERROR = 30;
+        public static final double RPM_ERROR = 45;
 
         /** P constant for the shooter PID loop. */
         public static final double P = 0.01;
