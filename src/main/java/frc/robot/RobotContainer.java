@@ -142,6 +142,8 @@ public class RobotContainer {
     SmartDashboard.putData(limelight);
     SmartDashboard.putData(photon);
     SmartDashboard.putData(climb);
+
+    outtake.resetEncoders();
   }
 
   /**

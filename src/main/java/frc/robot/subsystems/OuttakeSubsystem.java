@@ -11,6 +11,7 @@ import java.util.Map;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
@@ -25,11 +26,15 @@ public class OuttakeSubsystem extends SubsystemBase {
   private WPI_TalonFX shootMotor2;
   private WPI_TalonSRX feederMotor;
 
+  /** Encoder from motor 1 */
+  private TalonFXSensorCollection encoder1;
+  private TalonFXSensorCollection encoder2;
+
   /** The current setpoint */
   private double setpoint = 0;
 
-  /** RPM within the setpoint to be counted as up to speed */
-  private double setpointError = 15;
+  /** The current motor velocity, as measured by encoders */
+  private double velocity = 0;
 
   /** Creates a new OuttakeSubsystem. */
   public OuttakeSubsystem() {
@@ -38,12 +43,17 @@ public class OuttakeSubsystem extends SubsystemBase {
     feederMotor = new WPI_TalonSRX(FEEDER_MOTOR);
 
     shootMotor2.setInverted(true);
-
     feederMotor.setInverted(true);
+
+    encoder1 = shootMotor1.getSensorCollection();
+    encoder2 = shootMotor2.getSensorCollection();
 
     // P and D are statically imported constants
     shootMotor1.config_kP(1, P);
     shootMotor2.config_kP(1, P);
+
+    shootMotor1.config_kI(1, I);
+    shootMotor2.config_kI(1, I);
 
     shootMotor1.config_kD(1, D);
     shootMotor2.config_kD(1, D);
@@ -80,7 +90,7 @@ public class OuttakeSubsystem extends SubsystemBase {
    */
   public boolean upToSpeed() {
     // Units are in encoder units per 100 ms right now
-    double velocity = shootMotor1.getSensorCollection().getIntegratedSensorVelocity();
+    velocity = encoder1.getIntegratedSensorVelocity();
 
     // converting from encoder ticks / 100 ms to rotations per minutes
     // ((velocity * 10 ms) * 60 s) / 2048 ticks
@@ -88,7 +98,7 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     // check if rpm is within tolerance
     if (setpoint != 0) {  
-      return rpm >= (setpoint - setpointError) && rpm <= (setpoint + setpointError);
+      return rpm >= (setpoint - RPM_ERROR) && rpm <= (setpoint + RPM_ERROR);
     }
     else {
       return false;
@@ -113,11 +123,20 @@ public class OuttakeSubsystem extends SubsystemBase {
     return (setpoint * 2048) / 600;
   }
 
+  private double getEncoderDelta() {
+    return encoder2.getIntegratedSensorPosition() + encoder1.getIntegratedSensorPosition();
+  }
+
+  public void resetEncoders() {
+    encoder1.setIntegratedSensorPosition(0, 10);
+    encoder2.setIntegratedSensorPosition(0, 10);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-   shootMotor1.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
-   shootMotor2.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
+    shootMotor1.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
+    shootMotor2.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
 
     // Open loop control is used on feed motors
     if (upToSpeed() && setpoint != 0) {
@@ -128,12 +147,19 @@ public class OuttakeSubsystem extends SubsystemBase {
     }
   }
 
+  private double getVelocity() {
+    return (velocity * 600) / 2048;
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("OuttakeSubsystem");
     builder.addBooleanProperty("Up to speed", this::upToSpeed, null);
     builder.addDoubleProperty("Setpoint", this::getSetpoint, null);
     builder.addDoubleProperty("Adjusted setpoint", this::getAdjustedSetpoint, null);
+
+    builder.addDoubleProperty("Velocity", this::getVelocity, null);
+    builder.addDoubleProperty("Encoder delta", this::getEncoderDelta, null);
   }
 
   /**
