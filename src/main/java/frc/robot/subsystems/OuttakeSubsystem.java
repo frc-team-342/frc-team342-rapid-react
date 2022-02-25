@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -29,6 +30,9 @@ public class OuttakeSubsystem extends SubsystemBase {
   /** Encoder from motor 1 */
   private TalonFXSensorCollection encoder1;
   private TalonFXSensorCollection encoder2;
+
+  /** Current limiting for both motors. */
+  private SupplyCurrentLimitConfiguration currentLimitConfiguration;
 
   /** The current setpoint */
   private double setpoint = 0;
@@ -60,6 +64,16 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     shootMotor1.selectProfileSlot(1, 0);
     shootMotor2.selectProfileSlot(1, 0);
+
+    currentLimitConfiguration = new SupplyCurrentLimitConfiguration(
+      true, // enabled or not
+      CURRENT_LIMIT, // current to limit to after 
+      CURRENT_THRESHOLD, // current to start limiting at
+      TIMEOUT // time in seconds before current limit takes effect
+    );
+
+    shootMotor1.configSupplyCurrentLimit(currentLimitConfiguration);
+    shootMotor2.configSupplyCurrentLimit(currentLimitConfiguration);
   }
 
    /**

@@ -109,6 +109,11 @@ public final class Constants {
 
         /** D constant for the shooter PID loop. */
         public static final double D = 0.1;
+
+        // Current limit config
+        public static final double CURRENT_LIMIT = 30.0;
+        public static final double CURRENT_THRESHOLD = 50.0;
+        public static final double TIMEOUT = 0.5;
     }
 
     public static final class ClimbConstants {
