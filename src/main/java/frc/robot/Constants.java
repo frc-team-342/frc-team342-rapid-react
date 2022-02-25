@@ -93,16 +93,27 @@ public final class Constants {
         public static final double CPR = 2048;
 
         /** RPM to shoot for low hub. */
-        public static final double LOW_RPM = 1000;
+        public static final double LOW_RPM = 1000.0f;
 
         /** RPM to shoot for upper hub. */
-        public static final double HIGH_RPM = 2000;
+        public static final double HIGH_RPM = 2000.0f;
+
+        /** RPM tolerance for being considered up to speed. */
+        public static final double RPM_ERROR = 45;
 
         /** P constant for the shooter PID loop. */
-        public static final double P = 1.0;
+        public static final double P = 0.01;
+
+        /** I constant for the shooter PID Loop. */
+        public static final double I = 1e-4;
 
         /** D constant for the shooter PID loop. */
-        public static final double D = 0.0;
+        public static final double D = 0.1;
+
+        // Current limit config
+        public static final double CURRENT_LIMIT = 30.0;
+        public static final double CURRENT_THRESHOLD = 50.0;
+        public static final double TIMEOUT = 0.5;
     }
 
     public static final class ClimbConstants {

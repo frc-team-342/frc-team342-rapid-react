@@ -119,10 +119,10 @@ public class RobotContainer {
     outtakeHigh = new OuttakeHigh(outtake);
     
     // Intake Commands
-    retract = new Retract(intake);
+    /*retract = new Retract(intake);
     deploy = new Deploy(intake).andThen(new Retract(intake));
     reverseIntake = new ReverseIntake(intake).andThen(new Retract(intake));
-    intake.setDefaultCommand(retract);
+    intake.setDefaultCommand(retract);*/
 
     // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
@@ -142,6 +142,8 @@ public class RobotContainer {
     SmartDashboard.putData(limelight);
     SmartDashboard.putData(photon);
     SmartDashboard.putData(climb);
+
+    outtake.resetEncoders();
   }
 
   /**
@@ -156,9 +158,9 @@ public class RobotContainer {
     toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
 
     // Operator
-    deployBtn.whileHeld(deploy); // Right bumper
-    reverseIntakeBtn.whileHeld(reverseIntake); // B button
-    outtakeBtn.toggleWhenPressed(outtakeHigh); // Left bumper
+    /*deployBtn.whileHeld(deploy); // Right bumper
+    reverseIntakeBtn.whileHeld(reverseIntake); // B button*/
+    outtakeBtn.whileHeld(outtakeHigh); // Left bumper
     /*stage2ForwardBtn.whileHeld(stage2Forwards); // X button
     stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
     zeroRotatingArmBtn.whenPressed(zeroRotatingArm);*/
