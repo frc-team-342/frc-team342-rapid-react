@@ -161,6 +161,11 @@ public class Limelight implements Sendable{
         //Creates a transform2d for use by the limelight
         Transform2d limelightTransform2d = new Transform2d(limelightTranslation2d, limelightRotation2d);
 
+        // check if default values are returned
+        if (limelightTranslation2d.getX() == 0.0f && limelightTranslation2d.getY() == 0.0f) {
+            return null;
+        } 
+
         //Returns the limelight instance of Transform2d
         return limelightTransform2d;
     }
@@ -171,7 +176,11 @@ public class Limelight implements Sendable{
      * @return Horizontal distance converted to meters
      */
     public double getDistance() {
- 
+        // return negative 1 if a target is not present
+        if (!hasTargets()) {
+            return -1;
+        }
+
         double actAngle = getVerticalOffset() + camAngle;
         double hDistance = targetHeight / (Math.tan(Math.toRadians(actAngle)));
         

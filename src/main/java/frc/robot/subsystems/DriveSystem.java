@@ -194,7 +194,7 @@ public class DriveSystem extends SubsystemBase {
    */
   public MecanumControllerCommand trajectoryCommand(Trajectory trajectory) {
     return new MecanumControllerCommand(
-      trajectory, // Path to follow
+      (trajectory != null) ? trajectory : new Trajectory(), // Path to follow
       this::getPose, // Current robot position
 
       KINEMATICS, // Distance from center of robot to each wheel
