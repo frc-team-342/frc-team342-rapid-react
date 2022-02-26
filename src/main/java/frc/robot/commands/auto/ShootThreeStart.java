@@ -24,10 +24,19 @@ public class ShootThreeStart extends SequentialCommandGroup {
   private PhotonVision autoPhoton;
   private IntakeSubsystem autoIntake;
   private Limelight autoLime;
+  
   /** Creates a new ShootThreeInAuto. */
-  public ShootThreeStart() {
-    autoOuttake = new OuttakeSubsystem();
-    autoIntake = new IntakeSubsystem();
+  public ShootThreeStart(OuttakeSubsystem autoOuttake, DriveSystem autoDriveSystem, PhotonVision autoPhoton, IntakeSubsystem autoIntake, Limelight autoLime) {
+    this.autoOuttake = autoOuttake;
+    this.autoDriveSystem = autoDriveSystem;
+    this.autoPhoton = autoPhoton;
+    this.autoIntake = autoIntake;
+    this.autoLime = autoLime;
+
+    addRequirements(autoOuttake);
+    addRequirements(autoDriveSystem);
+    addRequirements(autoIntake);
+
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     

@@ -20,8 +20,13 @@ public class DriveFunctions extends SequentialCommandGroup {
 
   private AutoDrive exitTarmac;
   /** Creates a new DriveFunctions. */
-  public DriveFunctions() {
+  public DriveFunctions(DriveSystem drive, OuttakeSubsystem outtake) {
+    this.drive = drive;
+    this.outtake = outtake;
     exitTarmac = new AutoDrive(drive, 2);
+
+    addRequirements(drive);
+    addRequirements(outtake);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(

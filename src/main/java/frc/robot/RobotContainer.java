@@ -8,9 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -19,6 +22,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.intake.Deploy;
 import frc.robot.commands.intake.Retract;
 import frc.robot.commands.intake.ReverseIntake;
+import frc.robot.commands.auto.DriveFunctions;
+import frc.robot.commands.auto.DriveToCargo;
+import frc.robot.commands.auto.DriveToHub;
+import frc.robot.commands.auto.ShootThreeStart;
 import frc.robot.commands.climb.ClimbStageTwoBackward;
 import frc.robot.commands.climb.ClimbStageTwoForward;
 import frc.robot.commands.drive.DriveWithJoystick;
@@ -76,6 +83,11 @@ public class RobotContainer {
   private JoystickButton stage2BackwardBtn;
   private JoystickButton zeroRotatingArmBtn;
 
+  private SendableChooser<Command> autoChooser;
+  private Command driveToCargo;
+  private Command driveToHub;
+  private Command shootThreeStart;
+  private Command exitTarmac;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -84,7 +96,6 @@ public class RobotContainer {
     driveSystem = new DriveSystem();
     outtake = new OuttakeSubsystem();
     intake = new IntakeSubsystem();
-    outtake = new OuttakeSubsystem();
     climb = new ClimbSubsystem();
 
     photon = new PhotonVision("camera");
@@ -143,7 +154,22 @@ public class RobotContainer {
     SmartDashboard.putData(photon);
     SmartDashboard.putData(climb);
 
-    outtake.resetEncoders();
+    // Makes the autonomous chooser and associated commands
+    autoChooser = new SendableChooser<>();
+    driveToCargo = new DriveToCargo(driveSystem, photon);
+    driveToHub = new DriveToHub(driveSystem, limelight);
+    shootThreeStart = new ShootThreeStart(outtake, driveSystem, photon, intake, limelight);
+    exitTarmac = new DriveFunctions(driveSystem, outtake);
+
+    // Add options to the smart dashboard
+    autoChooser.setDefaultOption("Shoot 1 Cargo", driveToHub);
+    autoChooser.addOption("Shoot 2 Cargo", driveToCargo);
+    autoChooser.addOption("Shoot 3 Cargo", shootThreeStart);
+    autoChooser.setDefaultOption("Shoot 1 and leave the tarmac", exitTarmac);
+
+    // Sets chooser name and sends to dashboard
+    SendableRegistry.setName(autoChooser, "Autonomous Chooser");
+    SmartDashboard.putData(autoChooser);
   }
 
   /**
@@ -166,6 +192,7 @@ public class RobotContainer {
     zeroRotatingArmBtn.whenPressed(zeroRotatingArm);*/
   }
 
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
