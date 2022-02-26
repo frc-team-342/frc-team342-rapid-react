@@ -34,7 +34,7 @@ public class DriveToCargo extends SequentialCommandGroup {
         // movement needed in order to get to cargo
         Transform2d transform = photon.transformToTarget();
 
-        // if transform is null, instead transform to no movement
+        // if transform is null, instead do not move
         transform = (transform == null) ? new Transform2d() : transform;
 
         // desired end pose, generated from current location plus movement to target
