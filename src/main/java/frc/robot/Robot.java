@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+
+import edu.wpi.first.wpilibj.AnalogInput;
+
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,6 +24,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+  enum RobotType {aBot, bBot}
+
+  AnalogInput robotCheckAnalog = new AnalogInput(0);
+
+  double voltageThreshold = 4.5;
+  
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -71,6 +80,23 @@ public class Robot extends TimedRobot {
     // send to dashboard
     SmartDashboard.putString("Git Branch", branch);
     SmartDashboard.putString("Git Commit", commit);
+
+    System.out.println(robotCheckAnalog.getVoltage());
+  }
+
+  
+  public RobotType checkType(){
+      
+       if(robotCheckAnalog.getVoltage() < voltageThreshold){
+      System.out.println("A-bot");
+      return RobotType.aBot;
+       }
+      else{
+        System.out.println("B-bot");
+        return RobotType.bBot;
+      }
+  
+   
   }
 
   /**
