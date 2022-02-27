@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+
+import edu.wpi.first.wpilibj.AnalogInput;
+
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,6 +24,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+  private enum RobotType {A_BOT, B_BOT}
+
+  private AnalogInput robotCheckAnalog = new AnalogInput(Constants.ROBOT_ANALOG_CHECKER_CHANNEL);
+  
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -71,6 +78,22 @@ public class Robot extends TimedRobot {
     // send to dashboard
     SmartDashboard.putString("Git Branch", branch);
     SmartDashboard.putString("Git Commit", commit);
+
+  }
+
+  /**
+   * This method allows us to check what robot is being used
+   * @return the robot being used based on a voltage value
+   */
+  public RobotType checkType(){
+    if(robotCheckAnalog.getVoltage() < Constants.VOLTAGE_THRESHOLD){
+      System.out.println("A-bot");
+      return RobotType.A_BOT;
+    } else {
+      System.out.println("B-bot");
+      return RobotType.B_BOT;
+    }
+  
   }
 
   /**

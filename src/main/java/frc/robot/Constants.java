@@ -18,6 +18,10 @@ import edu.wpi.first.wpilibj.XboxController;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    //Constants for robot check
+    public static final double VOLTAGE_THRESHOLD = 4.5;
+    public static final int ROBOT_ANALOG_CHECKER_CHANNEL = 0;
+
     public final static class DriveConstants {
         // Motor IDs
         public static final int FRONT_LEFT_MOTOR = 1;
