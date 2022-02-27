@@ -25,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private enum RobotType {A_BOT, B_BOT}
+
+  private AnalogInput robotCheckAnalog = new AnalogInput(Constants.ROBOT_ANALOG_CHECKER_CHANNEL);
   
   private Command m_autonomousCommand;
 
@@ -79,19 +81,19 @@ public class Robot extends TimedRobot {
 
   }
 
-  
+  /**
+   * This method allows us to check what robot is being used
+   * @return the robot being used based on a voltage value
+   */
   public RobotType checkType(){
-      
-       if(Constants.ROBOT_CHECK_ANALOG.getVoltage() < Constants.VOLTAGE_THRESHOLD){
-          System.out.println("A-bot");
-          return RobotType.A_BOT;
-       }
-      else{
-         System.out.println("B-bot");
-          return RobotType.B_BOT;
-      }
+    if(robotCheckAnalog.getVoltage() < Constants.VOLTAGE_THRESHOLD){
+      System.out.println("A-bot");
+      return RobotType.A_BOT;
+    } else {
+      System.out.println("B-bot");
+      return RobotType.B_BOT;
+    }
   
-   
   }
 
   /**
