@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
@@ -18,6 +19,10 @@ import edu.wpi.first.wpilibj.XboxController;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    //Constants for robot check
+    public static final double VOLTAGE_THRESHOLD = 4.5;
+    public static final AnalogInput ROBOT_CHECK_ANALOG = new AnalogInput(0);
+
     public final static class DriveConstants {
         // Motor IDs
         public static final int FRONT_LEFT_MOTOR = 1;

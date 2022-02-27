@@ -24,11 +24,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-  enum RobotType {aBot, bBot}
-
-  AnalogInput robotCheckAnalog = new AnalogInput(0);
-
-  double voltageThreshold = 4.5;
+  private enum RobotType {A_BOT, B_BOT}
   
   private Command m_autonomousCommand;
 
@@ -81,19 +77,18 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("Git Branch", branch);
     SmartDashboard.putString("Git Commit", commit);
 
-    System.out.println(robotCheckAnalog.getVoltage());
   }
 
   
   public RobotType checkType(){
       
-       if(robotCheckAnalog.getVoltage() < voltageThreshold){
-      System.out.println("A-bot");
-      return RobotType.aBot;
+       if(Constants.ROBOT_CHECK_ANALOG.getVoltage() < Constants.VOLTAGE_THRESHOLD){
+          System.out.println("A-bot");
+          return RobotType.A_BOT;
        }
       else{
-        System.out.println("B-bot");
-        return RobotType.bBot;
+         System.out.println("B-bot");
+          return RobotType.B_BOT;
       }
   
    
