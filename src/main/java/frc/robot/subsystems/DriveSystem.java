@@ -83,7 +83,10 @@ public class DriveSystem extends SubsystemBase {
     backRight = new CANSparkMax(BACK_RIGHT_MOTOR, MotorType.kBrushless);
 
     if (Robot.checkType() == Robot.RobotType.A_BOT) {
-
+      frontLeft.setInverted(false);
+      backLeft.setInverted(false);
+      frontRight.setInverted(true);
+      backRight.setInverted(true);
     } else {
       frontLeft.setInverted(false);
       frontRight.setInverted(true);
