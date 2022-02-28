@@ -63,7 +63,7 @@ public class DriveSystem extends SubsystemBase {
   private RelativeEncoder frontRightEncoder;
   private RelativeEncoder backRightEncoder;
 
-  private boolean fieldOriented = true;
+  private boolean fieldOriented = false;
   private ADIS16470_IMU gyro;
 
   private MecanumDrive mecanumDrive;
@@ -138,10 +138,17 @@ public class DriveSystem extends SubsystemBase {
     double y = yVelocity * currentMode.speedMultiplier;
     double rotation = rotationVelocity * currentMode.speedMultiplier;
 
+    //Checks to see if currentMode is slow. If so, applies the slow speed to each dimension
+    if(currentMode == Mode.SLOW) {
+      x *= SLOW_SPEED;
+      y *= SLOW_SPEED;
+      rotation *= SLOW_SPEED;
+    }
+
     if (fieldOriented) {
       mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
     } else {
-      mecanumDrive.driveCartesian(y, x, rotation);
+      mecanumDrive.driveCartesian(y, x , rotation);
     }
   }
 

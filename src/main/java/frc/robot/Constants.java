@@ -136,8 +136,8 @@ public final class Constants {
         public static final int DEPLOY_RIGHT_MOTOR = 9;
         public static final int ROLLER_MOTOR = 10;
 
-        public static final double MIN_INTAKE_ANGLE = 0.25;
-        public static final double MAX_INTAKE_ANGLE = 62.0;
+        public static final double MIN_INTAKE_ANGLE = 52.75;
+        public static final double MAX_INTAKE_ANGLE = 0.25;
 
         public static final double INTAKE_P = 0.05;
 
@@ -169,5 +169,6 @@ public final class Constants {
         public static final int OP_CLIMB_STAGE2_FORWARD_BTN = XboxController.Button.kX.value;
         public static final int OP_ZERO_ROTATING_ARM_BTN = XboxController.Button.kStart.value;
         public static final int OP_REVERSE_INTAKE_BTN = XboxController.Button.kB.value;
+        public static final int OP_TOGGLE_SLOW_BTN = XboxController.Button.kBack.value;
     }
 }
