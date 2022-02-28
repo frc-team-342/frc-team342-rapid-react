@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 import static frc.robot.Constants.IntakeConstants.*;
 
@@ -31,15 +32,20 @@ public class IntakeSubsystem extends SubsystemBase {
     // capital variable names are statically imported constants
     deployLeft = new WPI_TalonSRX(DEPLOY_LEFT_MOTOR);
     deployRight = new WPI_TalonSRX(DEPLOY_RIGHT_MOTOR);
+    rollerMotor = new WPI_TalonSRX(ROLLER_MOTOR);
 
-    deployRight.setInverted(true);
+    // different inversions on A and B bot
+    if (Robot.checkType() == Robot.RobotType.A_BOT) {
+      rollerMotor.setInverted(true);
+    } else {
+      deployRight.setInverted(true);
+    }
+
 
     deployLeft.configPeakCurrentLimit(CURRENT_LIMIT);
     deployLeft.configPeakCurrentDuration(CURRENT_DURATION);
     deployRight.configPeakCurrentLimit(CURRENT_LIMIT);
     deployRight.configPeakCurrentDuration(CURRENT_DURATION);
-
-    rollerMotor = new WPI_TalonSRX(ROLLER_MOTOR);
   }
 
   @Override

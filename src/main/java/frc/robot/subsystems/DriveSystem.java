@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,10 +82,14 @@ public class DriveSystem extends SubsystemBase {
     frontRight = new CANSparkMax(FRONT_RIGHT_MOTOR, MotorType.kBrushless);
     backRight = new CANSparkMax(BACK_RIGHT_MOTOR, MotorType.kBrushless);
 
-    frontLeft.setInverted(false);
-    frontRight.setInverted(true);
-    backLeft.setInverted(false);
-    backRight.setInverted(true);
+    if (Robot.checkType() == Robot.RobotType.A_BOT) {
+
+    } else {
+      frontLeft.setInverted(false);
+      frontRight.setInverted(true);
+      backLeft.setInverted(false);
+      backRight.setInverted(true);
+    }
 
     // Current limits on breakers are set to 40 Amps
     frontLeft.setSmartCurrentLimit(CURRENT_LIMIT);

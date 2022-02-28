@@ -18,6 +18,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 import static frc.robot.Constants.OuttakeConstants.*;
 
@@ -46,8 +47,15 @@ public class OuttakeSubsystem extends SubsystemBase {
     shootMotor2 = new WPI_TalonFX(SHOOT_MOTOR_2);
     feederMotor = new WPI_TalonSRX(FEEDER_MOTOR);
 
-    shootMotor2.setInverted(true);
-    feederMotor.setInverted(true);
+    if (Robot.checkType() == Robot.RobotType.A_BOT) {
+      shootMotor1.setInverted(true);
+      shootMotor2.setInverted(false);
+      feederMotor.setInverted(false);
+    } else {
+      shootMotor1.setInverted(false);
+      shootMotor2.setInverted(true);
+      feederMotor.setInverted(true);
+    }
 
     encoder1 = shootMotor1.getSensorCollection();
     encoder2 = shootMotor2.getSensorCollection();
