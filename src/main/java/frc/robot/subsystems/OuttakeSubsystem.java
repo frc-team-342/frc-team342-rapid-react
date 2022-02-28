@@ -19,6 +19,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.Robot.RobotType;
 
 import static frc.robot.Constants.OuttakeConstants.*;
 
@@ -41,6 +42,9 @@ public class OuttakeSubsystem extends SubsystemBase {
   /** The current motor velocity, as measured by encoders */
   private double velocity = 0;
 
+  /* Encoders are reversed on A bot */
+  private double velocityMultiplier = 1; 
+
   /** Creates a new OuttakeSubsystem. */
   public OuttakeSubsystem() {
     shootMotor1 = new WPI_TalonFX(SHOOT_MOTOR_1);
@@ -59,6 +63,13 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     encoder1 = shootMotor1.getSensorCollection();
     encoder2 = shootMotor2.getSensorCollection();
+
+    // Encoder is backwards on A bot
+    if (Robot.checkType() == RobotType.A_BOT) {
+      velocityMultiplier = -1.0;
+    } else {
+      velocityMultiplier = 1.0;
+    }
 
     // P and D are statically imported constants
     shootMotor1.config_kP(1, P);
@@ -112,7 +123,7 @@ public class OuttakeSubsystem extends SubsystemBase {
    */
   public boolean upToSpeed() {
     // Units are in encoder units per 100 ms right now
-    velocity = encoder1.getIntegratedSensorVelocity();
+    velocity = velocityMultiplier * encoder1.getIntegratedSensorVelocity();
 
     // converting from encoder ticks / 100 ms to rotations per minutes
     // ((velocity * 10 ms) * 60 s) / 2048 ticks
@@ -185,7 +196,7 @@ public class OuttakeSubsystem extends SubsystemBase {
    * @return RPM
    */
   private double getVelocity() {
-    return (velocity * 600) / 2048;
+    return (velocity * 600 * velocityMultiplier) / 2048;
   }
 
   @Override
