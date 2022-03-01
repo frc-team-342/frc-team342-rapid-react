@@ -19,7 +19,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.Robot.RobotType;
 
 import static frc.robot.Constants.OuttakeConstants.*;
 
@@ -63,13 +62,6 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     encoder1 = shootMotor1.getSensorCollection();
     encoder2 = shootMotor2.getSensorCollection();
-
-    // Encoder is backwards on A bot
-    if (Robot.checkType() == RobotType.A_BOT) {
-      velocityMultiplier = -1.0;
-    } else {
-      velocityMultiplier = 1.0;
-    }
 
     // P and D are statically imported constants
     shootMotor1.config_kP(1, P);
