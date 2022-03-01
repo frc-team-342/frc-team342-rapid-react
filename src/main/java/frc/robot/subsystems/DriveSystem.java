@@ -137,18 +137,11 @@ public class DriveSystem extends SubsystemBase {
     double x = xVelocity * currentMode.speedMultiplier;
     double y = yVelocity * currentMode.speedMultiplier;
     double rotation = rotationVelocity * currentMode.speedMultiplier;
-
-    //Checks to see if currentMode is slow. If so, applies the slow speed to each dimension
-    if(currentMode == Mode.SLOW) {
-      x *= SLOW_SPEED;
-      y *= SLOW_SPEED;
-      rotation *= SLOW_SPEED;
-    }
-
+    
     if (fieldOriented) {
       mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
     } else {
-      mecanumDrive.driveCartesian(y, x , rotation);
+      mecanumDrive.driveCartesian(y, x, rotation);
     }
   }
 
