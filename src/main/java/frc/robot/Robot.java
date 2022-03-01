@@ -82,8 +82,10 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * This method allows us to check what robot is being used
-   * @return the robot being used based on a voltage value
+   * This method allows us to check what robot is being used. <br>
+   * There is a jumper on analog input 0 on b bot that makes it always return voltage.
+   * 
+   * @return the robot being used
    */
   public static RobotType checkType(){
     if(robotCheckAnalog.getVoltage() < Constants.VOLTAGE_THRESHOLD){
