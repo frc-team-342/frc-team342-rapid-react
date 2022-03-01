@@ -41,18 +41,21 @@ public class IntakeSubsystem extends SubsystemBase {
       deployRight.setInverted(true);
     }
 
-
     deployLeft.configPeakCurrentLimit(CURRENT_LIMIT);
     deployLeft.configPeakCurrentDuration(CURRENT_DURATION);
     deployRight.configPeakCurrentLimit(CURRENT_LIMIT);
     deployRight.configPeakCurrentDuration(CURRENT_DURATION);
+
+    rollerMotor.configPeakCurrentLimit(CURRENT_LIMIT);
+    rollerMotor.configPeakCurrentDuration(CURRENT_DURATION);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360;
-    currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360;
+    //Multiplying by -360 to return a positive value. Supposed to be started in the fold position
+    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360;
+    currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360;
   }
 
   /** 

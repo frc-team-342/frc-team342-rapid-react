@@ -64,7 +64,7 @@ public class DriveSystem extends SubsystemBase {
   private RelativeEncoder frontRightEncoder;
   private RelativeEncoder backRightEncoder;
 
-  private boolean fieldOriented = true;
+  private boolean fieldOriented = false;
   private ADIS16470_IMU gyro;
 
   private MecanumDrive mecanumDrive;
@@ -145,7 +145,7 @@ public class DriveSystem extends SubsystemBase {
     double x = xVelocity * currentMode.speedMultiplier;
     double y = yVelocity * currentMode.speedMultiplier;
     double rotation = rotationVelocity * currentMode.speedMultiplier;
-
+    
     if (fieldOriented) {
       mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
     } else {

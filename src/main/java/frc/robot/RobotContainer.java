@@ -18,8 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.intake.Deploy;
+import frc.robot.commands.intake.Intake;
 import frc.robot.commands.intake.Retract;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.auto.DriveFunctions;
@@ -30,6 +31,7 @@ import frc.robot.commands.climb.ClimbStageTwoBackward;
 import frc.robot.commands.climb.ClimbStageTwoForward;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
+import frc.robot.commands.outtake.OuttakeLow;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -63,6 +65,7 @@ public class RobotContainer {
   private InstantCommand zeroRotatingArm;
   private Command deploy;
   private Command retract;
+  private Command intakeCmd;
   private Command reverseIntake;
   private Command stage2Backwards;
   private Command stage2Forwards;
@@ -70,6 +73,7 @@ public class RobotContainer {
   private DriveWithJoystick driveWithJoystick;
 
   private OuttakeHigh outtakeHigh;
+  private OuttakeLow outtakeLow;
 
   private Joystick driver;
   private JoystickButton toggleFieldOrientedBtn;
@@ -77,11 +81,13 @@ public class RobotContainer {
 
   private XboxController operator;
   private JoystickButton deployBtn;
+  private JoystickButton intakeBtn;
   private JoystickButton reverseIntakeBtn;
-  private JoystickButton outtakeBtn;
+  private JoystickButton outtakeHighBtn;
   private JoystickButton stage2ForwardBtn;
   private JoystickButton stage2BackwardBtn;
   private JoystickButton zeroRotatingArmBtn;
+  private Trigger outtakeLowBtn;
 
   private SendableChooser<Command> autoChooser;
   private Command driveToCargo;
@@ -110,12 +116,16 @@ public class RobotContainer {
     toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 7
 
     // Operator buttons
-    deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
-    outtakeBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
+    //deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
+    outtakeHighBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
+    outtakeLowBtn = new Trigger(() -> { return (operator.getRightTriggerAxis() >= 0.8); }); // Right trigger
+
+    intakeBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right Bumper
     reverseIntakeBtn = new JoystickButton(operator, OP_REVERSE_INTAKE_BTN); // B Button
     stage2ForwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_FORWARD_BTN); // X button
     stage2BackwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_REVERSE_BTN); // Y button
     zeroRotatingArmBtn = new JoystickButton(driver, OP_ZERO_ROTATING_ARM_BTN); 
+    toggleSlowModeBtn = new JoystickButton(operator, OP_TOGGLE_SLOW_BTN); // Back/Select Button
 
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
@@ -128,11 +138,13 @@ public class RobotContainer {
 
     // Outtake Commands
     outtakeHigh = new OuttakeHigh(outtake);
+    outtakeLow = new OuttakeLow(outtake);
     
     // Intake Commands
     /*retract = new Retract(intake);
-    deploy = new Deploy(intake).andThen(new Retract(intake));
-    reverseIntake = new ReverseIntake(intake).andThen(new Retract(intake));
+    deploy = new Deploy(intake).andThen(new Retract(intake));*/
+    intakeCmd = new Intake(intake);
+    /*reverseIntake = new ReverseIntake(intake).andThen(new Retract(intake));
     intake.setDefaultCommand(retract);*/
 
     // Drive With Joystick
@@ -186,7 +198,9 @@ public class RobotContainer {
     // Operator
     /*deployBtn.whileHeld(deploy); // Right bumper
     reverseIntakeBtn.whileHeld(reverseIntake); // B button*/
-    outtakeBtn.whileHeld(outtakeHigh); // Left bumper
+    intakeBtn.whileHeld(intakeCmd);
+    outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
+    outtakeLowBtn.whileActiveContinuous(outtakeLow);
     /*stage2ForwardBtn.whileHeld(stage2Forwards); // X button
     stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
     zeroRotatingArmBtn.whenPressed(zeroRotatingArm);*/
