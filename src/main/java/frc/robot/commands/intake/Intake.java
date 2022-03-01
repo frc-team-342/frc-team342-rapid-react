@@ -11,11 +11,9 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class Intake extends CommandBase {
   /** Creates a new Intake. */
   private IntakeSubsystem intake;
-  private DriveSystem drive;
 
-  public Intake(IntakeSubsystem intake, DriveSystem drive) {
+  public Intake(IntakeSubsystem intake) {
     this.intake = intake;
-    this.drive = drive;
     
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(intake);
@@ -29,7 +27,6 @@ public class Intake extends CommandBase {
   @Override
   public void execute() {
     intake.intakeCargo();
-    drive.toggleSlowMode();
   }
 
   // Called once the command ends or is interrupted.
