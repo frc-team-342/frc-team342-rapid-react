@@ -135,7 +135,7 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public void intakeCargo()
   {
-    rollerMotor.set(INTAKE_SPEED);
+    rollerMotor.set(intakeSpeed);
   }
 
   /**
@@ -143,7 +143,7 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public void reverseIntakeCargo()
   {
-    rollerMotor.set(INTAKE_SPEED * -1);
+    rollerMotor.set(intakeSpeed * -1);
   }
 
   /**
