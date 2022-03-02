@@ -79,6 +79,10 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("Git Branch", branch);
     SmartDashboard.putString("Git Commit", commit);
 
+    System.out.println((checkType() == RobotType.A_BOT) ? "A Robot" : "B Robot");
+
+    // reset encoders when rio restarts
+    m_robotContainer.resetIntakeEncoders();
   }
 
   /**
@@ -89,10 +93,8 @@ public class Robot extends TimedRobot {
    */
   public static RobotType checkType(){
     if(robotCheckAnalog.getVoltage() < Constants.VOLTAGE_THRESHOLD){
-      System.out.println("A-bot");
       return RobotType.A_BOT;
     } else {
-      System.out.println("B-bot");
       return RobotType.B_BOT;
     }
   

@@ -210,6 +210,9 @@ public class RobotContainer {
     zeroRotatingArmBtn.whenPressed(zeroRotatingArm);*/
   }
 
+  public void resetIntakeEncoders() {
+    intake.resetEncoders();
+  }
   
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

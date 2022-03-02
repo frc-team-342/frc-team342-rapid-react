@@ -26,8 +26,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private double currentAngleLeft;
   private double currentAngleRight;
 
-  private double leftMultiplier = 1.0;
-  private double rightMultiplier = 1.0; 
+  // of course theyre different
+  private double intakeSpeed = INTAKE_SPEED;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
@@ -38,19 +38,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // different inversions on A and B bot
     if (Robot.checkType() == Robot.RobotType.A_BOT) {
-      deployRight.setInverted(true);
       rollerMotor.setInverted(true);
-    } else {
-      deployRight.setInverted(true);
     }
 
-    if (Robot.checkType() == Robot.RobotType.A_BOT) {
-      leftMultiplier = -1.0;
-      rightMultiplier = 1.0;
-    } else {
-      leftMultiplier = -1.0;
-      rightMultiplier = -1.0;
+    // why wouldnt they be different ?????
+    if (Robot.checkType() == Robot.RobotType.B_BOT) {
+      // differnet gear ratios
+      // because of course they are
+      intakeSpeed = 0.9;
     }
+
+    deployRight.setInverted(true);
 
     deployLeft.configPeakCurrentLimit(CURRENT_LIMIT);
     deployLeft.configPeakCurrentDuration(CURRENT_DURATION);
@@ -65,13 +63,18 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     //Multiplying by -360 to return a positive value. Supposed to be started in the fold position
-    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360 * leftMultiplier;
-    currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360 * rightMultiplier;
+    if (Robot.checkType() == Robot.RobotType.A_BOT) {
+      currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360.0f;
+      currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360.0f;
+    } else {
+      currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360.0f;
+      currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360.0f;
+    }
   }
 
   public void resetEncoders() {
-    deployLeft.getSensorCollection().setQuadraturePosition(0, 10);
-    deployRight.getSensorCollection().setQuadraturePosition(0, 10);
+    deployLeft.getSensorCollection().setQuadraturePosition(0, 0);
+    deployRight.getSensorCollection().setQuadraturePosition(0, 0);
   }
 
   /** 
@@ -114,12 +117,12 @@ public class IntakeSubsystem extends SubsystemBase {
     else
     {
       if (isDeployLeftBehind()) {
-        deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * (INTAKE_P * -1)));
+        deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
         deployRight.set(DEPLOY_SPEED * -1);
       }
       else if (isDeployRightBehind()) {
         deployLeft.set(DEPLOY_SPEED * -1);
-        deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * (INTAKE_P * -1)));
+        deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
       } else {
         deployLeft.set(DEPLOY_SPEED * -1);
         deployRight.set(DEPLOY_SPEED * -1);
@@ -179,7 +182,12 @@ public class IntakeSubsystem extends SubsystemBase {
    * @return boolean value
    */
   private boolean isDeployLeftBehind() {
-    return (currentAngleLeft < currentAngleRight - 0.1);
+    if (currentAngleLeft < currentAngleRight - 0.1) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   /**
@@ -187,7 +195,12 @@ public class IntakeSubsystem extends SubsystemBase {
    * @return boolean value
    */
   private boolean isDeployRightBehind() {
-    return (currentAngleRight < currentAngleLeft - 0.1);
+    if (currentAngleRight < currentAngleLeft - 0.1) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   @Override
