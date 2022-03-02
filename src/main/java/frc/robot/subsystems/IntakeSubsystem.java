@@ -26,6 +26,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private double currentAngleLeft;
   private double currentAngleRight;
 
+  private double leftMultiplier = 1.0;
+  private double rightMultiplier = 1.0; 
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
@@ -36,9 +38,18 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // different inversions on A and B bot
     if (Robot.checkType() == Robot.RobotType.A_BOT) {
+      deployRight.setInverted(true);
       rollerMotor.setInverted(true);
     } else {
       deployRight.setInverted(true);
+    }
+
+    if (Robot.checkType() == Robot.RobotType.A_BOT) {
+      leftMultiplier = -1.0;
+      rightMultiplier = 1.0;
+    } else {
+      leftMultiplier = -1.0;
+      rightMultiplier = -1.0;
     }
 
     deployLeft.configPeakCurrentLimit(CURRENT_LIMIT);
@@ -54,8 +65,13 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     //Multiplying by -360 to return a positive value. Supposed to be started in the fold position
-    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360;
-    currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360;
+    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360 * leftMultiplier;
+    currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * 360 * rightMultiplier;
+  }
+
+  public void resetEncoders() {
+    deployLeft.getSensorCollection().setQuadraturePosition(0, 10);
+    deployRight.getSensorCollection().setQuadraturePosition(0, 10);
   }
 
   /** 
@@ -63,7 +79,7 @@ public class IntakeSubsystem extends SubsystemBase {
   */
   public void deployIntake()
   {
-    if(currentAngleLeft <= MIN_INTAKE_ANGLE && currentAngleRight <= MIN_INTAKE_ANGLE)
+    if(currentAngleLeft >= MIN_INTAKE_ANGLE && currentAngleRight >= MIN_INTAKE_ANGLE)
     {
       deployLeft.set(0);
       deployRight.set(0);
@@ -90,7 +106,7 @@ public class IntakeSubsystem extends SubsystemBase {
   */
   public void retractIntake(){
   
-    if(currentAngleLeft >= MAX_INTAKE_ANGLE && currentAngleRight >= MAX_INTAKE_ANGLE)
+    if(currentAngleLeft <= MAX_INTAKE_ANGLE && currentAngleRight <= MAX_INTAKE_ANGLE)
     {
       deployLeft.set(0);
       deployRight.set(0);
@@ -163,12 +179,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * @return boolean value
    */
   private boolean isDeployLeftBehind() {
-    if (currentAngleLeft < currentAngleRight - 0.1) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return (currentAngleLeft < currentAngleRight - 0.1);
   }
 
   /**
@@ -176,12 +187,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * @return boolean value
    */
   private boolean isDeployRightBehind() {
-    if (currentAngleRight < currentAngleLeft - 0.1) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return (currentAngleRight < currentAngleLeft - 0.1);
   }
 
   @Override

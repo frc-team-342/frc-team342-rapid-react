@@ -61,6 +61,7 @@ public class RobotContainer {
   private InstantCommand toggleFieldOriented; 
   private InstantCommand toggleSlowMode;
   private InstantCommand toggleTurboMode;
+  private InstantCommand resetIntakeEncoders;
 
   private InstantCommand zeroRotatingArm;
   private Command deploy;
@@ -131,6 +132,9 @@ public class RobotContainer {
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
     toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
     toggleTurboMode = new InstantCommand(driveSystem::toggleTurboMode, driveSystem);
+    resetIntakeEncoders = new InstantCommand(intake::resetEncoders, intake);
+
+    SmartDashboard.putData("Reset intake encoders", resetIntakeEncoders);
 
     // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
@@ -141,11 +145,11 @@ public class RobotContainer {
     outtakeLow = new OuttakeLow(outtake);
     
     // Intake Commands
-    /*retract = new Retract(intake);
-    deploy = new Deploy(intake).andThen(new Retract(intake));*/
-    intakeCmd = new Intake(intake);
-    /*reverseIntake = new ReverseIntake(intake).andThen(new Retract(intake));
-    intake.setDefaultCommand(retract);*/
+    retract = new Retract(intake);
+    deploy = new Deploy(intake);
+    //intakeCmd = new Intake(intake);
+    reverseIntake = new ReverseIntake(intake);
+    intake.setDefaultCommand(retract);
 
     // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
@@ -198,7 +202,7 @@ public class RobotContainer {
     // Operator
     /*deployBtn.whileHeld(deploy); // Right bumper
     reverseIntakeBtn.whileHeld(reverseIntake); // B button*/
-    intakeBtn.whileHeld(intakeCmd);
+    intakeBtn.whileHeld(deploy); // Right bumper 
     outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
     outtakeLowBtn.whileActiveContinuous(outtakeLow);
     /*stage2ForwardBtn.whileHeld(stage2Forwards); // X button

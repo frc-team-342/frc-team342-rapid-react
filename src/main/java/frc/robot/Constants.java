@@ -141,7 +141,7 @@ public final class Constants {
 
         public static final double INTAKE_P = 0.05;
 
-        public static final double DEPLOY_SPEED = 0.5;
+        public static final double DEPLOY_SPEED = 0.2;
         public static final double INTAKE_SPEED = 0.5;
 
         public static final int LIMIT_SWITCH_UP = 3;
