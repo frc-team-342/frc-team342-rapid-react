@@ -26,6 +26,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private double currentAngleLeft;
   private double currentAngleRight;
 
+  private double intakeSpeed = INTAKE_SPEED;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
@@ -37,9 +38,14 @@ public class IntakeSubsystem extends SubsystemBase {
     // different inversions on A and B bot
     if (Robot.checkType() == Robot.RobotType.A_BOT) {
       rollerMotor.setInverted(true);
-    } else {
-      deployRight.setInverted(true);
     }
+
+    if (Robot.checkType() == Robot.RobotType.B_BOT) {
+      // b bot is 9:1 gear ratio on rollers and a bot is 3:1
+      intakeSpeed = 0.9;
+    }
+
+    deployRight.setInverted(true);
 
     deployLeft.configPeakCurrentLimit(CURRENT_LIMIT);
     deployLeft.configPeakCurrentDuration(CURRENT_DURATION);
@@ -54,56 +60,66 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     //Multiplying by -360 to return a positive value. Supposed to be started in the fold position
-    currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360;
-    currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360;
+    if (Robot.checkType() == Robot.RobotType.A_BOT) {
+      currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360.0f;
+      currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360.0f;
+    } else {
+      currentAngleLeft = (deployLeft.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360.0f;
+      currentAngleRight = (deployRight.getSelectedSensorPosition() / ENCODER_TICKS_PER_ROTATION) * -360.0f;
+    }
   }
 
-  /** 
-  * Deploys the intake device for picking up cargo
-  */
-  public void deployIntake()
-  {
-    if(currentAngleLeft <= MIN_INTAKE_ANGLE && currentAngleRight <= MIN_INTAKE_ANGLE)
-    {
+  /**
+   * Sets both encoders to 0 without a timeout. <br>
+   * Timeout is not applied so that the reset does not fail when CAN frames are dropped on startup.
+   */
+  public void resetEncoders() {
+    deployLeft.getSensorCollection().setQuadraturePosition(0, 0);
+    deployRight.getSensorCollection().setQuadraturePosition(0, 0);
+  }
+
+  /**
+   * Deploys the intake from the upper position into the intaking position. <br>
+   * The maximum angle it deploys to is 52.75 degrees forwards from the starting position.
+   * 
+   * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
+   */
+  public void deployIntake() {
+    if (currentAngleLeft >= MIN_INTAKE_ANGLE && currentAngleRight >= MIN_INTAKE_ANGLE) {
       deployLeft.set(0);
       deployRight.set(0);
-    }
-    else
-    {
+    } else {
       if (isDeployLeftBehind()) {
         deployLeft.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * INTAKE_P));
         deployRight.set(DEPLOY_SPEED);
-      }
-      else if (isDeployRightBehind()) {
+      } else if (isDeployRightBehind()) {
         deployLeft.set(DEPLOY_SPEED);
         deployRight.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * INTAKE_P));
-      }
-      else {
+      } else {
         deployLeft.set(DEPLOY_SPEED);
         deployRight.set(DEPLOY_SPEED);
       }
     }
   }
 
-  /** 
-  * Retracts the intake device
-  */
-  public void retractIntake(){
-  
-    if(currentAngleLeft >= MAX_INTAKE_ANGLE && currentAngleRight >= MAX_INTAKE_ANGLE)
-    {
+  /**
+   * Retracts the intake from the intaking position above the bumpers. <br>
+   * The minimum angle it retracts to is 15.0 degrees forwards from the starting position.
+   * This is to avoid jamming the intake back into the original position.
+   * 
+   * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
+   */
+  public void retractIntake() {
+    if (currentAngleLeft <= MAX_INTAKE_ANGLE && currentAngleRight <= MAX_INTAKE_ANGLE) {
       deployLeft.set(0);
       deployRight.set(0);
-    }
-    else
-    {
+    } else {
       if (isDeployLeftBehind()) {
-        deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * (INTAKE_P * -1)));
+        deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
         deployRight.set(DEPLOY_SPEED * -1);
-      }
-      else if (isDeployRightBehind()) {
+      } else if (isDeployRightBehind()) {
         deployLeft.set(DEPLOY_SPEED * -1);
-        deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * (INTAKE_P * -1)));
+        deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
       } else {
         deployLeft.set(DEPLOY_SPEED * -1);
         deployRight.set(DEPLOY_SPEED * -1);
@@ -112,31 +128,30 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   /**
-   * Activates the intake rollers to collect cargo
+   * Runs the intake rollers inwards to intake cargo
    */
-  public void intakeCargo()
-  {
-    rollerMotor.set(INTAKE_SPEED);
+  public void intakeCargo() {
+    rollerMotor.set(intakeSpeed);
   }
 
   /**
-   * Reverses the intake system to remove jammed cargo
+   * Runs the intake rollers in reverse to eject cargo held below the conveyor
    */
-  public void reverseIntakeCargo()
-  {
-    rollerMotor.set(INTAKE_SPEED * -1);
+  public void reverseIntakeCargo() {
+    rollerMotor.set(intakeSpeed * -1);
   }
 
   /**
-   * Stopes the intake rollers
+   * Stops the intake rollers
    */
-  public void stopIntake(){
+  public void stopIntake() {
     rollerMotor.set(0);
   }
 
   /**
    * Returns current angle of the deployLeft encoder
-   * @return double value
+   * 
+   * @return degrees from starting position, positive is forwards
    */
   public double getCurrentAngleLeft() {
     return currentAngleLeft;
@@ -144,44 +159,38 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /**
    * Returns the current angle of the deployRight encoder
-   * @return double value
+   * 
+   * @return degrees from starting position, positive is forwards
    */
   public double getCurrentAngleRight() {
     return currentAngleRight;
   }
 
   /**
-   * Gets the absolute value of the difference of the Deploy encoder angles
-   * @return double value
+   * Gets the difference of the deploy encoder angles
+   * 
+   * @return absolute value of the difference
    */
   private double getDeltaDeployEncoders() {
     return Math.abs(currentAngleLeft - currentAngleRight);
   }
 
   /**
-   * Checks to see if the left deploy encoder is less than the right deploy encoder
-   * @return boolean value
+   * Checks to see if the left deploy encoder is less than the right deploy encoder, within a certain error margin
+   * 
+   * @return true if left encoder angle is less than right
    */
   private boolean isDeployLeftBehind() {
-    if (currentAngleLeft < currentAngleRight - 0.1) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return (currentAngleLeft < currentAngleRight - 0.1);
   }
 
   /**
-   * Checks to see if the right deploy encoder is less than the left deploy encoder
-   * @return boolean value
+   * Checks to see if the right deploy encoder is less than the left deploy encoder, within a certain error margin
+   * 
+   * @return true if right encoder angle is less than left
    */
   private boolean isDeployRightBehind() {
-    if (currentAngleRight < currentAngleLeft - 0.1) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return (currentAngleRight < currentAngleLeft - 0.1);
   }
 
   @Override

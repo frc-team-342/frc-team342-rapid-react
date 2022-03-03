@@ -53,11 +53,15 @@ public class OuttakeSubsystem extends SubsystemBase {
     if (Robot.checkType() == Robot.RobotType.A_BOT) {
       shootMotor1.setInverted(true);
       shootMotor2.setInverted(false);
-      feederMotor.setInverted(false);
+      feederMotor.setInverted(true);
     } else {
       shootMotor1.setInverted(false);
       shootMotor2.setInverted(true);
       feederMotor.setInverted(true);
+    }
+
+    if (Robot.checkType() == Robot.RobotType.A_BOT) {
+      velocityMultiplier = -1.0;
     }
 
     encoder1 = shootMotor1.getSensorCollection();
