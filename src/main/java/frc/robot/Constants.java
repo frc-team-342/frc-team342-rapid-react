@@ -147,7 +147,8 @@ public final class Constants {
         public static final int LIMIT_SWITCH_UP = 3;
         public static final int LIMIT_SWITCH_DOWN = 4;
 
-        public static final int CURRENT_LIMIT = 5;
+        public static final int DEPLOY_CURRENT_LIMIT = 50;
+        public static final int ROLLER_CURRENT_LIMIT = 30;
         public static final int CURRENT_DURATION = 500;
 
         public static final double ENCODER_TICKS_PER_ROTATION = 8192.0f;

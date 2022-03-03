@@ -42,17 +42,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
     if (Robot.checkType() == Robot.RobotType.B_BOT) {
       // b bot is 9:1 gear ratio on rollers and a bot is 3:1
-      intakeSpeed = 0.9;
+      intakeSpeed = 0.7;
     }
 
     deployRight.setInverted(true);
 
-    deployLeft.configPeakCurrentLimit(CURRENT_LIMIT);
+    deployLeft.configPeakCurrentLimit(DEPLOY_CURRENT_LIMIT);
     deployLeft.configPeakCurrentDuration(CURRENT_DURATION);
-    deployRight.configPeakCurrentLimit(CURRENT_LIMIT);
+    deployRight.configPeakCurrentLimit(DEPLOY_CURRENT_LIMIT);
     deployRight.configPeakCurrentDuration(CURRENT_DURATION);
 
-    rollerMotor.configPeakCurrentLimit(CURRENT_LIMIT);
+    rollerMotor.configPeakCurrentLimit(ROLLER_CURRENT_LIMIT);
     rollerMotor.configPeakCurrentDuration(CURRENT_DURATION);
   }
 
