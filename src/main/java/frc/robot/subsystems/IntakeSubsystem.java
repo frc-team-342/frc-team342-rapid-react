@@ -52,6 +52,8 @@ public class IntakeSubsystem extends SubsystemBase {
     deployRight.configPeakCurrentLimit(DEPLOY_CURRENT_LIMIT);
     deployRight.configPeakCurrentDuration(CURRENT_DURATION);
 
+    // roller motor wiggling causes it to lose power and led to it burning out previously
+    // lower current limit is necessary so that it doesnt stall and burn out
     rollerMotor.configPeakCurrentLimit(ROLLER_CURRENT_LIMIT);
     rollerMotor.configPeakCurrentDuration(CURRENT_DURATION);
   }
