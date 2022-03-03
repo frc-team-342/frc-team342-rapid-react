@@ -26,7 +26,6 @@ public class IntakeSubsystem extends SubsystemBase {
   private double currentAngleLeft;
   private double currentAngleRight;
 
-  // of course theyre different
   private double intakeSpeed = INTAKE_SPEED;
 
   /** Creates a new IntakeSubsystem. */
@@ -41,10 +40,8 @@ public class IntakeSubsystem extends SubsystemBase {
       rollerMotor.setInverted(true);
     }
 
-    // why wouldnt they be different ?????
     if (Robot.checkType() == Robot.RobotType.B_BOT) {
-      // differnet gear ratios
-      // because of course they are
+      // b bot is 9:1 gear ratio on rollers and a bot is 3:1
       intakeSpeed = 0.9;
     }
 
