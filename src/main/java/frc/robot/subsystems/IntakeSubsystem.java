@@ -81,6 +81,8 @@ public class IntakeSubsystem extends SubsystemBase {
   /**
    * Deploys the intake from the upper position into the intaking position. <br>
    * The maximum angle it deploys to is 52.75 degrees forwards from the starting position.
+   * 
+   * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
    */
   public void deployIntake() {
     if (currentAngleLeft >= MIN_INTAKE_ANGLE && currentAngleRight >= MIN_INTAKE_ANGLE) {
@@ -104,6 +106,8 @@ public class IntakeSubsystem extends SubsystemBase {
    * Retracts the intake from the intaking position above the bumpers. <br>
    * The minimum angle it retracts to is 15.0 degrees forwards from the starting position.
    * This is to avoid jamming the intake back into the original position.
+   * 
+   * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
    */
   public void retractIntake() {
     if (currentAngleLeft <= MAX_INTAKE_ANGLE && currentAngleRight <= MAX_INTAKE_ANGLE) {
