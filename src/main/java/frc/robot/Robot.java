@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("Git Branch", branch);
     SmartDashboard.putString("Git Commit", commit);
 
-    System.out.println((checkType() == RobotType.A_BOT) ? "A Robot" : "B Robot");
+    SmartDashboard.putString("Current Detected Robot", (checkType() == RobotType.A_BOT) ? "A Robot" : "B Robot");
 
     // reset encoders when rio restarts
     m_robotContainer.resetIntakeEncoders();
