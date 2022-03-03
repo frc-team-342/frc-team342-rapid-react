@@ -137,11 +137,11 @@ public final class Constants {
         public static final int ROLLER_MOTOR = 10;
 
         public static final double MIN_INTAKE_ANGLE = 52.75;
-        public static final double MAX_INTAKE_ANGLE = 2.0;
+        public static final double MAX_INTAKE_ANGLE = 15.0;
 
         public static final double INTAKE_P = 0.000005;
 
-        public static final double DEPLOY_SPEED = 0.2;
+        public static final double DEPLOY_SPEED = 0.6;
         public static final double INTAKE_SPEED = 0.5;
 
         public static final int LIMIT_SWITCH_UP = 3;
