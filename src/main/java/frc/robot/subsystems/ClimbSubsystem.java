@@ -132,9 +132,24 @@ public class ClimbSubsystem extends SubsystemBase {
   }
 
   /**
-   * Changes the current status of climbMode to th eopposite of what it was
+   * Changes the current status of climbMode to the desired state
    */
-  public void setClimbMode() {
+  public void setClimbMode(boolean mode) {
+    climbMode = mode;
+  }
+
+  /**
+   * Returns climbMode
+   * @return boolean
+   */
+  public boolean getClimbMode() {
+    return climbMode;
+  }
+
+  /**
+   * Changes the current status of climbMode to the opposite state of what it was
+   */
+  public void toggleClimbMode() {
     climbMode = !climbMode;
   }
 
