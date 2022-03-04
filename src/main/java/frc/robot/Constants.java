@@ -129,6 +129,12 @@ public final class Constants {
 
         public static final int LIMIT_SWITCH_1 = 1;
         public static final int LIMIT_SWITCH_2 = 2;
+
+        public static final double LIFT_MAX_POSITION = 225559.0;
+        public static final double LIFT_MIN_POSITION = 0.0;
+
+        public static final double ROTATE_MAX_ANGLE = 115.0;
+        public static final double ROTATE_MIN_ANGLE = 62.5;
     }
 
     public static final class IntakeConstants {

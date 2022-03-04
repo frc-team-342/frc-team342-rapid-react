@@ -30,21 +30,14 @@ public class ClimbSubsystem extends SubsystemBase {
   private WPI_TalonFX climbMotor2;
   private WPI_TalonSRX secondStageMotor1;
   private WPI_TalonSRX secondStageMotor2;
-  private DigitalInput limitSwitch1;
-  private DigitalInput limitSwitch2;
 
-  private TalonFXSensorCollection leftEncoder;
-  private TalonFXSensorCollection rightEncoder;
+  private TalonFXSensorCollection leftLiftEncoder;
+  private TalonFXSensorCollection rightLiftEncoder;
   
   //Sets the second stage climb initial angle using the rotation ticks from the hex bore encoder
   private double secondStageInitialAngle = (2048 / 8192) * 360;
 
-  private double secondStageMaximumAngle = 115.0;
-  private double secondStageMinimumAngle = 62.5;
   private double currentAngle;
-
-  private double stageOneMaxHeight = 225559;
-  private double stageOneMinHeight = 0;
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
@@ -54,11 +47,8 @@ public class ClimbSubsystem extends SubsystemBase {
     secondStageMotor1 = new WPI_TalonSRX(CLIMB_SECOND_MOTOR_1);
     secondStageMotor2 = new WPI_TalonSRX(CLIMB_SECOND_MOTOR_2);
 
-    limitSwitch1 = new DigitalInput(LIMIT_SWITCH_1);
-    limitSwitch2 = new DigitalInput(LIMIT_SWITCH_2);
-
-    leftEncoder = climbMotor1.getSensorCollection();
-    rightEncoder = climbMotor2.getSensorCollection();
+    leftLiftEncoder = climbMotor1.getSensorCollection();
+    rightLiftEncoder = climbMotor2.getSensorCollection();
 
     // different motor inversions on A and B bot
     if (Robot.checkType() == Robot.RobotType.A_BOT) {
@@ -93,17 +83,16 @@ public class ClimbSubsystem extends SubsystemBase {
    * Lift the climb to the mid hangar position
    */
   public void liftClimb() {
-    // TODO: move this to constants
-    climbMotor1.set(TalonFXControlMode.Position, 225559);
-    climbMotor2.set(TalonFXControlMode.Position, 225559);
+    climbMotor1.set(TalonFXControlMode.Position, LIFT_MAX_POSITION);
+    climbMotor2.set(TalonFXControlMode.Position, LIFT_MAX_POSITION);
   }
 
   /**
    * Reverse the climb back to the starting position
    */
   public void reverseClimb() {
-    climbMotor1.set(TalonFXControlMode.Position, 0);
-    climbMotor2.set(TalonFXControlMode.Position, 0);
+    climbMotor1.set(TalonFXControlMode.Position, LIFT_MIN_POSITION);
+    climbMotor2.set(TalonFXControlMode.Position, LIFT_MIN_POSITION);
   }
 
   /**
@@ -114,6 +103,9 @@ public class ClimbSubsystem extends SubsystemBase {
     climbMotor2.set(ControlMode.PercentOutput, 0);
   }
 
+  /**
+   * Set both of the encoders on the lift motors to 0
+   */
   public void resetLiftEncoders() {
     climbMotor1.setSelectedSensorPosition(0);
     climbMotor2.setSelectedSensorPosition(0);
@@ -123,7 +115,8 @@ public class ClimbSubsystem extends SubsystemBase {
    * Allows the second stage climber to rotate forward
    */
   public void stage2RotateBackwards() {
-    if (currentAngle <= (secondStageMaximumAngle + 0.5f)) {
+    // TODO: determine whether these angles are correct
+    if (currentAngle <= (ROTATE_MAX_ANGLE + 0.5f)) {
       secondStageMotor1.set(ControlMode.PercentOutput, -0.5);
       secondStageMotor2.set(ControlMode.PercentOutput, -0.5);
     } else {
@@ -135,7 +128,7 @@ public class ClimbSubsystem extends SubsystemBase {
    * Allows the second stage climber to rotate forward
    */
   public void stage2RotateForwards() {
-    if (currentAngle >= (secondStageMinimumAngle - 0.5f)) {
+    if (currentAngle >= (ROTATE_MIN_ANGLE - 0.5f)) {
       secondStageMotor1.set(ControlMode.PercentOutput, 0.5);
       secondStageMotor2.set(ControlMode.PercentOutput, 0.5);
     } else {
@@ -143,35 +136,54 @@ public class ClimbSubsystem extends SubsystemBase {
     }
   }
 
-  /** */
+  /**
+   * Stop the movement of the rotational climb arms
+   */
   public void deactivateStage2() {
     secondStageMotor1.set(ControlMode.PercentOutput, 0);
     secondStageMotor2.set(ControlMode.PercentOutput, 0);
   }
 
+  /**
+   * Gets the current angle of the rotational arm
+   * 
+   * @return degrees
+   */
   public double getCurrentAngle() {
     return currentAngle;
   }
 
+  /** 
+   * Sets the encoder of the rotational motor to 0
+   */
   public void zeroRotatingArm() {
     secondStageMotor2.setSelectedSensorPosition(0, 0, 0);
   }
 
-  private double getLeftAngle() {
-    return leftEncoder.getIntegratedSensorPosition();
+  /**
+   * Get position from the encoder of the left lift motor
+   * 
+   * @return encoder ticks
+   */
+  private double getLeftPosition() {
+    return leftLiftEncoder.getIntegratedSensorPosition();
   }
 
-  private double getRightAngle() {
-    return rightEncoder.getIntegratedSensorPosition();
+  /**
+   * Get position from the encoder of the right lift motor
+   * 
+   * @return encoder ticks
+   */
+  private double getRightPosition() {
+    return rightLiftEncoder.getIntegratedSensorPosition();
   }
 
   @Override
   public void initSendable(SendableBuilder sendable) {
     sendable.setSmartDashboardType("Climbsubsystem");
     sendable.addDoubleProperty("Current Angle", this::getCurrentAngle, null);
-    sendable.addDoubleProperty("Left lift encoder", this::getLeftAngle, null);
-    sendable.addDoubleProperty("Right lift encoder", this::getRightAngle, null);
-    
+    sendable.addDoubleProperty("Left lift encoder", this::getLeftPosition, null);
+    sendable.addDoubleProperty("Right lift encoder", this::getRightPosition, null);
   }
 
   /**
