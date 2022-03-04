@@ -36,6 +36,7 @@ public class ClimbSubsystem extends SubsystemBase {
   private double secondStageMinimumAngle = 62.5;
   private double currentAngle;
 
+  private boolean climbMode;
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
@@ -48,6 +49,7 @@ public class ClimbSubsystem extends SubsystemBase {
     limitSwitch1 = new DigitalInput(LIMIT_SWITCH_1);
     limitSwitch2 = new DigitalInput(LIMIT_SWITCH_2);
 
+    climbMode = false;
   }
   
   @Override
@@ -127,6 +129,13 @@ public class ClimbSubsystem extends SubsystemBase {
   public void zeroRotatingArm()
   {
     secondStageMotor2.setSelectedSensorPosition(0, 0, 0);
+  }
+
+  /**
+   * Changes the current status of climbMode to th eopposite of what it was
+   */
+  public void setClimbMode() {
+    climbMode = !climbMode;
   }
 
   @Override
