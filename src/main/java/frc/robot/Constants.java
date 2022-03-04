@@ -171,6 +171,7 @@ public final class Constants {
         public static final int OP_ZERO_ROTATING_ARM_BTN = XboxController.Button.kStart.value;
         public static final int OP_REVERSE_INTAKE_BTN = XboxController.Button.kB.value;
         public static final int OP_TOGGLE_SLOW_BTN = XboxController.Button.kBack.value;
-        public static final int OP_CLIMB_STAGE_ONE_BTN = XboxController.Button.kLeftStick.value;
+        public static final int OP_CLIMB_LIFT_BTN = XboxController.Button.kLeftStick.value;
+        public static final int OP_CLIMB_REVERSE_BTN = XboxController.Button.kRightStick.value;
     }
 }

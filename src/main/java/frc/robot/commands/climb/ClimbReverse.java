@@ -7,14 +7,14 @@ package frc.robot.commands.climb;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ClimbSubsystem;
 
-public class ClimbStageOne extends CommandBase {
-  private ClimbSubsystem subsystem;
+public class ClimbReverse extends CommandBase {
+  private ClimbSubsystem climb;
 
-  /** Creates a new ClimbStageOne. */
-  public ClimbStageOne(ClimbSubsystem subsystem) {
+  /** Creates a new ClimbReverse. */
+  public ClimbReverse(ClimbSubsystem climb) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.subsystem = subsystem; 
-    addRequirements(this.subsystem);
+    this.climb = climb;
+    addRequirements(climb);
   }
 
   // Called when the command is initially scheduled.
@@ -24,13 +24,13 @@ public class ClimbStageOne extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.liftClimb();
+    climb.reverseClimb();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    subsystem.stopClimbLift();
+    climb.stopClimbLift();
   }
 
   // Returns true when the command should end.

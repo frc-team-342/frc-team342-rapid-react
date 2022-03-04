@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -42,6 +43,9 @@ public class ClimbSubsystem extends SubsystemBase {
   private double secondStageMinimumAngle = 62.5;
   private double currentAngle;
 
+  private double stageOneMaxHeight = 225559;
+  private double stageOneMinHeight = 0;
+
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
     climbMotor1 = new WPI_TalonFX(CLIMB_LEFT_MOTOR);
@@ -61,6 +65,22 @@ public class ClimbSubsystem extends SubsystemBase {
       climbMotor1.setInverted(false);
       climbMotor2.setInverted(false);
     }
+
+    climbMotor1.config_kP(1, 0.0001);
+    climbMotor2.config_kP(1, 0.0001);
+
+    climbMotor1.config_kI(1, 0.00005);
+    climbMotor2.config_kI(1, 0.00005);
+
+    climbMotor1.config_kD(1, 0.000005);
+    climbMotor2.config_kD(1, 0.000005);
+
+    climbMotor1.selectProfileSlot(1, 0);
+    climbMotor2.selectProfileSlot(1, 0);
+
+    // brake mode so that it doesnt fall 
+    climbMotor1.setNeutralMode(NeutralMode.Brake);
+    climbMotor2.setNeutralMode(NeutralMode.Brake);
   }
   
   @Override
@@ -87,11 +107,16 @@ public class ClimbSubsystem extends SubsystemBase {
   }
 
   /**
-   * Stop all movement of the climb
+   * Stop all movement of the stage one motors
    */
   public void stopClimbLift() {
     climbMotor1.set(ControlMode.PercentOutput, 0);
     climbMotor2.set(ControlMode.PercentOutput, 0);
+  }
+
+  public void resetLiftEncoders() {
+    climbMotor1.setSelectedSensorPosition(0);
+    climbMotor2.setSelectedSensorPosition(0);
   }
   
   /**
@@ -146,6 +171,7 @@ public class ClimbSubsystem extends SubsystemBase {
     sendable.addDoubleProperty("Current Angle", this::getCurrentAngle, null);
     sendable.addDoubleProperty("Left lift encoder", this::getLeftAngle, null);
     sendable.addDoubleProperty("Right lift encoder", this::getRightAngle, null);
+    
   }
 
   /**
