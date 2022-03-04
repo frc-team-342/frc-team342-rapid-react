@@ -9,12 +9,15 @@ import java.util.Map;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 import static frc.robot.Constants.ClimbConstants.*;
 
@@ -28,6 +31,9 @@ public class ClimbSubsystem extends SubsystemBase {
   private WPI_TalonSRX secondStageMotor2;
   private DigitalInput limitSwitch1;
   private DigitalInput limitSwitch2;
+
+  private TalonFXSensorCollection leftEncoder;
+  private TalonFXSensorCollection rightEncoder;
   
   //Sets the second stage climb initial angle using the rotation ticks from the hex bore encoder
   private double secondStageInitialAngle = (2048 / 8192) * 360;
@@ -35,7 +41,6 @@ public class ClimbSubsystem extends SubsystemBase {
   private double secondStageMaximumAngle = 115.0;
   private double secondStageMinimumAngle = 62.5;
   private double currentAngle;
-
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
@@ -48,6 +53,14 @@ public class ClimbSubsystem extends SubsystemBase {
     limitSwitch1 = new DigitalInput(LIMIT_SWITCH_1);
     limitSwitch2 = new DigitalInput(LIMIT_SWITCH_2);
 
+    leftEncoder = climbMotor1.getSensorCollection();
+    rightEncoder = climbMotor2.getSensorCollection();
+
+    // different motor inversions on A and B bot
+    if (Robot.checkType() == Robot.RobotType.A_BOT) {
+      climbMotor1.setInverted(false);
+      climbMotor2.setInverted(false);
+    }
   }
   
   @Override
@@ -56,42 +69,39 @@ public class ClimbSubsystem extends SubsystemBase {
     currentAngle = (secondStageMotor2.getSelectedSensorPosition() / 8192) * 360 + 62.5;
   }
   
-/**
- * will only run if both switches are not triggered
- */
-  public void activateClimb(){
-
-    if (!limitSwitch1.get() && !limitSwitch2.get()){
-      climbMotor1.set(ControlMode.PercentOutput, 1);
-      climbMotor2.set(ControlMode.PercentOutput, 1);
-    }else{
-      deactivateClimb();
-    }
-
-    
+  /**
+   * Lift the climb to the mid hangar position
+   */
+  public void liftClimb() {
+    // TODO: move this to constants
+    climbMotor1.set(TalonFXControlMode.Position, 225559);
+    climbMotor2.set(TalonFXControlMode.Position, 225559);
   }
 
-  public void deactivateClimb() {
+  /**
+   * Reverse the climb back to the starting position
+   */
+  public void reverseClimb() {
+    climbMotor1.set(TalonFXControlMode.Position, 0);
+    climbMotor2.set(TalonFXControlMode.Position, 0);
+  }
+
+  /**
+   * Stop all movement of the climb
+   */
+  public void stopClimbLift() {
     climbMotor1.set(ControlMode.PercentOutput, 0);
     climbMotor2.set(ControlMode.PercentOutput, 0);
-  }
-
-  public boolean limitSwitchTriggered(){
-    return(limitSwitch1.get() && limitSwitch2.get());
   }
   
   /**
    * Allows the second stage climber to rotate forward
    */
-  public void stage2RotateBackwards()
-  {
-    if(currentAngle <= (secondStageMaximumAngle + 0.5f))
-    {
+  public void stage2RotateBackwards() {
+    if (currentAngle <= (secondStageMaximumAngle + 0.5f)) {
       secondStageMotor1.set(ControlMode.PercentOutput, -0.5);
       secondStageMotor2.set(ControlMode.PercentOutput, -0.5);
-    }
-    else
-    {
+    } else {
       deactivateStage2();
     }
   }
@@ -99,41 +109,43 @@ public class ClimbSubsystem extends SubsystemBase {
   /**
    * Allows the second stage climber to rotate forward
    */
-  public void stage2RotateForwards()
-  {
-    if(currentAngle >= (secondStageMinimumAngle - 0.5f))
-    {
+  public void stage2RotateForwards() {
+    if (currentAngle >= (secondStageMinimumAngle - 0.5f)) {
       secondStageMotor1.set(ControlMode.PercentOutput, 0.5);
       secondStageMotor2.set(ControlMode.PercentOutput, 0.5);
-    }
-    else
-    {
+    } else {
       deactivateStage2();
     }
   }
 
-  //Stops the second stage climber
-  public void deactivateStage2()
-  {
+  /** */
+  public void deactivateStage2() {
     secondStageMotor1.set(ControlMode.PercentOutput, 0);
     secondStageMotor2.set(ControlMode.PercentOutput, 0);
   }
 
-  public double getCurrentAngle()
-  {
+  public double getCurrentAngle() {
     return currentAngle;
   }
 
-  public void zeroRotatingArm()
-  {
+  public void zeroRotatingArm() {
     secondStageMotor2.setSelectedSensorPosition(0, 0, 0);
   }
 
+  private double getLeftAngle() {
+    return leftEncoder.getIntegratedSensorPosition();
+  }
+
+  private double getRightAngle() {
+    return rightEncoder.getIntegratedSensorPosition();
+  }
+
   @Override
-  public void initSendable(SendableBuilder sendable)
-  {
+  public void initSendable(SendableBuilder sendable) {
     sendable.setSmartDashboardType("Climbsubsystem");
     sendable.addDoubleProperty("Current Angle", this::getCurrentAngle, null);
+    sendable.addDoubleProperty("Left lift encoder", this::getLeftAngle, null);
+    sendable.addDoubleProperty("Right lift encoder", this::getRightAngle, null);
   }
 
   /**

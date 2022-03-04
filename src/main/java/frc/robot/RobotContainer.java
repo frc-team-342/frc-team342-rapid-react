@@ -27,6 +27,7 @@ import frc.robot.commands.auto.DriveFunctions;
 import frc.robot.commands.auto.DriveToCargo;
 import frc.robot.commands.auto.DriveToHub;
 import frc.robot.commands.auto.ShootThreeStart;
+import frc.robot.commands.climb.ClimbStageOne;
 import frc.robot.commands.climb.ClimbStageTwoBackward;
 import frc.robot.commands.climb.ClimbStageTwoForward;
 import frc.robot.commands.drive.DriveWithJoystick;
@@ -70,6 +71,7 @@ public class RobotContainer {
   private Command reverseIntake;
   private Command stage2Backwards;
   private Command stage2Forwards;
+  private Command stageOneLift;
 
   private DriveWithJoystick driveWithJoystick;
 
@@ -88,6 +90,7 @@ public class RobotContainer {
   private JoystickButton stage2ForwardBtn;
   private JoystickButton stage2BackwardBtn;
   private JoystickButton zeroRotatingArmBtn;
+  private JoystickButton climbStageOneBtn;
   private Trigger outtakeLowBtn;
 
   private SendableChooser<Command> autoChooser;
@@ -127,6 +130,7 @@ public class RobotContainer {
     stage2BackwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_REVERSE_BTN); // Y button
     zeroRotatingArmBtn = new JoystickButton(driver, OP_ZERO_ROTATING_ARM_BTN); 
     toggleSlowModeBtn = new JoystickButton(operator, OP_TOGGLE_SLOW_BTN); // Back/Select Button
+    climbStageOneBtn = new JoystickButton(operator, OP_CLIMB_STAGE_ONE_BTN); // left stick press
 
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
@@ -154,6 +158,9 @@ public class RobotContainer {
     // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
     driveSystem.setDefaultCommand(driveWithJoystick);
+
+    // Stage one climb
+    stageOneLift = new ClimbStageOne(climb);
 
     // Second stage climb commands
     /*stage2Backwards = new ClimbStageTwoBackward(climb);
@@ -208,6 +215,8 @@ public class RobotContainer {
     /*stage2ForwardBtn.whileHeld(stage2Forwards); // X button
     stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
     zeroRotatingArmBtn.whenPressed(zeroRotatingArm);*/
+
+    climbStageOneBtn.whileHeld(stageOneLift);
   }
 
   public void resetIntakeEncoders() {
