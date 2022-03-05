@@ -144,6 +144,28 @@ public class ClimbSubsystem extends SubsystemBase {
     leadClimbRotate.set(0);
   }
 
+  /**
+   * Changes the current status of climbMode to the desired state
+   */
+  public void setClimbMode(boolean mode) {
+    climbMode = mode;
+  }
+
+  /**
+   * Returns climbMode
+   * @return true if climb is active, false otherwise
+   */
+  public boolean getClimbMode() {
+    return climbMode;
+  }
+
+  /**
+   * Changes the current status of climbMode to the opposite state of what it was
+   */
+  public void toggleClimbMode() {
+    climbMode = !climbMode;
+  }
+
   @Override
   public void initSendable(SendableBuilder sendable) {
     sendable.setSmartDashboardType("ClimbSubsystem");

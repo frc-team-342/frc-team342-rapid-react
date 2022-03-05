@@ -65,7 +65,7 @@ public class RobotContainer {
   private InstantCommand zeroRotatingArm;
   private Command deploy;
   private Command retract;
-  private Command intakeCmd;
+  //private Command intakeCmd; // Used for testing the rollers without deploying the intake
   private Command reverseIntake;
   private Command stage2Backwards;
   private Command stage2Forwards;
@@ -82,7 +82,7 @@ public class RobotContainer {
 
   private XboxController operator;
   private JoystickButton deployBtn;
-  private JoystickButton intakeBtn;
+  //private JoystickButton intakeBtn; // Used for testing the rollers without deploying the intake
   private JoystickButton reverseIntakeBtn;
   private JoystickButton outtakeHighBtn;
   private JoystickButton stage2ForwardBtn;
@@ -117,11 +117,11 @@ public class RobotContainer {
     toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 7
 
     // Operator buttons
-    //deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
+    deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
     outtakeHighBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
     outtakeLowBtn = new Trigger(() -> { return (operator.getRightTriggerAxis() >= 0.8); }); // Right trigger
 
-    intakeBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right Bumper
+    //intakeBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right Bumper // Used for testing the rollers without deploying the intake
     reverseIntakeBtn = new JoystickButton(operator, OP_REVERSE_INTAKE_BTN); // B Button
     stage2ForwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_FORWARD_BTN); // X button
     stage2BackwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_REVERSE_BTN); // Y button
@@ -147,7 +147,7 @@ public class RobotContainer {
     // Intake Commands
     retract = new Retract(intake);
     deploy = new Deploy(intake);
-    //intakeCmd = new Intake(intake);
+    //intakeCmd = new Intake(intake); // Used for testing the rollers without deploying the intake
     reverseIntake = new ReverseIntake(intake);
     intake.setDefaultCommand(retract);
 
@@ -204,9 +204,9 @@ public class RobotContainer {
     toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
 
     // Operator
-    /*deployBtn.whileHeld(deploy); // Right bumper
-    reverseIntakeBtn.whileHeld(reverseIntake); // B button*/
-    intakeBtn.whileHeld(deploy); // Right bumper 
+    deployBtn.whileHeld(deploy); // Right bumper
+    reverseIntakeBtn.whileHeld(reverseIntake); // B button
+    //intakeBtn.whileHeld(intakeCmd); // Right bumper // Used for testing the rollers without deploying the intake
     outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
     outtakeLowBtn.whileActiveContinuous(outtakeLow);
     /*stage2ForwardBtn.whileHeld(stage2Forwards); // X button
