@@ -28,6 +28,8 @@ import frc.robot.commands.auto.DriveToCargo;
 import frc.robot.commands.auto.DriveToHub;
 import frc.robot.commands.auto.ShootThreeStart;
 import frc.robot.commands.climb.StageOneClimb;
+import frc.robot.commands.climb.StageTwoClimb;
+import frc.robot.commands.climb.TurnOnClimbMode;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
 import frc.robot.commands.outtake.OuttakeLow;
@@ -69,7 +71,10 @@ public class RobotContainer {
   private Command reverseIntake;
   private Command stage2Backwards;
   private Command stage2Forwards;
+
   private Command climbLift;
+  private Command climbRotate;
+  private Command climbModeEnable;
 
   private DriveWithJoystick driveWithJoystick;
 
@@ -155,14 +160,13 @@ public class RobotContainer {
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
     driveSystem.setDefaultCommand(driveWithJoystick);
 
-    // First stage of climb
+    // Climb
     climbLift = new StageOneClimb(climb, operator);
+    climbRotate = new StageTwoClimb(climb, operator);
+    climbModeEnable = new TurnOnClimbMode(climb, intake);
     climb.setDefaultCommand(climbLift);
 
-    // Second stage climb commands
-    /*stage2Backwards = new ClimbStageTwoBackward(climb);
-    stage2Forwards = new ClimbStageTwoForward(climb);
-    zeroRotatingArm = new InstantCommand(climb::zeroRotatingArm, climb);*/
+    climb.resetLiftEncoders();
 
     // Configure the button bindings
     configureButtonBindings();
@@ -209,9 +213,8 @@ public class RobotContainer {
     //intakeBtn.whileHeld(intakeCmd); // Right bumper // Used for testing the rollers without deploying the intake
     outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
     outtakeLowBtn.whileActiveContinuous(outtakeLow);
-    /*stage2ForwardBtn.whileHeld(stage2Forwards); // X button
-    stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
-    zeroRotatingArmBtn.whenPressed(zeroRotatingArm);*/
+    
+    new JoystickButton(operator, XboxController.Button.kY.value).toggleWhenPressed(climbModeEnable);
   }
 
   public void resetIntakeEncoders() {

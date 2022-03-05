@@ -77,14 +77,14 @@ public class ClimbSubsystem extends SubsystemBase {
 
       // only runs outside of bounds if it is moving back towards bounds
       if ((leftAboveMin || speed > 0) && (leftBelowMax || speed < 0)) {
-        leftClimbLift.set(speed);
+        leftClimbLift.set(speed * CLIMB_SPEED);
       } else {
         // otherwise do not move
         leftClimbLift.set(0);
       }
 
       if ((rightAboveMin || speed > 0) && (rightBelowMax || speed < 0)) {
-        rightClimbLift.set(speed);
+        rightClimbLift.set(speed * CLIMB_SPEED);
       } else {
         rightClimbLift.set(0);
       }
@@ -106,11 +106,13 @@ public class ClimbSubsystem extends SubsystemBase {
 
     if (climbMode) {
       boolean withinMinAngle = encoderTicksToDegrees(position) > ROTATE_MIN_ANGLE;
-      boolean withinMaxAngle = encoderTicksToDegrees(position) > ROTATE_MAX_ANGLE;
+      boolean withinMaxAngle = encoderTicksToDegrees(position) < ROTATE_MAX_ANGLE;
 
       // only run if within bounds or moving back towards within bounds
-      if ((withinMinAngle || speed > 0) && (withinMaxAngle || speed < 0)) {
-        leadClimbRotate.set(speed);
+      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0)) {
+        leadClimbRotate.set(speed * CLIMB_SPEED);
+      } else {
+        leadClimbRotate.set(0);
       }
     } else {
       // do not run if climb mode is not enabled
@@ -135,6 +137,21 @@ public class ClimbSubsystem extends SubsystemBase {
   public void stopClimbLift() {
     leftClimbLift.set(0);
     rightClimbLift.set(0);
+  }
+
+  /**
+   * Sets the position of both lift motor encoders back to 0.
+   */
+  public void resetLiftEncoders() {
+    leftClimbLiftEncoder.setIntegratedSensorPosition(0, 0);
+    rightClimbLiftEncoder.setIntegratedSensorPosition(0, 0);
+  }
+
+  /**
+   * Sets the position of the rotate motor encoder to 0.
+   */
+  public void resetRotateEncoders() {
+    leadClimbRotate.setSelectedSensorPosition(0);
   }
 
   /**
@@ -169,6 +186,12 @@ public class ClimbSubsystem extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder sendable) {
     sendable.setSmartDashboardType("ClimbSubsystem");
+    sendable.addBooleanProperty("Climb mode", this::getClimbMode, this::setClimbMode);
+    sendable.addDoubleProperty("Left lift encoder", leftClimbLiftEncoder::getIntegratedSensorPosition, null);
+    sendable.addDoubleProperty("Right lift encoder", rightClimbLiftEncoder::getIntegratedSensorPosition, null);
+    sendable.addDoubleProperty("Rotate encoder", () -> {
+      return encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition());
+    }, null);
   }
 
   /**

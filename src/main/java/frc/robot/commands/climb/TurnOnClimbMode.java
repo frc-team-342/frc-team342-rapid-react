@@ -18,7 +18,7 @@ public class TurnOnClimbMode extends CommandBase {
     this.climb = climb;
     this.intake = intake;
 
-    addRequirements(climb, intake);
+    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
@@ -31,18 +31,19 @@ public class TurnOnClimbMode extends CommandBase {
   @Override
   public void execute() {
     if (climb.getClimbMode()) {
-      climb.toggleClimbMode();
       intake.deployIntake();
     }
     else {
-      climb.toggleClimbMode();
       intake.retractIntake();
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    // since it is toggle when pressed
+    climb.toggleClimbMode();
+  }
 
   // Returns true when the command should end.
   @Override

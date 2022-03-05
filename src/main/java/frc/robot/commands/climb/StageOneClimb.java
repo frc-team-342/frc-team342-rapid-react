@@ -4,6 +4,7 @@
 
 package frc.robot.commands.climb;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -28,7 +29,12 @@ public class StageOneClimb extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    climb.liftClimb(xbox.getLeftY());
+    // deadbanding
+    double liftSpeed = -MathUtil.applyDeadband(xbox.getLeftY(), 0.15);
+    double rotateSpeed = MathUtil.applyDeadband(xbox.getRightX(), 0.15);
+
+    climb.liftClimb(liftSpeed);
+    climb.rotateClimb(rotateSpeed);
   }
 
   // Called once the command ends or is interrupted.
