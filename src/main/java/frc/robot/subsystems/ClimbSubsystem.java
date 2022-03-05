@@ -10,6 +10,7 @@ import java.util.Map;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -33,6 +34,8 @@ public class ClimbSubsystem extends SubsystemBase {
   private WPI_TalonSRX leadClimbRotate;
   private WPI_TalonSRX followClimbRotate;
 
+  private SensorCollection rotateEncoder;
+
   // Used for locking the climber controls on the operator control before climb time
   private boolean climbMode;
 
@@ -41,8 +44,13 @@ public class ClimbSubsystem extends SubsystemBase {
     leftClimbLift = new WPI_TalonFX(LEFT_LIFT_MOTOR);
     rightClimbLift = new WPI_TalonFX(RIGHT_LIFT_MOTOR);
 
+    leftClimbLiftEncoder = leftClimbLift.getSensorCollection();
+    rightClimbLiftEncoder = rightClimbLift.getSensorCollection();
+
     leadClimbRotate = new WPI_TalonSRX(LEAD_ROTATE_MOTOR);
     followClimbRotate = new WPI_TalonSRX(FOLLOW_ROTATE_MOTOR);
+
+    followClimbRotate.follow(leadClimbRotate);
 
     // brake mode so that it does not fall when on the bars
     leftClimbLift.setNeutralMode(NeutralMode.Brake);
@@ -95,11 +103,37 @@ public class ClimbSubsystem extends SubsystemBase {
   }
 
   /**
-   * 
+   * Moves the rotational mechanism of the climber. 
+   * Will not move outside of a window of angles for minimum and maximum position.
+   *  
    * @param speed the speed to rotate at, [-1, 1]
    */
   public void rotateClimb(double speed) {
+    double position = leadClimbRotate.getSelectedSensorPosition();
 
+    if (climbMode) {
+      boolean withinMinAngle = encoderTicksToDegrees(position) > ROTATE_MIN_ANGLE;
+      boolean withinMaxAngle = encoderTicksToDegrees(position) > ROTATE_MAX_ANGLE;
+
+      // only run if within bounds or moving back towards within bounds
+      if ((withinMinAngle || speed > 0) && (withinMaxAngle || speed < 0)) {
+        leadClimbRotate.set(speed);
+      }
+    } else {
+      // do not run if climb mode is not enabled
+      leadClimbRotate.set(0);
+    }
+  }
+
+  /**
+   * Converts encoder ticks to degrees of motor rotation
+   * 
+   * @param ticks encoder ticks
+   * @return degrees, continuous past 360
+   */
+  private double encoderTicksToDegrees(double ticks) {
+    // 8192 encoder ticks in a rotation, 360 degrees in a rotation
+    return (ticks / ROTATE_ENCODER_TICKS_PER_ROT) * 360;
   }
 
   /**

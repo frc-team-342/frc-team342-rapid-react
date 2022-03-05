@@ -130,8 +130,10 @@ public final class Constants {
         public static final double LIFT_MIN_POSITION = 0;
         public static final double LIFT_MAX_POSITION = 225559;
 
-        public static final double ROTATE_MIN_ANGLE = 0;
-        public static final double ROTATE_MAX_ANGLE = 0;
+        public static final double ROTATE_MIN_ANGLE = -10.0;
+        public static final double ROTATE_MAX_ANGLE = 10.0;
+
+        public static final double ROTATE_ENCODER_TICKS_PER_ROT = 8192;
     }
 
     public static final class IntakeConstants {
