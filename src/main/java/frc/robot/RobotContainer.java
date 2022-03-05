@@ -76,18 +76,23 @@ public class RobotContainer {
 
   private OuttakeHigh outtakeHigh;
   private OuttakeLow outtakeLow;
-
+  
+  // Driver Buttons
   private Joystick driver;
-  private JoystickButton toggleFieldOrientedBtn;
-  private JoystickButton toggleSlowModeBtn;
+  private JoystickButton driver_toggleFieldOrientedBtn;
+  private JoystickButton driver_toggleSlowModeBtn;
+  private JoystickButton driver_outtakeHighBtn;
+  private JoystickButton driver_outtakeLowBtn;
+  private JoystickButton driver_reverseOuttakeBtn;
 
+  // Operator Buttons
   private XboxController operator;
-  private JoystickButton deployBtn;
-  //private JoystickButton intakeBtn; // Used for testing the rollers without deploying the intake
-  private JoystickButton reverseIntakeBtn;
-  private JoystickButton outtakeHighBtn;
-  private JoystickButton climbModeBtn;
-  private Trigger outtakeLowBtn;
+  private JoystickButton op_deployBtn;
+  private JoystickButton op_reverseOuttakeBtn;
+  private JoystickButton op_climbModeBtn;
+  private JoystickButton op_toggleSlowModeBtn;
+  private JoystickButton op_outtakeHighBtn;
+  private Trigger op_outtakeLowBtn;
 
   private SendableChooser<Command> autoChooser;
   private Command driveToCargo;
@@ -112,18 +117,19 @@ public class RobotContainer {
     operator = new XboxController(OPERATOR_PORT);
 
     // Driver buttons
-    toggleFieldOrientedBtn = new JoystickButton(driver, DRIVER_FIELD_ORIENTED_BTN); // Button 5
-    toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 7
+    driver_toggleFieldOrientedBtn = new JoystickButton(driver, DRIVER_FIELD_ORIENTED_BTN); // Button 6
+    driver_toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 4
+    driver_outtakeLowBtn = new JoystickButton(driver, DRIVER_OUTTAKE_LOW_BTN);
+    driver_outtakeHighBtn = new JoystickButton(driver, DRIVER_OUTTAKE_HIGH_BTN);
+    driver_reverseOuttakeBtn = new JoystickButton(driver, DRIVER_OUTTAKE_REVERSE_BTN);
 
     // Operator buttons
-    deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
-    outtakeHighBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
-    outtakeLowBtn = new Trigger(() -> { return (operator.getRightTriggerAxis() >= 0.8); }); // Right trigger
-
-    //intakeBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right Bumper // Used for testing the rollers without deploying the intake
-    reverseIntakeBtn = new JoystickButton(operator, OP_REVERSE_INTAKE_BTN); // B Button
-    climbModeBtn = new JoystickButton(operator, OP_CLIMB_MODE_BTN);
-    toggleSlowModeBtn = new JoystickButton(operator, OP_TOGGLE_SLOW_BTN); // Back/Select Button
+    op_deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
+    op_outtakeHighBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
+    op_outtakeLowBtn = new Trigger(() -> { return (operator.getLeftTriggerAxis() >= 0.8); }); // Left trigger
+    op_reverseOuttakeBtn = new JoystickButton(operator, OP_REVERSE_OUTTAKE_BTN); // B Button
+    op_climbModeBtn = new JoystickButton(operator, OP_CLIMB_MODE_BTN);
+    op_toggleSlowModeBtn = new JoystickButton(operator, OP_TOGGLE_SLOW_BTN); // Back/Select Button
 
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
@@ -193,17 +199,18 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Driver
-    toggleFieldOrientedBtn.whenPressed(toggleFieldOriented); // Button 5
-    toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
+    driver_toggleFieldOrientedBtn.whenPressed(toggleFieldOriented); // Button 6
+    driver_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 4
+    driver_outtakeLowBtn.whileHeld(outtakeLow); // Button 8
+    driver_outtakeHighBtn.whileHeld(outtakeHigh); // Button 3
+    driver_reverseOuttakeBtn.whileHeld(reverseIntake); // Button 12
 
     // Operator
-    deployBtn.whileHeld(deploy); // Right bumper
-    reverseIntakeBtn.whileHeld(reverseIntake); // B button
-    //intakeBtn.whileHeld(intakeCmd); // Right bumper // Used for testing the rollers without deploying the intake
-    outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
-    outtakeLowBtn.whileActiveContinuous(outtakeLow);
-    
-    climbModeBtn.toggleWhenPressed(climbModeEnable);
+    op_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
+    op_deployBtn.whileHeld(deploy); // Right bumper
+    op_outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
+    op_reverseOuttakeBtn.whileHeld(reverseIntake); // B button
+    op_outtakeLowBtn.whileActiveContinuous(outtakeLow); // Right trigger
   }
 
   public void resetIntakeEncoders() {
