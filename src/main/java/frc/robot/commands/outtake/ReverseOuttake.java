@@ -2,23 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.reverse;
+package frc.robot.commands.outtake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
 
-public class ReverseAll extends CommandBase {
-  /** Creates a new ReverseAll. */
-  public IntakeSubsystem intakeSub;
+public class ReverseOuttake extends CommandBase {
+  /** Creates a new ReverseOuttake. */
   public OuttakeSubsystem outtakeSub;
 
-  public ReverseAll(IntakeSubsystem intakeSub, OuttakeSubsystem outtakeSub) {
+  public ReverseOuttake(OuttakeSubsystem outtakeSub) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.intakeSub = intakeSub;
     this.outtakeSub = outtakeSub;
 
-    addRequirements(intakeSub, outtakeSub);
+    addRequirements(outtakeSub);
   }
 
   // Called when the command is initially scheduled.
@@ -29,9 +26,7 @@ public class ReverseAll extends CommandBase {
   @Override
   public void execute()
   {
-    intakeSub.deployIntake();
-    intakeSub.reverseIntakeCargo();
-    outtakeSub.setIsReverse(true);
+    outtakeSub.setReverse(true);
     outtakeSub.reverse();
   }
 

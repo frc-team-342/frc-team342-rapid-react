@@ -17,7 +17,7 @@ public class Retract extends CommandBase {
     this.intake = intake;
     this.outtakeSub = outtakeSub;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake);
+    addRequirements(intake, outtakeSub);
   }
 
   // Called when the command is initially scheduled.
@@ -29,7 +29,7 @@ public class Retract extends CommandBase {
   public void execute() {
 
     intake.retractIntake();
-    outtakeSub.setIsReverse(false);
+    outtakeSub.setReverse(false);
     intake.stopIntake();
     
   }

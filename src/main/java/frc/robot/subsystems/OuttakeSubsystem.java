@@ -6,7 +6,7 @@ package frc.robot.subsystems;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle.Control;
+
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -108,12 +108,12 @@ public class OuttakeSubsystem extends SubsystemBase {
     setpoint = HIGH_RPM;
   }
 
-  public void setIsReverse(boolean reverse)
+  public void setReverse(boolean reverse)
   {
     isReverse = reverse;
   }
 
-  public boolean getIsReverse()
+  public boolean getReverse()
   {
     return isReverse;
   }
