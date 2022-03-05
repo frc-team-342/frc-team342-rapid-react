@@ -140,7 +140,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * Runs the intake rollers in reverse to eject cargo held below the conveyor
    */
   public void reverseIntakeCargo() {
-    rollerMotor.set(intakeSpeed * -1);
+    rollerMotor.set(intakeSpeed);
   }
 
   /**

@@ -32,6 +32,8 @@ import frc.robot.commands.climb.ClimbStageTwoForward;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
 import frc.robot.commands.outtake.OuttakeLow;
+import frc.robot.commands.reverse.ReverseAll;
+import frc.robot.commands.reverse.ReverseOuttake;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -70,6 +72,8 @@ public class RobotContainer {
   private Command reverseIntake;
   private Command stage2Backwards;
   private Command stage2Forwards;
+  private Command reverseAll;
+  private Command reverseOuttake;
 
   private DriveWithJoystick driveWithJoystick;
 
@@ -88,6 +92,8 @@ public class RobotContainer {
   private JoystickButton stage2ForwardBtn;
   private JoystickButton stage2BackwardBtn;
   private JoystickButton zeroRotatingArmBtn;
+  private JoystickButton reverseAllbtn;
+  private JoystickButton reverseOuttakebtn;
   private Trigger outtakeLowBtn;
 
   private SendableChooser<Command> autoChooser;
@@ -115,6 +121,8 @@ public class RobotContainer {
     // Driver buttons
     toggleFieldOrientedBtn = new JoystickButton(driver, DRIVER_FIELD_ORIENTED_BTN); // Button 5
     toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 7
+    reverseAllbtn = new JoystickButton(driver, 11);
+    reverseOuttakebtn = new JoystickButton(driver, 12);
 
     // Operator buttons
     //deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
@@ -145,8 +153,10 @@ public class RobotContainer {
     outtakeLow = new OuttakeLow(outtake);
     
     // Intake Commands
-    retract = new Retract(intake);
+    retract = new Retract(intake, outtake);
     deploy = new Deploy(intake);
+    reverseAll = new ReverseAll(intake, outtake);
+    reverseOuttake = new ReverseOuttake(outtake);
     //intakeCmd = new Intake(intake);
     reverseIntake = new ReverseIntake(intake);
     intake.setDefaultCommand(retract);
@@ -198,6 +208,8 @@ public class RobotContainer {
     // Driver
     toggleFieldOrientedBtn.whenPressed(toggleFieldOriented); // Button 5
     toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
+    reverseAllbtn.whileHeld(reverseAll);
+    reverseOuttakebtn.whileHeld(reverseOuttake);
 
     // Operator
     /*deployBtn.whileHeld(deploy); // Right bumper
