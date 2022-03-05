@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ClimbSubsystem;
 
-public class StageOneClimb extends CommandBase {
+public class Climb extends CommandBase {
   private ClimbSubsystem climb;
   private XboxController xbox;
 
   /** Creates a new StageOneClimb. */
-  public StageOneClimb(ClimbSubsystem climb, XboxController xbox) {
+  public Climb(ClimbSubsystem climb, XboxController xbox) {
     this.climb = climb;
     this.xbox = xbox;
 
