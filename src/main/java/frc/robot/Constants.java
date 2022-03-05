@@ -160,8 +160,12 @@ public final class Constants {
         public static final int OPERATOR_PORT = 1;
 
         // Driver button IDs
-        public static final int DRIVER_FIELD_ORIENTED_BTN = 5;
-        public static final int DRIVER_SLOW_MODE_BTN = 7;
+        public static final int DRIVER_FIELD_ORIENTED_BTN = 6;
+        public static final int DRIVER_SLOW_MODE_BTN = 4;
+        public static final int DRIVER_OUTTAKE_LOW_BTN = 8;
+        public static final int DRIVER_OUTTAKE_HIGH_BTN = 3;
+        public static final int DRIVER_CLIMB_STAGE2_REVERSE_BTN = 12;
+
 
         // Operator button IDs
         public static final int OP_DEPLOY_INTAKE_BTN = XboxController.Button.kRightBumper.value;
