@@ -67,19 +67,39 @@ public class ClimbSubsystem extends SubsystemBase {
 
     // only run if climb has been activated
     if (climbMode) {
-      // above minimum position and below maximum position
-      boolean leftInPositionWindow = (leftPosition >= LIFT_MIN_POSITION) && (leftPosition <= LIFT_MAX_POSITION);
-      boolean rightInPositionWindow = (rightPosition >= LIFT_MIN_POSITION) && (rightPosition <= LIFT_MAX_POSITION);
+      // above minimum position on each encoder since arms are not mechanically linked
+      boolean leftAboveMin = (leftPosition >= LIFT_MIN_POSITION);
+      boolean leftBelowMax = (leftPosition <= LIFT_MAX_POSITION);
 
-      // only run if motors are within acceptable positions
-      if (leftInPositionWindow) {
+      boolean rightAboveMin = (rightPosition >= LIFT_MIN_POSITION);
+      boolean rightBelowMax = (rightPosition <= LIFT_MAX_POSITION);
+
+      // only runs outside of bounds if it is moving back towards bounds
+      if ((leftAboveMin || speed > 0) && (leftBelowMax || speed < 0)) {
         leftClimbLift.set(speed);
+      } else {
+        // otherwise do not move
+        leftClimbLift.set(0);
       }
 
-      if (rightInPositionWindow) {
+      if ((rightAboveMin || speed > 0) && (rightBelowMax || speed < 0)) {
         rightClimbLift.set(speed);
+      } else {
+        rightClimbLift.set(0);
       }
+    } else {
+      // do not run motors if climb mode is not enabled
+      leftClimbLift.set(0);
+      rightClimbLift.set(0);
     }
+  }
+
+  /**
+   * 
+   * @param speed the speed to rotate at, [-1, 1]
+   */
+  public void rotateClimb(double speed) {
+
   }
 
   /**
