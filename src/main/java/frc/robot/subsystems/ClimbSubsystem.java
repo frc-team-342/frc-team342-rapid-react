@@ -140,7 +140,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
   /**
    * Returns climbMode
-   * @return boolean
+   * @return true if climb is active, false otherwise
    */
   public boolean getClimbMode() {
     return climbMode;
