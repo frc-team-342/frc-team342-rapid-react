@@ -164,7 +164,7 @@ public final class Constants {
         public static final int DRIVER_SLOW_MODE_BTN = 4;
         public static final int DRIVER_OUTTAKE_LOW_BTN = 8;
         public static final int DRIVER_OUTTAKE_HIGH_BTN = 3;
-        public static final int DRIVER_CLIMB_STAGE2_REVERSE_BTN = 12;
+        public static final int DRIVER_INTAKE_REVERSE_BTN = 12;
 
 
         // Operator button IDs

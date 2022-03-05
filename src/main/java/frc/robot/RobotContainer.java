@@ -80,23 +80,23 @@ public class RobotContainer {
   private Joystick driver;
   private JoystickButton toggleFieldOrientedBtn;
  
-  private JoystickButton DR_toggleSlowModeBtn;
-  private JoystickButton DR_outtakeHighBtn;
-  private JoystickButton DR_outtakeLowBtn;
-  private JoystickButton DR_reverseIntakeBtn;
+  private JoystickButton driver_toggleSlowModeBtn;
+  private JoystickButton driver_outtakeHighBtn;
+  private JoystickButton driver_outtakeLowBtn;
+  private JoystickButton driver_reverseIntakeBtn;
 
   //Operator Buttons
   private XboxController operator;
   private JoystickButton deployBtn;
   private JoystickButton intakeBtn;
-  private JoystickButton OP_reverseIntakeBtn;
+  private JoystickButton op_reverseIntakeBtn;
   
   private JoystickButton stage2ForwardBtn;
   private JoystickButton stage2BackwardBtn;
   private JoystickButton zeroRotatingArmBtn; 
-  private JoystickButton OP_toggleSlowModeBtn;
-  private JoystickButton OP_outtakeHighBtn;
-  private Trigger OP_outtakeLowBtn;
+  private JoystickButton op_toggleSlowModeBtn;
+  private JoystickButton op_outtakeHighBtn;
+  private Trigger op_outtakeLowBtn;
 
   private SendableChooser<Command> autoChooser;
   private Command driveToCargo;
@@ -122,22 +122,22 @@ public class RobotContainer {
 
     // Driver buttons
     toggleFieldOrientedBtn = new JoystickButton(driver, DRIVER_FIELD_ORIENTED_BTN); // Button 6
-    DR_toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 4
-    DR_outtakeLowBtn = new JoystickButton(driver, DRIVER_OUTTAKE_LOW_BTN);
-    DR_outtakeHighBtn = new JoystickButton(driver, DRIVER_OUTTAKE_HIGH_BTN);
-    DR_reverseIntakeBtn = new JoystickButton(driver, DRIVER_CLIMB_STAGE2_REVERSE_BTN);
+    driver_toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 4
+    driver_outtakeLowBtn = new JoystickButton(driver, DRIVER_OUTTAKE_LOW_BTN);
+    driver_outtakeHighBtn = new JoystickButton(driver, DRIVER_OUTTAKE_HIGH_BTN);
+    driver_reverseIntakeBtn = new JoystickButton(driver, DRIVER_INTAKE_REVERSE_BTN);
 
     // Operator buttons
     //deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
-    OP_outtakeHighBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
-    OP_outtakeLowBtn = new Trigger(() -> { return (operator.getRightTriggerAxis() >= 0.8); }); // Right trigger
+    op_outtakeHighBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
+    op_outtakeLowBtn = new Trigger(() -> { return (operator.getRightTriggerAxis() >= 0.8); }); // Right trigger
 
     intakeBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right Bumper
-    OP_reverseIntakeBtn = new JoystickButton(operator, OP_REVERSE_INTAKE_BTN); // B Button
+    op_reverseIntakeBtn = new JoystickButton(operator, OP_REVERSE_INTAKE_BTN); // B Button
     stage2ForwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_FORWARD_BTN); // X button
     stage2BackwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_REVERSE_BTN); // Y button
     zeroRotatingArmBtn = new JoystickButton(driver, OP_ZERO_ROTATING_ARM_BTN); 
-    OP_toggleSlowModeBtn = new JoystickButton(operator, OP_TOGGLE_SLOW_BTN); // Back/Select Button
+    op_toggleSlowModeBtn = new JoystickButton(operator, OP_TOGGLE_SLOW_BTN); // Back/Select Button
 
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
@@ -208,20 +208,20 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Driver
     toggleFieldOrientedBtn.whenPressed(toggleFieldOriented); // Button 5
-    OP_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
-    DR_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 4
+    op_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
+    driver_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 4
     // Operator
     /*deployBtn.whileHeld(deploy); // Right bumper
-    OP_reverseIntakeBtn.whileHeld(reverseIntake); // B button
-    DR_reverseIntakeBtn.whileHeld(reverseIntake);
+    op_reverseIntakeBtn.whileHeld(reverseIntake); // B button
+    driver_reverseIntakeBtn.whileHeld(reverseIntake);
     */
     
     intakeBtn.whileHeld(deploy); // Right bumper 
-    OP_outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
-    DR_outtakeHighBtn.whileActiveContinuous(outtakeHigh);
+    op_outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
+    driver_outtakeHighBtn.whileActiveContinuous(outtakeHigh);
 
-    OP_outtakeLowBtn.whileActiveContinuous(outtakeLow);
-    DR_outtakeLowBtn.whileActiveContinuous(outtakeLow);
+    op_outtakeLowBtn.whileActiveContinuous(outtakeLow);
+    driver_outtakeLowBtn.whileActiveContinuous(outtakeLow);
     /*stage2ForwardBtn.whileHeld(stage2Forwards); // X button
     stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
     zeroRotatingArmBtn.whenPressed(zeroRotatingArm);*/
