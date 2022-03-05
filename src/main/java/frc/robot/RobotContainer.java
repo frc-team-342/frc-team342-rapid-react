@@ -27,6 +27,7 @@ import frc.robot.commands.auto.DriveFunctions;
 import frc.robot.commands.auto.DriveToCargo;
 import frc.robot.commands.auto.DriveToHub;
 import frc.robot.commands.auto.ShootThreeStart;
+import frc.robot.commands.climb.StageOneClimb;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
 import frc.robot.commands.outtake.OuttakeLow;
@@ -68,6 +69,7 @@ public class RobotContainer {
   private Command reverseIntake;
   private Command stage2Backwards;
   private Command stage2Forwards;
+  private Command climbLift;
 
   private DriveWithJoystick driveWithJoystick;
 
@@ -152,6 +154,10 @@ public class RobotContainer {
     // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
     driveSystem.setDefaultCommand(driveWithJoystick);
+
+    // First stage of climb
+    climbLift = new StageOneClimb(climb, operator);
+    climb.setDefaultCommand(climbLift);
 
     // Second stage climb commands
     /*stage2Backwards = new ClimbStageTwoBackward(climb);

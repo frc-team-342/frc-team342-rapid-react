@@ -34,8 +34,6 @@ public class ClimbSubsystem extends SubsystemBase {
   private WPI_TalonSRX leadClimbRotate;
   private WPI_TalonSRX followClimbRotate;
 
-  private SensorCollection rotateEncoder;
-
   // Used for locking the climber controls on the operator control before climb time
   private boolean climbMode;
 
@@ -142,6 +140,13 @@ public class ClimbSubsystem extends SubsystemBase {
   public void stopClimbLift() {
     leftClimbLift.set(0);
     rightClimbLift.set(0);
+  }
+
+  /**
+   * Stop the movement of the climb rotate motors.
+   */
+  public void stopClimbRotate() {
+    leadClimbRotate.set(0);
   }
 
   @Override
