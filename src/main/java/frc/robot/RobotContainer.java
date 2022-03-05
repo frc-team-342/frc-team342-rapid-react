@@ -27,8 +27,9 @@ import frc.robot.commands.auto.DriveFunctions;
 import frc.robot.commands.auto.DriveToCargo;
 import frc.robot.commands.auto.DriveToHub;
 import frc.robot.commands.auto.ShootThreeStart;
-import frc.robot.commands.climb.ClimbStageTwoBackward;
-import frc.robot.commands.climb.ClimbStageTwoForward;
+import frc.robot.commands.climb.Climb;
+import frc.robot.commands.climb.StageTwoClimb;
+import frc.robot.commands.climb.TurnOnClimbMode;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
 import frc.robot.commands.outtake.OuttakeLow;
@@ -63,13 +64,13 @@ public class RobotContainer {
   private InstantCommand toggleTurboMode;
   private InstantCommand resetIntakeEncoders;
 
-  private InstantCommand zeroRotatingArm;
   private Command deploy;
   private Command retract;
-  private Command intakeCmd;
+  //private Command intakeCmd; // Used for testing the rollers without deploying the intake
   private Command reverseIntake;
-  private Command stage2Backwards;
-  private Command stage2Forwards;
+
+  private Command climbCmd;
+  private Command climbModeEnable;
 
   private DriveWithJoystick driveWithJoystick;
 
@@ -82,12 +83,10 @@ public class RobotContainer {
 
   private XboxController operator;
   private JoystickButton deployBtn;
-  private JoystickButton intakeBtn;
+  //private JoystickButton intakeBtn; // Used for testing the rollers without deploying the intake
   private JoystickButton reverseIntakeBtn;
   private JoystickButton outtakeHighBtn;
-  private JoystickButton stage2ForwardBtn;
-  private JoystickButton stage2BackwardBtn;
-  private JoystickButton zeroRotatingArmBtn;
+  private JoystickButton climbModeBtn;
   private Trigger outtakeLowBtn;
 
   private SendableChooser<Command> autoChooser;
@@ -117,15 +116,13 @@ public class RobotContainer {
     toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 7
 
     // Operator buttons
-    //deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
+    deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
     outtakeHighBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
     outtakeLowBtn = new Trigger(() -> { return (operator.getRightTriggerAxis() >= 0.8); }); // Right trigger
 
-    intakeBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right Bumper
+    //intakeBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right Bumper // Used for testing the rollers without deploying the intake
     reverseIntakeBtn = new JoystickButton(operator, OP_REVERSE_INTAKE_BTN); // B Button
-    stage2ForwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_FORWARD_BTN); // X button
-    stage2BackwardBtn = new JoystickButton(operator, OP_CLIMB_STAGE2_REVERSE_BTN); // Y button
-    zeroRotatingArmBtn = new JoystickButton(driver, OP_ZERO_ROTATING_ARM_BTN); 
+    climbModeBtn = new JoystickButton(operator, OP_CLIMB_MODE_BTN);
     toggleSlowModeBtn = new JoystickButton(operator, OP_TOGGLE_SLOW_BTN); // Back/Select Button
 
     // Toggle Commands
@@ -133,8 +130,6 @@ public class RobotContainer {
     toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
     toggleTurboMode = new InstantCommand(driveSystem::toggleTurboMode, driveSystem);
     resetIntakeEncoders = new InstantCommand(intake::resetEncoders, intake);
-
-    SmartDashboard.putData("Reset intake encoders", resetIntakeEncoders);
 
     // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
@@ -147,7 +142,7 @@ public class RobotContainer {
     // Intake Commands
     retract = new Retract(intake);
     deploy = new Deploy(intake);
-    //intakeCmd = new Intake(intake);
+    //intakeCmd = new Intake(intake); // Used for testing the rollers without deploying the intake
     reverseIntake = new ReverseIntake(intake);
     intake.setDefaultCommand(retract);
 
@@ -155,10 +150,12 @@ public class RobotContainer {
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
     driveSystem.setDefaultCommand(driveWithJoystick);
 
-    // Second stage climb commands
-    /*stage2Backwards = new ClimbStageTwoBackward(climb);
-    stage2Forwards = new ClimbStageTwoForward(climb);
-    zeroRotatingArm = new InstantCommand(climb::zeroRotatingArm, climb);*/
+    // Climb
+    climbCmd = new Climb(climb, operator);
+    climbModeEnable = new TurnOnClimbMode(climb, intake);
+    climb.setDefaultCommand(climbCmd);
+
+    climb.resetLiftEncoders();
 
     // Configure the button bindings
     configureButtonBindings();
@@ -200,14 +197,13 @@ public class RobotContainer {
     toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
 
     // Operator
-    /*deployBtn.whileHeld(deploy); // Right bumper
-    reverseIntakeBtn.whileHeld(reverseIntake); // B button*/
-    intakeBtn.whileHeld(deploy); // Right bumper 
+    deployBtn.whileHeld(deploy); // Right bumper
+    reverseIntakeBtn.whileHeld(reverseIntake); // B button
+    //intakeBtn.whileHeld(intakeCmd); // Right bumper // Used for testing the rollers without deploying the intake
     outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
     outtakeLowBtn.whileActiveContinuous(outtakeLow);
-    /*stage2ForwardBtn.whileHeld(stage2Forwards); // X button
-    stage2BackwardBtn.whileHeld(stage2Backwards); // Y button
-    zeroRotatingArmBtn.whenPressed(zeroRotatingArm);*/
+    
+    climbModeBtn.toggleWhenPressed(climbModeEnable);
   }
 
   public void resetIntakeEncoders() {

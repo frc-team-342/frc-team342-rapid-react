@@ -6,36 +6,48 @@ package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
-public class ClimbStageOne extends CommandBase {
-  private ClimbSubsystem subsystem;
+public class TurnOnClimbMode extends CommandBase {
+  /** Creates a new TurnOnClimbMode. */
+  private ClimbSubsystem climb;
+  private IntakeSubsystem intake;
 
-  /** Creates a new ClimbStageOne. */
-  public ClimbStageOne(ClimbSubsystem subsystem) {
+  public TurnOnClimbMode(ClimbSubsystem climb, IntakeSubsystem intake) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.subsystem = subsystem; 
-    addRequirements(this.subsystem);
+    this.climb = climb;
+    this.intake = intake;
+
+    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    climb.toggleClimbMode();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.activateClimb();
+    if (climb.getClimbMode()) {
+      intake.deployIntake();
+    }
+    else {
+      intake.retractIntake();
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    subsystem.deactivateClimb();
+    // since it is toggle when pressed
+    climb.toggleClimbMode();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return subsystem.limitSwitchTriggered();
+    return false;
   }
 }

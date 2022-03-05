@@ -8,132 +8,190 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ctre.phoenix.ErrorCode;
-import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ClimbConstants.*;
 
-
-
 public class ClimbSubsystem extends SubsystemBase {
 
-  private WPI_TalonFX climbMotor1;
-  private WPI_TalonFX climbMotor2;
-  private WPI_TalonSRX secondStageMotor1;
-  private WPI_TalonSRX secondStageMotor2;
-  private DigitalInput limitSwitch1;
-  private DigitalInput limitSwitch2;
-  
-  //Sets the second stage climb initial angle using the rotation ticks from the hex bore encoder
-  private double secondStageInitialAngle = (2048 / 8192) * 360;
+  private WPI_TalonFX leftClimbLift;
+  private WPI_TalonFX rightClimbLift;
 
-  private double secondStageMaximumAngle = 115.0;
-  private double secondStageMinimumAngle = 62.5;
-  private double currentAngle;
+  private TalonFXSensorCollection leftClimbLiftEncoder;
+  private TalonFXSensorCollection rightClimbLiftEncoder;
 
+  private WPI_TalonSRX leadClimbRotate;
+  private WPI_TalonSRX followClimbRotate;
+
+  // Used for locking the climber controls on the operator control before climb time
+  private boolean climbMode;
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
-    climbMotor1 = new WPI_TalonFX(CLIMB_LEFT_MOTOR);
-    climbMotor2 = new WPI_TalonFX(CLIMB_RIGHT_MOTOR);
+    leftClimbLift = new WPI_TalonFX(LEFT_LIFT_MOTOR);
+    rightClimbLift = new WPI_TalonFX(RIGHT_LIFT_MOTOR);
 
-    secondStageMotor1 = new WPI_TalonSRX(CLIMB_SECOND_MOTOR_1);
-    secondStageMotor2 = new WPI_TalonSRX(CLIMB_SECOND_MOTOR_2);
+    leftClimbLiftEncoder = leftClimbLift.getSensorCollection();
+    rightClimbLiftEncoder = rightClimbLift.getSensorCollection();
 
-    limitSwitch1 = new DigitalInput(LIMIT_SWITCH_1);
-    limitSwitch2 = new DigitalInput(LIMIT_SWITCH_2);
+    leadClimbRotate = new WPI_TalonSRX(LEAD_ROTATE_MOTOR);
+    followClimbRotate = new WPI_TalonSRX(FOLLOW_ROTATE_MOTOR);
 
+    followClimbRotate.follow(leadClimbRotate);
+
+    // brake mode so that it does not fall when on the bars
+    leftClimbLift.setNeutralMode(NeutralMode.Brake);
+    rightClimbLift.setNeutralMode(NeutralMode.Brake);
+
+    // locks or activates the climbers
+    climbMode = false;
   }
   
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    currentAngle = (secondStageMotor2.getSelectedSensorPosition() / 8192) * 360 + 62.5;
-  }
-  
-/**
- * will only run if both switches are not triggered
- */
-  public void activateClimb(){
+  public void periodic() {}
 
-    if (!limitSwitch1.get() && !limitSwitch2.get()){
-      climbMotor1.set(ControlMode.PercentOutput, 1);
-      climbMotor2.set(ControlMode.PercentOutput, 1);
-    }else{
-      deactivateClimb();
-    }
-
-    
-  }
-
-  public void deactivateClimb() {
-    climbMotor1.set(ControlMode.PercentOutput, 0);
-    climbMotor2.set(ControlMode.PercentOutput, 0);
-  }
-
-  public boolean limitSwitchTriggered(){
-    return(limitSwitch1.get() && limitSwitch2.get());
-  }
-  
   /**
-   * Allows the second stage climber to rotate forward
+   * Moves the lift mechanism of the climber. <br>
+   * Will not move outside of a window of encoder values for minimum and maximum positions.
+   * 
+   * @param speed the speed to move the climber at, [-1, 1]
    */
-  public void stage2RotateBackwards()
-  {
-    if(currentAngle <= (secondStageMaximumAngle + 0.5f))
-    {
-      secondStageMotor1.set(ControlMode.PercentOutput, -0.5);
-      secondStageMotor2.set(ControlMode.PercentOutput, -0.5);
-    }
-    else
-    {
-      deactivateStage2();
+  public void liftClimb(double speed) {
+    double leftPosition = leftClimbLiftEncoder.getIntegratedSensorPosition();
+    double rightPosition = rightClimbLiftEncoder.getIntegratedSensorPosition();
+
+    // only run if climb has been activated
+    if (climbMode) {
+      // above minimum position on each encoder since arms are not mechanically linked
+      boolean leftAboveMin = (leftPosition >= LIFT_MIN_POSITION);
+      boolean leftBelowMax = (leftPosition <= LIFT_MAX_POSITION);
+
+      boolean rightAboveMin = (rightPosition >= LIFT_MIN_POSITION);
+      boolean rightBelowMax = (rightPosition <= LIFT_MAX_POSITION);
+
+      // only runs outside of bounds if it is moving back towards bounds
+      if ((leftAboveMin || speed > 0) && (leftBelowMax || speed < 0)) {
+        leftClimbLift.set(speed * CLIMB_SPEED);
+      } else {
+        // otherwise do not move
+        leftClimbLift.set(0);
+      }
+
+      if ((rightAboveMin || speed > 0) && (rightBelowMax || speed < 0)) {
+        rightClimbLift.set(speed * CLIMB_SPEED);
+      } else {
+        rightClimbLift.set(0);
+      }
+    } else {
+      // do not run motors if climb mode is not enabled
+      leftClimbLift.set(0);
+      rightClimbLift.set(0);
     }
   }
 
   /**
-   * Allows the second stage climber to rotate forward
+   * Moves the rotational mechanism of the climber. 
+   * Will not move outside of a window of angles for minimum and maximum position.
+   *  
+   * @param speed the speed to rotate at, [-1, 1]
    */
-  public void stage2RotateForwards()
-  {
-    if(currentAngle >= (secondStageMinimumAngle - 0.5f))
-    {
-      secondStageMotor1.set(ControlMode.PercentOutput, 0.5);
-      secondStageMotor2.set(ControlMode.PercentOutput, 0.5);
+  public void rotateClimb(double speed) {
+    double position = leadClimbRotate.getSelectedSensorPosition();
+
+    if (climbMode) {
+      boolean withinMinAngle = encoderTicksToDegrees(position) > ROTATE_MIN_ANGLE;
+      boolean withinMaxAngle = encoderTicksToDegrees(position) < ROTATE_MAX_ANGLE;
+
+      // only run if within bounds or moving back towards within bounds
+      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0)) {
+        leadClimbRotate.set(speed * CLIMB_SPEED);
+      } else {
+        leadClimbRotate.set(0);
+      }
+    } else {
+      // do not run if climb mode is not enabled
+      leadClimbRotate.set(0);
     }
-    else
-    {
-      deactivateStage2();
-    }
   }
 
-  //Stops the second stage climber
-  public void deactivateStage2()
-  {
-    secondStageMotor1.set(ControlMode.PercentOutput, 0);
-    secondStageMotor2.set(ControlMode.PercentOutput, 0);
+  /**
+   * Converts encoder ticks to degrees of motor rotation
+   * 
+   * @param ticks encoder ticks
+   * @return degrees, continuous past 360
+   */
+  private double encoderTicksToDegrees(double ticks) {
+    // 8192 encoder ticks in a rotation, 360 degrees in a rotation
+    return (ticks / ROTATE_ENCODER_TICKS_PER_ROT) * 360;
   }
 
-  public double getCurrentAngle()
-  {
-    return currentAngle;
+  /**
+   * Stop the movement of the climb lift motors.
+   */
+  public void stopClimbLift() {
+    leftClimbLift.set(0);
+    rightClimbLift.set(0);
   }
 
-  public void zeroRotatingArm()
-  {
-    secondStageMotor2.setSelectedSensorPosition(0, 0, 0);
+  /**
+   * Sets the position of both lift motor encoders back to 0.
+   */
+  public void resetLiftEncoders() {
+    leftClimbLiftEncoder.setIntegratedSensorPosition(0, 0);
+    rightClimbLiftEncoder.setIntegratedSensorPosition(0, 0);
+  }
+
+  /**
+   * Sets the position of the rotate motor encoder to 0.
+   */
+  public void resetRotateEncoders() {
+    leadClimbRotate.setSelectedSensorPosition(0);
+  }
+
+  /**
+   * Stop the movement of the climb rotate motors.
+   */
+  public void stopClimbRotate() {
+    leadClimbRotate.set(0);
+  }
+
+  /**
+   * Changes the current status of climbMode to the desired state
+   */
+  public void setClimbMode(boolean mode) {
+    climbMode = mode;
+  }
+
+  /**
+   * Returns climbMode
+   * @return true if climb is active, false otherwise
+   */
+  public boolean getClimbMode() {
+    return climbMode;
+  }
+
+  /**
+   * Changes the current status of climbMode to the opposite state of what it was
+   */
+  public void toggleClimbMode() {
+    climbMode = !climbMode;
   }
 
   @Override
-  public void initSendable(SendableBuilder sendable)
-  {
-    sendable.setSmartDashboardType("Climbsubsystem");
-    sendable.addDoubleProperty("Current Angle", this::getCurrentAngle, null);
+  public void initSendable(SendableBuilder sendable) {
+    sendable.setSmartDashboardType("ClimbSubsystem");
+    sendable.addBooleanProperty("Climb mode", this::getClimbMode, this::setClimbMode);
+    sendable.addDoubleProperty("Left lift encoder", leftClimbLiftEncoder::getIntegratedSensorPosition, null);
+    sendable.addDoubleProperty("Right lift encoder", rightClimbLiftEncoder::getIntegratedSensorPosition, null);
+    sendable.addDoubleProperty("Rotate encoder", () -> {
+      return encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition());
+    }, null);
   }
 
   /**
@@ -144,22 +202,21 @@ public class ClimbSubsystem extends SubsystemBase {
   public Map<String, Boolean> test() {
     var motors = new HashMap<String, Boolean>();
 
-    climbMotor1.getBusVoltage();
-    motors.put("Climb motor 1", climbMotor1.getLastError() == ErrorCode.OK);
+    leftClimbLift.getBusVoltage();
+    motors.put("Climb motor 1", leftClimbLift.getLastError() == ErrorCode.OK);
 
-    climbMotor2.getBusVoltage();
-    motors.put("Climb motor 2", climbMotor2.getLastError() == ErrorCode.OK);
+    rightClimbLift.getBusVoltage();
+    motors.put("Climb motor 2", rightClimbLift.getLastError() == ErrorCode.OK);
 
-    secondStageMotor1.getBusVoltage();
-    motors.put("Second stage motor 1", secondStageMotor1.getLastError() == ErrorCode.OK);
+    leadClimbRotate.getBusVoltage();
+    motors.put("Second stage motor 1", leadClimbRotate.getLastError() == ErrorCode.OK);
 
-    secondStageMotor2.getBusVoltage();
-    motors.put("Second stage motor 2", secondStageMotor2.getLastError() == ErrorCode.OK);
+    followClimbRotate.getBusVoltage();
+    motors.put("Second stage motor 2", followClimbRotate.getLastError() == ErrorCode.OK);
 
     // encoder check
-    motors.put("Climb rotation encoder", secondStageMotor2.getSensorCollection().getPulseWidthRiseToFallUs() != 0);
+    motors.put("Climb rotation encoder", followClimbRotate.getSensorCollection().getPulseWidthRiseToFallUs() != 0);
     
     return motors;
   }
-
 }

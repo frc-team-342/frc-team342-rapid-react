@@ -4,17 +4,21 @@
 
 package frc.robot.commands.climb;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ClimbSubsystem;
 
+public class StageTwoClimb extends CommandBase {
+  private ClimbSubsystem climb;
+  private XboxController xbox;
 
+  /** Creates a new StageTwoClimb. */
+  public StageTwoClimb(ClimbSubsystem climb, XboxController xbox) {
+    this.climb = climb;
+    this.xbox = xbox;
 
-public class ClimbStageTwoBackward extends CommandBase {
-  private ClimbSubsystem stage2Subsystem;
-
-  public ClimbStageTwoBackward(ClimbSubsystem subsystem) {
-    stage2Subsystem = subsystem;
-    addRequirements(stage2Subsystem);
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(climb);
   }
 
   // Called when the command is initially scheduled.
@@ -24,13 +28,13 @@ public class ClimbStageTwoBackward extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    stage2Subsystem.stage2RotateBackwards();
+    climb.rotateClimb(xbox.getRightX());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    stage2Subsystem.deactivateStage2();
+    climb.stopClimbRotate();
   }
 
   // Returns true when the command should end.
