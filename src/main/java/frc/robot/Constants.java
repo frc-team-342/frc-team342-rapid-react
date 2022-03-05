@@ -121,14 +121,17 @@ public final class Constants {
     }
 
     public static final class ClimbConstants {
-        public static final int CLIMB_LEFT_MOTOR = 11;
-        public static final int CLIMB_RIGHT_MOTOR = 12;
+        public static final int LEFT_LIFT_MOTOR = 11;
+        public static final int RIGHT_LIFT_MOTOR = 12;
 
-        public static final int CLIMB_SECOND_MOTOR_1 = 14;
-        public static final int CLIMB_SECOND_MOTOR_2 = 13;
+        public static final int LEAD_ROTATE_MOTOR = 13;
+        public static final int FOLLOW_ROTATE_MOTOR = 14;
 
-        public static final int LIMIT_SWITCH_1 = 1;
-        public static final int LIMIT_SWITCH_2 = 2;
+        public static final double LIFT_MIN_POSITION = 0;
+        public static final double LIFT_MAX_POSITION = 225559;
+
+        public static final double ROTATE_MIN_ANGLE = 0;
+        public static final double ROTATE_MAX_ANGLE = 0;
     }
 
     public static final class IntakeConstants {
