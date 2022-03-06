@@ -37,7 +37,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // different inversions on A and B bot
     if (Robot.checkType() == Robot.RobotType.A_BOT) {
-      rollerMotor.setInverted(true);
+      rollerMotor.setInverted(false);
     }
 
     if (Robot.checkType() == Robot.RobotType.B_BOT) {
