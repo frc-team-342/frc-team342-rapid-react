@@ -6,6 +6,7 @@ package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.outtake.OuttakeHigh;
+import frc.robot.commands.outtake.OuttakeLow;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.OuttakeSubsystem;
 
@@ -20,17 +21,21 @@ public class ShootPreloadedExit extends SequentialCommandGroup {
   private AutoDrive exitTarmac;
 
   /** Creates a new DriveFunctions. */
-  public ShootPreloadedExit(DriveSystem drive, OuttakeSubsystem outtake) {
+  public ShootPreloadedExit(DriveSystem drive, OuttakeSubsystem outtake, boolean shootHigh) {
     this.drive = drive;
     this.outtake = outtake;
+
     exitTarmac = new AutoDrive(drive, 1);
 
     addRequirements(drive);
     addRequirements(outtake);
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
+    
     addCommands(
-      new OuttakeHigh(outtake).withTimeout(4),
+      // applies the `withTimeout` to whichever is selected in the ternary expression
+      (shootHigh ? new OuttakeHigh(outtake) : new OuttakeLow(outtake)).withTimeout(4),
+      // if true: `new OuttakeHigh(outtake).withTimeout(4)`
+      // if false: `new OuttakeLow(outtake).withTimeout(4)`
+
       exitTarmac
     );
   }

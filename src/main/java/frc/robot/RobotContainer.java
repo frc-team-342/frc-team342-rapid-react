@@ -98,7 +98,8 @@ public class RobotContainer {
   private Command driveToCargo;
   private Command driveToHub;
   private Command shootThreeStart;
-  private Command shootPreloadExit;
+  private Command shootPreloadHigh;
+  private Command shootPreloadLow;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -175,13 +176,14 @@ public class RobotContainer {
 
     // Makes the autonomous chooser and associated commands
     autoChooser = new SendableChooser<>();
-    driveToCargo = new DriveToCargo(driveSystem, photon);
-    driveToHub = new DriveToHub(driveSystem, limelight);
     shootThreeStart = new ShootThreeStart(outtake, driveSystem, photon, intake, limelight);
-    shootPreloadExit = new ShootPreloadedExit(driveSystem, outtake);
+
+    shootPreloadHigh = new ShootPreloadedExit(driveSystem, outtake, true);
+    shootPreloadLow = new ShootPreloadedExit(driveSystem, outtake, false);
 
     // Add options to the smart dashboard
-    autoChooser.setDefaultOption("Shoot preloaded and exit tarmac", shootPreloadExit);
+    autoChooser.setDefaultOption("Shoot preloaded high and exit tarmac", shootPreloadHigh);
+    autoChooser.setDefaultOption("Shoot preloaded low and exit tarmac", shootPreloadLow);
 
     // Sets chooser name and sends to dashboard
     SendableRegistry.setName(autoChooser, "Autonomous Chooser");
