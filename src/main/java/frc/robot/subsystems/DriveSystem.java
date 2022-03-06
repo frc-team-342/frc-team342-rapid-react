@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -300,6 +301,20 @@ public class DriveSystem extends SubsystemBase {
    */
   public void driveWithTargeting(double x, double y, double targetAngle) {
     drive(x / 2, y / 2, (rotationController.calculate(getGyro(), getGyro() - targetAngle)));
+  }
+
+  /**
+   * Sets the neutral mode of all the drive motors.
+   * 
+   * @param mode true for brake mode, false for coast
+   */
+  public void setBrakeMode(boolean mode) {
+    var idleMode = (mode) ? IdleMode.kBrake : IdleMode.kCoast;
+
+    frontLeft.setIdleMode(idleMode);
+    backLeft.setIdleMode(idleMode);
+    frontRight.setIdleMode(idleMode);
+    backRight.setIdleMode(idleMode);
   }
 
   @Override
