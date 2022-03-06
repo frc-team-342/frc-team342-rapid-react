@@ -49,6 +49,11 @@ public class Limelight implements Sendable{
     public boolean hasTargets() {
         return targets.getBoolean(false);
     }
+
+    public void toggleDriverMode() {
+        int currentCamMode = camMode.getNumber(0).intValue();
+        camMode.setNumber((currentCamMode == 0) ? 1 : 0);
+    }
     
     /**
      * Gets horizontal offset from crosshair to target. 

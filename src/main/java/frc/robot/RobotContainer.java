@@ -63,6 +63,7 @@ public class RobotContainer {
   private InstantCommand toggleSlowMode;
   private InstantCommand toggleTurboMode;
   private InstantCommand resetIntakeEncoders;
+  private InstantCommand toggleLimelight;
 
   private Command deploy;
   private Command retract;
@@ -79,6 +80,7 @@ public class RobotContainer {
   
   // Driver Buttons
   private Joystick driver;
+  private JoystickButton driver_toggleLimelightBtn;
   private JoystickButton driver_toggleFieldOrientedBtn;
   private JoystickButton driver_toggleSlowModeBtn;
   private JoystickButton driver_outtakeHighBtn;
@@ -118,6 +120,7 @@ public class RobotContainer {
     operator = new XboxController(OPERATOR_PORT);
 
     // Driver buttons
+    driver_toggleLimelightBtn = new JoystickButton(driver, DRIVER_TOGGLE_LIMELIGHT_BTN); // Button 1
     driver_toggleFieldOrientedBtn = new JoystickButton(driver, DRIVER_FIELD_ORIENTED_BTN); // Button 6
     driver_toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 4
     driver_outtakeLowBtn = new JoystickButton(driver, DRIVER_OUTTAKE_LOW_BTN);
@@ -137,6 +140,7 @@ public class RobotContainer {
     toggleSlowMode = new InstantCommand(driveSystem::toggleSlowMode, driveSystem);
     toggleTurboMode = new InstantCommand(driveSystem::toggleTurboMode, driveSystem);
     resetIntakeEncoders = new InstantCommand(intake::resetEncoders, intake);
+    toggleLimelight = new InstantCommand(limelight::toggleDriverMode);
 
     // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
@@ -198,6 +202,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Driver
+    driver_toggleLimelightBtn.whenPressed(toggleLimelight); // Button 1
     driver_toggleFieldOrientedBtn.whenPressed(toggleFieldOriented); // Button 6
     driver_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 4
     driver_outtakeLowBtn.whileHeld(outtakeLow); // Button 8
