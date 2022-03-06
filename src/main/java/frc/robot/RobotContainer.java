@@ -23,9 +23,9 @@ import frc.robot.commands.intake.Deploy;
 import frc.robot.commands.intake.Intake;
 import frc.robot.commands.intake.Retract;
 import frc.robot.commands.intake.ReverseIntake;
-import frc.robot.commands.auto.DriveFunctions;
 import frc.robot.commands.auto.DriveToCargo;
 import frc.robot.commands.auto.DriveToHub;
+import frc.robot.commands.auto.ShootPreloadedExit;
 import frc.robot.commands.auto.ShootThreeStart;
 import frc.robot.commands.climb.Climb;
 import frc.robot.commands.climb.StageTwoClimb;
@@ -98,7 +98,7 @@ public class RobotContainer {
   private Command driveToCargo;
   private Command driveToHub;
   private Command shootThreeStart;
-  private Command exitTarmac;
+  private Command shootPreloadExit;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -178,13 +178,10 @@ public class RobotContainer {
     driveToCargo = new DriveToCargo(driveSystem, photon);
     driveToHub = new DriveToHub(driveSystem, limelight);
     shootThreeStart = new ShootThreeStart(outtake, driveSystem, photon, intake, limelight);
-    exitTarmac = new DriveFunctions(driveSystem, outtake);
+    shootPreloadExit = new ShootPreloadedExit(driveSystem, outtake);
 
     // Add options to the smart dashboard
-    autoChooser.setDefaultOption("Shoot 1 Cargo", driveToHub);
-    autoChooser.addOption("Shoot 2 Cargo", driveToCargo);
-    autoChooser.addOption("Shoot 3 Cargo", shootThreeStart);
-    autoChooser.setDefaultOption("Shoot 1 and leave the tarmac", exitTarmac);
+    autoChooser.setDefaultOption("Shoot preloaded and exit tarmac", shootPreloadExit);
 
     // Sets chooser name and sends to dashboard
     SendableRegistry.setName(autoChooser, "Autonomous Chooser");
@@ -223,11 +220,11 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // trajectory to follow during auto
-    var trajectory = new Trajectory();
+    return autoChooser.getSelected();
+  }
 
-    // command to follow that trajectory
-    return driveSystem.trajectoryCommand(trajectory);
+  public void teleopCoastMode() {
+    driveSystem.setBrakeMode(false);
   }
 
   /**

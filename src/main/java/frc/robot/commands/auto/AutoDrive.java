@@ -14,7 +14,7 @@ public class AutoDrive extends CommandBase {
   private Timer timer;
 
   private final double seconds;
-  private double speed = 0.8;
+  private double speed = 0.6;
 
   /** Creates a new AutoDrive. */
   public AutoDrive(DriveSystem subsystem, double seconds) {
@@ -40,18 +40,21 @@ public class AutoDrive extends CommandBase {
   public void initialize() {
     timer.reset();
     timer.start();
+
+    // set brake mode so it does not continue coasting after auto
+    subsystem.setBrakeMode(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.drive(speed,0,0);
+    subsystem.drive(0, -speed, 0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    subsystem.drive(0,0,0);
+    subsystem.drive(0, 0, 0);
   }
 
   // Returns true when the command should end.

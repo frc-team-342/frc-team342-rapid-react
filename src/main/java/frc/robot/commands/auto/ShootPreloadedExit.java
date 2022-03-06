@@ -12,25 +12,25 @@ import frc.robot.subsystems.OuttakeSubsystem;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class DriveFunctions extends SequentialCommandGroup {
+public class ShootPreloadedExit extends SequentialCommandGroup {
 
   private DriveSystem drive;
   private OuttakeSubsystem outtake;
 
-
   private AutoDrive exitTarmac;
+
   /** Creates a new DriveFunctions. */
-  public DriveFunctions(DriveSystem drive, OuttakeSubsystem outtake) {
+  public ShootPreloadedExit(DriveSystem drive, OuttakeSubsystem outtake) {
     this.drive = drive;
     this.outtake = outtake;
-    exitTarmac = new AutoDrive(drive, 2);
+    exitTarmac = new AutoDrive(drive, 1);
 
     addRequirements(drive);
     addRequirements(outtake);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new OuttakeHigh(outtake),
+      new OuttakeHigh(outtake).withTimeout(4),
       exitTarmac
     );
   }
