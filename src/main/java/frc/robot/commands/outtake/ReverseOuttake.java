@@ -2,22 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.intake;
+package frc.robot.commands.outtake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
 
-public class Retract extends CommandBase {
-  /** Creates a new Retract. */
-  private IntakeSubsystem intake;
-  private OuttakeSubsystem outtakeSub;
-  public Retract(IntakeSubsystem intake, OuttakeSubsystem outtakeSub) {
+public class ReverseOuttake extends CommandBase {
+  /** Creates a new ReverseOuttake. */
+  public OuttakeSubsystem outtakeSub;
 
-    this.intake = intake;
-    this.outtakeSub = outtakeSub;
+  public ReverseOuttake(OuttakeSubsystem outtakeSub) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake, outtakeSub);
+    this.outtakeSub = outtakeSub;
+
+    addRequirements(outtakeSub);
   }
 
   // Called when the command is initially scheduled.
@@ -26,19 +24,15 @@ public class Retract extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-
-    intake.retractIntake();
-    outtakeSub.setReverse(false);
-    intake.stopIntake();
-    
+  public void execute()
+  {
+    outtakeSub.setReverse(true);
+    outtakeSub.reverse();
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    intake.stopIntake();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

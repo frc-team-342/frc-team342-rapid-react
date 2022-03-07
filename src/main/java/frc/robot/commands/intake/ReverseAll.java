@@ -8,16 +8,17 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
 
-public class Retract extends CommandBase {
-  /** Creates a new Retract. */
-  private IntakeSubsystem intake;
-  private OuttakeSubsystem outtakeSub;
-  public Retract(IntakeSubsystem intake, OuttakeSubsystem outtakeSub) {
+public class ReverseAll extends CommandBase {
+  /** Creates a new ReverseAll. */
+  public IntakeSubsystem intakeSub;
+  public OuttakeSubsystem outtakeSub;
 
-    this.intake = intake;
-    this.outtakeSub = outtakeSub;
+  public ReverseAll(IntakeSubsystem intakeSub, OuttakeSubsystem outtakeSub) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake, outtakeSub);
+    this.intakeSub = intakeSub;
+    this.outtakeSub = outtakeSub;
+
+    addRequirements(intakeSub, outtakeSub);
   }
 
   // Called when the command is initially scheduled.
@@ -26,19 +27,17 @@ public class Retract extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-
-    intake.retractIntake();
-    outtakeSub.setReverse(false);
-    intake.stopIntake();
-    
+  public void execute()
+  {
+    intakeSub.deployIntake();
+    intakeSub.reverseIntakeCargo();
+    outtakeSub.setReverse(true);
+    outtakeSub.reverse();
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    intake.stopIntake();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

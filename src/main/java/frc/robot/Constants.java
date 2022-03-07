@@ -91,6 +91,9 @@ public final class Constants {
         public static final int SHOOT_MOTOR_2 = 6;
         public static final int FEEDER_MOTOR = 7;
 
+        /** Reverse speed for cargo removal */
+        public static final double REVERSE_SPEED = -0.4;
+
         public static final double LOAD_SPEED = 0.8;
 
         /** Counts per revolution for the Falcon encoder. */
@@ -172,6 +175,7 @@ public final class Constants {
         public static final int DRIVER_SLOW_MODE_BTN = 4;
         public static final int DRIVER_OUTTAKE_LOW_BTN = 8;
         public static final int DRIVER_OUTTAKE_HIGH_BTN = 3;
+        public static final int DRIVER_REVERSE_ALL_BTN = 11;
         public static final int DRIVER_OUTTAKE_REVERSE_BTN = 12;
 
         // Operator button IDs

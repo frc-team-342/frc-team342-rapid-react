@@ -33,6 +33,8 @@ import frc.robot.commands.climb.TurnOnClimbMode;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
 import frc.robot.commands.outtake.OuttakeLow;
+import frc.robot.commands.intake.ReverseAll;
+import frc.robot.commands.outtake.ReverseOuttake;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -72,6 +74,8 @@ public class RobotContainer {
 
   private Command climbCmd;
   private Command climbModeEnable;
+  private Command reverseAll;
+  private Command reverseOuttake;
 
   private DriveWithJoystick driveWithJoystick;
 
@@ -86,6 +90,7 @@ public class RobotContainer {
   private JoystickButton driver_outtakeHighBtn;
   private JoystickButton driver_outtakeLowBtn;
   private JoystickButton driver_reverseOuttakeBtn;
+  private JoystickButton driver_reverseAllBtn;
 
   // Operator Buttons
   private XboxController operator;
@@ -125,6 +130,7 @@ public class RobotContainer {
     driver_toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 4
     driver_outtakeLowBtn = new JoystickButton(driver, DRIVER_OUTTAKE_LOW_BTN);
     driver_outtakeHighBtn = new JoystickButton(driver, DRIVER_OUTTAKE_HIGH_BTN);
+    driver_reverseAllBtn = new JoystickButton(driver, DRIVER_REVERSE_ALL_BTN);
     driver_reverseOuttakeBtn = new JoystickButton(driver, DRIVER_OUTTAKE_REVERSE_BTN);
 
     // Operator buttons
@@ -151,9 +157,11 @@ public class RobotContainer {
     outtakeLow = new OuttakeLow(outtake);
     
     // Intake Commands
-    retract = new Retract(intake);
+    retract = new Retract(intake, outtake);
     deploy = new Deploy(intake);
-    //intakeCmd = new Intake(intake); // Used for testing the rollers without deploying the intake
+    reverseAll = new ReverseAll(intake, outtake);
+    reverseOuttake = new ReverseOuttake(outtake);
+    //intakeCmd = new Intake(intake);
     reverseIntake = new ReverseIntake(intake);
     intake.setDefaultCommand(retract);
 

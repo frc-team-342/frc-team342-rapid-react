@@ -55,6 +55,9 @@ public class OuttakeSubsystem extends SubsystemBase {
   /* Encoders are reversed on A bot */
   private double velocityMultiplier = 1; 
 
+  // Boolean variable
+  private boolean isReverse = false;
+
   /** Creates a new OuttakeSubsystem. */
   public OuttakeSubsystem() {
     shootMotor1 = new WPI_TalonFX(SHOOT_MOTOR_1);
@@ -114,6 +117,25 @@ public class OuttakeSubsystem extends SubsystemBase {
    */
   public void shootHigh(){
     setpoint = HIGH_RPM;
+  }
+
+  public void setReverse(boolean reverse)
+  {
+    isReverse = reverse;
+  }
+
+  public boolean getReverse()
+  {
+    return isReverse;
+  }
+
+  /**
+   * Reverses the Motors to remove the cargo
+   */
+  public void reverse()
+  {
+    shootMotor1.set(ControlMode.PercentOutput, REVERSE_SPEED);
+    shootMotor2.set(ControlMode.PercentOutput, REVERSE_SPEED);
   }
 
   /**
@@ -189,11 +211,19 @@ public class OuttakeSubsystem extends SubsystemBase {
     // the velocity variable is updated in period by the upToSpeed() method
 
     // Open loop control is used on feed motors
-    if (upToSpeed() && setpoint != 0) {
-      // Only feed if the shooter is ready
-      feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
-    } else {
-      feederMotor.set(ControlMode.PercentOutput, 0);
+
+    if (!isReverse)
+    {
+      if (upToSpeed() && setpoint != 0) {
+        // Only feed if the shooter is ready
+        feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
+      } else {
+        feederMotor.set(ControlMode.PercentOutput, 0);
+      }
+    }
+    else
+    {
+      feederMotor.set(ControlMode.PercentOutput, REVERSE_SPEED);
     }
   }
 
