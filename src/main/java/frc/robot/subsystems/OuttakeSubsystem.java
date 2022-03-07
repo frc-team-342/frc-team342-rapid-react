@@ -24,6 +24,17 @@ import static frc.robot.Constants.OuttakeConstants.*;
 
 public class OuttakeSubsystem extends SubsystemBase {
 
+  private enum ShooterStates {
+    // runs when shooter is up to speed
+    AUTOMATIC,
+
+    // runs when being reversed to eject cargo
+    REVERSE,
+
+    // runs when being used to partly uptake cargo
+    FORWARDS
+  }
+
   private WPI_TalonFX shootMotor1;
   private WPI_TalonFX shootMotor2;
   private WPI_TalonSRX feederMotor;
@@ -201,7 +212,6 @@ public class OuttakeSubsystem extends SubsystemBase {
     builder.addBooleanProperty("Up to speed", this::upToSpeed, null);
     builder.addDoubleProperty("Setpoint", this::getSetpoint, null);
     builder.addDoubleProperty("Adjusted setpoint", this::getAdjustedSetpoint, null);
-
     builder.addDoubleProperty("Velocity", this::getVelocity, null);
     builder.addDoubleProperty("Encoder delta", this::getEncoderDelta, null);
   }
