@@ -138,7 +138,7 @@ public class RobotContainer {
     op_outtakeHighBtn = new JoystickButton(operator, OP_OUTTAKE_HIGH_BTN); // Left bumper
     op_outtakeLowBtn = new Trigger(() -> { return (operator.getLeftTriggerAxis() >= 0.8); }); // Left trigger
     op_reverseOuttakeBtn = new JoystickButton(operator, OP_REVERSE_OUTTAKE_BTN); // B Button
-    op_climbModeBtn = new JoystickButton(operator, OP_CLIMB_MODE_BTN);
+    op_climbModeBtn = new JoystickButton(operator, OP_CLIMB_MODE_BTN); // Y button
     op_toggleSlowModeBtn = new JoystickButton(operator, OP_TOGGLE_SLOW_BTN); // Back/Select Button
 
     // Toggle Commands
@@ -218,7 +218,8 @@ public class RobotContainer {
     driver_reverseOuttakeBtn.whileHeld(reverseIntake); // Button 12
 
     // Operator
-    op_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 7
+    op_toggleSlowModeBtn.whenPressed(toggleSlowMode); //
+    op_climbModeBtn.whenPressed(climbModeEnable); // Y button
     op_deployBtn.whileHeld(deploy); // Right bumper
     op_outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
     op_reverseOuttakeBtn.whileHeld(reverseIntake); // B button

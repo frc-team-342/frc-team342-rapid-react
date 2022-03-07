@@ -7,6 +7,7 @@ package frc.robot.commands.intake;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
+import frc.robot.subsystems.OuttakeSubsystem.ShooterStates;
 
 public class Retract extends CommandBase {
   /** Creates a new Retract. */
@@ -22,14 +23,15 @@ public class Retract extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    outtakeSub.setState(ShooterStates.AUTOMATIC);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
     intake.retractIntake();
-    outtakeSub.setReverse(false);
     intake.stopIntake();
     
   }

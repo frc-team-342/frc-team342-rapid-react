@@ -6,6 +6,7 @@ package frc.robot.commands.outtake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.OuttakeSubsystem;
+import frc.robot.subsystems.OuttakeSubsystem.ShooterStates;
 
 public class ReverseOuttake extends CommandBase {
   /** Creates a new ReverseOuttake. */
@@ -20,19 +21,21 @@ public class ReverseOuttake extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    outtakeSub.setState(ShooterStates.REVERSE);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute()
-  {
-    outtakeSub.setReverse(true);
+  public void execute() {
     outtakeSub.reverse();
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    outtakeSub.setState(ShooterStates.AUTOMATIC);
+  }
 
   // Returns true when the command should end.
   @Override
