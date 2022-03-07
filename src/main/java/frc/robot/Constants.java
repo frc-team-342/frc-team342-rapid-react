@@ -175,8 +175,6 @@ public final class Constants {
         public static final int DRIVER_SLOW_MODE_BTN = 4;
         public static final int DRIVER_OUTTAKE_LOW_BTN = 8;
         public static final int DRIVER_OUTTAKE_HIGH_BTN = 3;
-        public static final int DRIVER_REVERSE_ALL_BTN = 11;
-        public static final int DRIVER_OUTTAKE_REVERSE_BTN = 12;
 
         // Operator button IDs
         public static final int OP_DEPLOY_INTAKE_BTN = XboxController.Button.kRightBumper.value;
@@ -185,5 +183,7 @@ public final class Constants {
         public static final int OP_ZERO_ROTATING_ARM_BTN = XboxController.Button.kStart.value;
         public static final int OP_REVERSE_OUTTAKE_BTN = XboxController.Button.kB.value;
         public static final int OP_TOGGLE_SLOW_BTN = XboxController.Button.kBack.value;
+        public static final int OP_REVERSE_ALL_BTN = XboxController.Button.kX.value;
+        public static final int OP_MANUAL_UPTAKE_BTN = XboxController.Button.kA.value;
     }
 }

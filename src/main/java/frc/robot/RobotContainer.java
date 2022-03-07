@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.intake.Deploy;
 import frc.robot.commands.intake.Intake;
+import frc.robot.commands.intake.ManualUptake;
 import frc.robot.commands.intake.Retract;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.auto.DriveToCargo;
@@ -76,6 +77,7 @@ public class RobotContainer {
   private Command climbModeEnable;
   private Command reverseAll;
   private Command reverseOuttake;
+  private Command manualUptake;
 
   private DriveWithJoystick driveWithJoystick;
 
@@ -89,8 +91,6 @@ public class RobotContainer {
   private JoystickButton driver_toggleSlowModeBtn;
   private JoystickButton driver_outtakeHighBtn;
   private JoystickButton driver_outtakeLowBtn;
-  private JoystickButton driver_reverseOuttakeBtn;
-  private JoystickButton driver_reverseAllBtn;
 
   // Operator Buttons
   private XboxController operator;
@@ -99,6 +99,8 @@ public class RobotContainer {
   private JoystickButton op_climbModeBtn;
   private JoystickButton op_toggleSlowModeBtn;
   private JoystickButton op_outtakeHighBtn;
+  private JoystickButton op_reverseAllBtn;
+  private JoystickButton op_manualUptakeBtn;
   private Trigger op_outtakeLowBtn;
 
   private SendableChooser<Command> autoChooser;
@@ -130,8 +132,6 @@ public class RobotContainer {
     driver_toggleSlowModeBtn = new JoystickButton(driver, DRIVER_SLOW_MODE_BTN); // Button 4
     driver_outtakeLowBtn = new JoystickButton(driver, DRIVER_OUTTAKE_LOW_BTN);
     driver_outtakeHighBtn = new JoystickButton(driver, DRIVER_OUTTAKE_HIGH_BTN);
-    driver_reverseAllBtn = new JoystickButton(driver, DRIVER_REVERSE_ALL_BTN);
-    driver_reverseOuttakeBtn = new JoystickButton(driver, DRIVER_OUTTAKE_REVERSE_BTN);
 
     // Operator buttons
     op_deployBtn = new JoystickButton(operator, OP_DEPLOY_INTAKE_BTN); // Right bumper
@@ -139,7 +139,9 @@ public class RobotContainer {
     op_outtakeLowBtn = new Trigger(() -> { return (operator.getLeftTriggerAxis() >= 0.8); }); // Left trigger
     op_reverseOuttakeBtn = new JoystickButton(operator, OP_REVERSE_OUTTAKE_BTN); // B Button
     op_climbModeBtn = new JoystickButton(operator, OP_CLIMB_MODE_BTN); // Y button
+    op_reverseAllBtn = new JoystickButton(operator, OP_REVERSE_ALL_BTN); // X button
     op_toggleSlowModeBtn = new JoystickButton(operator, OP_TOGGLE_SLOW_BTN); // Back/Select Button
+    op_manualUptakeBtn = new JoystickButton(operator, OP_MANUAL_UPTAKE_BTN); // A button
 
     // Toggle Commands
     toggleFieldOriented = new InstantCommand(driveSystem::toggleFieldOriented, driveSystem);
@@ -163,6 +165,8 @@ public class RobotContainer {
     reverseOuttake = new ReverseOuttake(outtake);
     //intakeCmd = new Intake(intake);
     reverseIntake = new ReverseIntake(intake);
+    manualUptake = new ManualUptake(outtake);
+
     intake.setDefaultCommand(retract);
 
     // Drive With Joystick
@@ -215,15 +219,16 @@ public class RobotContainer {
     driver_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Button 4
     driver_outtakeLowBtn.whileHeld(outtakeLow); // Button 8
     driver_outtakeHighBtn.whileHeld(outtakeHigh); // Button 3
-    driver_reverseOuttakeBtn.whileHeld(reverseIntake); // Button 12
 
     // Operator
-    op_toggleSlowModeBtn.whenPressed(toggleSlowMode); //
+    op_toggleSlowModeBtn.whenPressed(toggleSlowMode); // Select button
     op_climbModeBtn.whenPressed(climbModeEnable); // Y button
     op_deployBtn.whileHeld(deploy); // Right bumper
     op_outtakeHighBtn.whileHeld(outtakeHigh); // Left bumper
-    op_reverseOuttakeBtn.whileHeld(reverseIntake); // B button
+    op_reverseOuttakeBtn.whileHeld(reverseOuttake); // B button
     op_outtakeLowBtn.whileActiveContinuous(outtakeLow); // Right trigger
+    op_reverseAllBtn.whileHeld(reverseAll); // X button
+    op_manualUptakeBtn.whileHeld(manualUptake); // A button
   }
 
   public void resetIntakeEncoders() {

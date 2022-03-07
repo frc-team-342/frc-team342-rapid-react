@@ -123,15 +123,6 @@ public class OuttakeSubsystem extends SubsystemBase {
     setpoint = HIGH_RPM;
   }
 
-  public void setReverse(boolean reverse) {
-    isReverse = reverse;
-  }
-
-  public boolean getReverse()
-  {
-    return currentState == ShooterStates.REVERSE;
-  }
-
   /**
    * Reverses the Motors to remove the cargo
    */
@@ -205,10 +196,16 @@ public class OuttakeSubsystem extends SubsystemBase {
     encoder2.setIntegratedSensorPosition(0, 10);
   }
 
+  /**
+   * @param state the state to switch to
+   */
   public void setState(ShooterStates state) {
     this.currentState = state;
   }
 
+  /**
+   * @return the current state
+   */
   public ShooterStates getState() {
     return this.currentState;
   }
@@ -243,7 +240,6 @@ public class OuttakeSubsystem extends SubsystemBase {
         }
         break;
     }
-    
   }
 
   /**
