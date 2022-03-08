@@ -18,7 +18,7 @@ public class Retract extends CommandBase {
     this.intake = intake;
     this.outtakeSub = outtakeSub;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake, outtakeSub);
+    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.

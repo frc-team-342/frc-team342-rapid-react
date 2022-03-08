@@ -57,9 +57,6 @@ public class OuttakeSubsystem extends SubsystemBase {
   /* Encoders are reversed on A bot */
   private double velocityMultiplier = 1; 
 
-  // Boolean variable
-  private boolean isReverse = false;
-
   /** Creates a new OuttakeSubsystem. */
   public OuttakeSubsystem() {
     shootMotor1 = new WPI_TalonFX(SHOOT_MOTOR_1);
@@ -217,7 +214,8 @@ public class OuttakeSubsystem extends SubsystemBase {
     shootMotor2.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
 
     // the velocity variable is updated in period by the upToSpeed() method
-
+    velocity = velocityMultiplier * encoder1.getIntegratedSensorVelocity();
+  
     switch (currentState) {
       // when reversing intake, do not run automatically
       case REVERSE:
