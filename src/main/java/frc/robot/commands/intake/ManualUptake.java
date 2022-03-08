@@ -5,41 +5,36 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem.ShooterStates;
 
-public class Retract extends CommandBase {
-  /** Creates a new Retract. */
-  private IntakeSubsystem intake;
-  private OuttakeSubsystem outtakeSub;
-  public Retract(IntakeSubsystem intake, OuttakeSubsystem outtakeSub) {
+/** starfish */
+public class ManualUptake extends CommandBase {
+  private OuttakeSubsystem outtake;
 
-    this.intake = intake;
-    this.outtakeSub = outtakeSub;
+  /** Creates a new ManualUptake. */
+  public ManualUptake(OuttakeSubsystem outtake) {
+    this.outtake = outtake;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake);
+    addRequirements(outtake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    outtakeSub.setState(ShooterStates.AUTOMATIC);
+    outtake.setState(ShooterStates.FORWARDS);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
-    intake.retractIntake();
-    intake.stopIntake();
     
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.stopIntake();
+    outtake.setState(ShooterStates.AUTOMATIC);
   }
 
   // Returns true when the command should end.
