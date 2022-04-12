@@ -14,6 +14,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ClimbConstants.*;
@@ -29,6 +31,8 @@ public class ClimbSubsystem extends SubsystemBase {
   private WPI_TalonSRX leadClimbRotate;
   private WPI_TalonSRX followClimbRotate;
 
+  private DigitalInput climbLimitSwitch;
+
   // Used for locking the climber controls on the operator control before climb time
   private boolean climbMode;
 
@@ -42,6 +46,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
     leadClimbRotate = new WPI_TalonSRX(LEAD_ROTATE_MOTOR);
     followClimbRotate = new WPI_TalonSRX(FOLLOW_ROTATE_MOTOR);
+
+    climbLimitSwitch = new DigitalInput(3);
 
     followClimbRotate.follow(leadClimbRotate);
 
@@ -108,8 +114,8 @@ public class ClimbSubsystem extends SubsystemBase {
       boolean withinMinAngle = encoderTicksToDegrees(position) > ROTATE_MIN_ANGLE;
       boolean withinMaxAngle = encoderTicksToDegrees(position) < ROTATE_MAX_ANGLE;
 
-      // only run if within bounds or moving back towards within bounds
-      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0)) {
+      // only run if within bounds or moving back towards within bounds and only if limit switches were not triggered
+      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0) && (!climbLimitSwitch.get())) {
         leadClimbRotate.set(speed * CLIMB_SPEED);
       } else {
         leadClimbRotate.set(0);
