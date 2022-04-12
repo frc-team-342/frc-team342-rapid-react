@@ -5,9 +5,13 @@
 package frc.robot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -241,7 +245,24 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    Pose2d curr = driveSystem.getPose();
+
+    return driveSystem.trajectoryCommand(
+      TrajectoryGenerator.generateTrajectory(
+        curr, 
+        List.of(), 
+        new Pose2d(
+          curr.getX() + 1,
+          curr.getY() + 1,
+          curr.getRotation()
+        ), 
+        driveSystem.getTrajectoryConfig()
+      )
+    ).andThen(
+      new InstantCommand(() -> {
+        driveSystem.drive(0, 0, 0);
+      }, driveSystem)
+    );
   }
 
   public void teleopCoastMode() {

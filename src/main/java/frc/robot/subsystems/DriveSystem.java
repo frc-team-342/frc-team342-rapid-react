@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -23,6 +24,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -125,13 +127,19 @@ public class DriveSystem extends SubsystemBase {
     frontRightEncoder = frontRight.getEncoder();
     backRightEncoder = backRight.getEncoder();
 
+    // please do not ask how we made this work. 1/6 made error but this is fine
+    frontLeftEncoder.setPositionConversionFactor(1.0f/6.0f);
+    backLeftEncoder.setPositionConversionFactor(1.0f/6.0f);
+    frontRightEncoder.setPositionConversionFactor(1.0f/6.0f);
+    backRightEncoder.setPositionConversionFactor(1.0f/6.0f);
+
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
     gyro = new ADIS16470_IMU();
 
     odometry = new MecanumDriveOdometry(KINEMATICS, new Rotation2d(gyro.getAngle()));
     trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
-    rotationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
+    rotationController = new ProfiledPIDController(0.0001, 0, 0, new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
   }
 
   /**
@@ -166,11 +174,16 @@ public class DriveSystem extends SubsystemBase {
    */
   private MecanumDriveWheelSpeeds getWheelSpeeds() {
     return new MecanumDriveWheelSpeeds(
-      frontLeftEncoder.getVelocity(),
-      backLeftEncoder.getVelocity(),
-      frontRightEncoder.getVelocity(),
-      backRightEncoder.getVelocity()
+      rpmToMetersPerSec(frontLeftEncoder.getVelocity()),
+      rpmToMetersPerSec(backLeftEncoder.getVelocity()),
+      rpmToMetersPerSec(frontRightEncoder.getVelocity()),
+      rpmToMetersPerSec(backRightEncoder.getVelocity())
     );
+  }
+
+  private double rpmToMetersPerSec(double rpm) {
+    // rpm times circumference times 60 sec
+    return rpm * WHEEL_CIRCUMFERENCE * 60;
   }
 
   /**
@@ -208,8 +221,8 @@ public class DriveSystem extends SubsystemBase {
 
       KINEMATICS, // Distance from center of robot to each wheel
 
-      new PIDController(0, 0, 0), // PID controller on x-position
-      new PIDController(0, 0, 0), // PID controller on y-position
+      new PIDController(0.0001, 0, 0.0001), // PID controller on x-position
+      new PIDController(0.0001, 0, 0.0001), // PID controller on y-position
       rotationController, // PID controller on rotation
 
       MAX_SPEED, // Maximum speed in m/s
@@ -317,6 +330,14 @@ public class DriveSystem extends SubsystemBase {
     backRight.setIdleMode(idleMode);
   }
 
+  private double getX() {
+    return odometry.getPoseMeters().getX();
+  }
+
+  private double getY() {
+    return odometry.getPoseMeters().getY();
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -331,6 +352,14 @@ public class DriveSystem extends SubsystemBase {
     builder.setSmartDashboardType("DriveSystem");
     builder.addBooleanProperty("Field Oriented", this::getFieldOriented, null);
     builder.addDoubleProperty("Speed Multiplier", this::getSpeedMultiplier, null);
+    builder.addDoubleProperty("X Position", this::getX, null);
+    builder.addDoubleProperty("Y Position", this::getY, null);
+    builder.addDoubleProperty("Left front encoder", frontLeftEncoder::getPosition, null);
+    builder.addDoubleProperty("Left back encoder", backLeftEncoder::getPosition, null);
+    builder.addDoubleProperty("Right front encoder", frontRightEncoder::getPosition, null);
+    builder.addDoubleProperty("Right back encoder", backRightEncoder::getPosition, null);    
+    builder.addStringProperty("is the drivetrain scrungled???", () -> (frontLeftEncoder.getPositionConversionFactor() == 1.0f/6.0f) ? "scrimblo scrongus" : "scronkled", null);
+    builder.addDoubleProperty("the scrimblo scrungler unscringus", frontLeftEncoder::getPositionConversionFactor, null);
   }
 
 
