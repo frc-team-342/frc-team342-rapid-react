@@ -15,7 +15,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ClimbConstants.*;
@@ -47,7 +46,7 @@ public class ClimbSubsystem extends SubsystemBase {
     leadClimbRotate = new WPI_TalonSRX(LEAD_ROTATE_MOTOR);
     followClimbRotate = new WPI_TalonSRX(FOLLOW_ROTATE_MOTOR);
 
-    climbLimitSwitch = new DigitalInput(3);
+    climbLimitSwitch = new DigitalInput(CLIMB_LIMIT_SWITCH_PORT);
 
     followClimbRotate.follow(leadClimbRotate);
 
