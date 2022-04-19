@@ -354,14 +354,19 @@ public class DriveSystem extends SubsystemBase {
     builder.addDoubleProperty("Speed Multiplier", this::getSpeedMultiplier, null);
     builder.addDoubleProperty("X Position", this::getX, null);
     builder.addDoubleProperty("Y Position", this::getY, null);
-    builder.addDoubleProperty("Left front encoder", frontLeftEncoder::getPosition, null);
-    builder.addDoubleProperty("Left back encoder", backLeftEncoder::getPosition, null);
-    builder.addDoubleProperty("Right front encoder", frontRightEncoder::getPosition, null);
-    builder.addDoubleProperty("Right back encoder", backRightEncoder::getPosition, null);    
-    builder.addStringProperty("is the drivetrain scrungled???", () -> (frontLeftEncoder.getPositionConversionFactor() == 1.0f/6.0f) ? "scrimblo scrongus" : "scronkled", null);
-    builder.addDoubleProperty("the scrimblo scrungler unscringus", frontLeftEncoder::getPositionConversionFactor, null);
-  }
 
+    // Encoder positions
+    builder.addDoubleProperty("Left front position", frontLeftEncoder::getPosition, null);
+    builder.addDoubleProperty("Left back position", backLeftEncoder::getPosition, null);
+    builder.addDoubleProperty("Right front position", frontRightEncoder::getPosition, null);
+    builder.addDoubleProperty("Right back position", backRightEncoder::getPosition, null);
+    
+    // Encoder velocities
+    builder.addDoubleProperty("Left front velocity", frontLeftEncoder::getVelocity, null);
+    builder.addDoubleProperty("Left back velocity", backLeftEncoder::getPosition, null);
+    builder.addDoubleProperty("Right front velocity", frontRightEncoder::getPosition, null);
+    builder.addDoubleProperty("Right back velocity", backRightEncoder::getPosition, null);    
+  }
 
   /**
    * Checks whether each motor controller is physically connected to the robot.
