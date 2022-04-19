@@ -139,6 +139,8 @@ public final class Constants {
         public static final double CLIMB_SPEED = 0.4;
 
         public static final double ROTATE_ENCODER_TICKS_PER_ROT = 8192;
+
+        public static final int CLIMB_LIMIT_SWITCH_PORT = 3;
     }
 
     public static final class IntakeConstants {
