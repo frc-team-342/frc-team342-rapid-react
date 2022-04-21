@@ -114,7 +114,7 @@ public class ClimbSubsystem extends SubsystemBase {
       boolean withinMaxAngle = encoderTicksToDegrees(position) < ROTATE_MAX_ANGLE;
 
       // only run if within bounds or moving back towards within bounds and only if limit switches were not triggered
-      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0) && (!climbLimitSwitch.get())) {
+      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0) && (climbLimitSwitch.get())) {
         leadClimbRotate.set(speed * CLIMB_SPEED);
       } else {
         leadClimbRotate.set(0);
@@ -181,6 +181,10 @@ public class ClimbSubsystem extends SubsystemBase {
     return climbMode;
   }
 
+  public boolean getLimitSwitch() {
+    return climbLimitSwitch.get();
+  }
+
   /**
    * Changes the current status of climbMode to the opposite state of what it was
    */
@@ -197,6 +201,7 @@ public class ClimbSubsystem extends SubsystemBase {
     sendable.addDoubleProperty("Rotate encoder", () -> {
       return encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition());
     }, null);
+    sendable.addBooleanProperty("Climb Limit Switch", this::getLimitSwitch, null);
   }
 
   /**
