@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -24,7 +23,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -140,20 +138,37 @@ public class DriveSystem extends SubsystemBase {
     trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
     rotationController = new ProfiledPIDController(0.0001, 0, 0, new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
+
+    // PID controller setup
+    frontLeftController.setP(0.001);
+    frontLeftController.setI(0.0);
+    frontLeftController.setD(0.0);
+
+    backLeftController.setP(0.001);
+    backLeftController.setI(0.0);
+    backLeftController.setD(0.0);
+
+    frontRightController.setP(0.001);
+    frontRightController.setI(0.0);
+    frontRightController.setD(0.0);
+
+    backRightController.setP(0.001);
+    backRightController.setI(0.0);
+    backRightController.setD(0.0);    
   }
 
   /**
    * Drives based on whether driving is field oriented or not
    * 
-   * @param xVelocity velocity of the robot moving forward
-   * @param yVelocity velocity of the robot moving side-to-side 
-   * @param rotationVelocity velocity of robot moving clockwise 
+   * @param xOutput velocity of the robot moving forward
+   * @param yOutput velocity of the robot moving side-to-side 
+   * @param rotationOutput velocity of robot moving clockwise 
    **/
-  public void drive(double xVelocity, double yVelocity, double rotationVelocity) {
+  public void drive(double xOutput, double yOutput, double rotationOutput) {
     // Used for slow mode 
-    double x = xVelocity * currentMode.speedMultiplier;
-    double y = yVelocity * currentMode.speedMultiplier;
-    double rotation = rotationVelocity * currentMode.speedMultiplier;
+    double x = xOutput * currentMode.speedMultiplier;
+    double y = yOutput * currentMode.speedMultiplier;
+    double rotation = rotationOutput * currentMode.speedMultiplier;
     
     if (fieldOriented) {
       mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
