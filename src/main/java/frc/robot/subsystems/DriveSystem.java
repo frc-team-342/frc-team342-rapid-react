@@ -15,6 +15,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -73,6 +74,8 @@ public class DriveSystem extends SubsystemBase {
   private MecanumDriveOdometry odometry;
   private TrajectoryConfig trajectoryConfig;
 
+  private PIDController xAxisController;
+  private PIDController yAxisController;
   private ProfiledPIDController rotationController;
 
   /** Creates a new DriveSystem. */
@@ -137,6 +140,9 @@ public class DriveSystem extends SubsystemBase {
     odometry = new MecanumDriveOdometry(KINEMATICS, new Rotation2d(gyro.getAngle()));
     trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
+    // Holonomic PID
+    xAxisController = new PIDController(0.001, 0.0, 0.0);
+    yAxisController = new PIDController(0.001, 0.0, 0.0);
     rotationController = new ProfiledPIDController(0.0001, 0, 0, new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
 
     // PID controller setup
@@ -160,9 +166,9 @@ public class DriveSystem extends SubsystemBase {
   /**
    * Drives based on whether driving is field oriented or not
    * 
-   * @param xOutput velocity of the robot moving forward
-   * @param yOutput velocity of the robot moving side-to-side 
-   * @param rotationOutput velocity of robot moving clockwise 
+   * @param xOutput percent output of the robot moving forward
+   * @param yOutput percent output of the robot moving side-to-side 
+   * @param rotationOutput percent output of robot moving clockwise 
    **/
   public void drive(double xOutput, double yOutput, double rotationOutput) {
     // Used for slow mode 
@@ -177,13 +183,35 @@ public class DriveSystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Drive the robot at a specific velocity along each axis using PID
+   * 
+   * @param xVelocity velocity of the robot moving forwards in m/s
+   * @param yVelocity velocity of the robot moving side-to-side in m/s
+   * @param rotationVelocity radial velocity of the robot in rad/s clockwise-positive
+   */
+  public void driveVelocity(double xVelocity, double yVelocity, double rotationVelocity) {
+    double currentXVelocity = 0.0; // find motion along x-axis from encoder speeds??
+    double currentYVelocity = 0.0;
+    double currentRotVelocity = 0.0;
+
+    double x = xAxisController.calculate(currentXVelocity, xVelocity);
+    double y = yAxisController.calculate(currentYVelocity, yVelocity);
+    double rot = rotationController.calculate(currentRotVelocity, rotationVelocity);
+
+    // TODO: implementation for field oriented
+
+    MecanumDriveWheelSpeeds speeds = KINEMATICS.toWheelSpeeds(new ChassisSpeeds(x, y, rot));
+    this.drive(speeds);
+  }
+
   public Pose2d getPose() {
     return odometry.getPoseMeters();
   }
 
   /**
    * Get the current speeds of the wheel as a MecanumDriveWheelSpeeds object. <br/>
-   * Units are RPM.
+   * Units are meters per second.
    * 
    * @return the current wheel speeds
    */
@@ -236,8 +264,8 @@ public class DriveSystem extends SubsystemBase {
 
       KINEMATICS, // Distance from center of robot to each wheel
 
-      new PIDController(0.0001, 0, 0.0001), // PID controller on x-position
-      new PIDController(0.0001, 0, 0.0001), // PID controller on y-position
+      xAxisController, // PID controller on x-position
+      yAxisController, // PID controller on y-position
       rotationController, // PID controller on rotation
 
       MAX_SPEED, // Maximum speed in m/s
