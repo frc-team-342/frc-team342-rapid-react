@@ -14,7 +14,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.ClimbConstants.*;
@@ -30,7 +30,7 @@ public class ClimbSubsystem extends SubsystemBase {
   private WPI_TalonSRX leadClimbRotate;
   private WPI_TalonSRX followClimbRotate;
 
-  private DigitalInput climbLimitSwitch;
+  private AnalogInput climbLimitSwitch;
 
   // Used for locking the climber controls on the operator control before climb time
   private boolean climbMode;
@@ -46,7 +46,7 @@ public class ClimbSubsystem extends SubsystemBase {
     leadClimbRotate = new WPI_TalonSRX(LEAD_ROTATE_MOTOR);
     followClimbRotate = new WPI_TalonSRX(FOLLOW_ROTATE_MOTOR);
 
-    climbLimitSwitch = new DigitalInput(CLIMB_LIMIT_SWITCH_PORT);
+    climbLimitSwitch = new AnalogInput(3);
 
     followClimbRotate.follow(leadClimbRotate);
 
@@ -114,8 +114,12 @@ public class ClimbSubsystem extends SubsystemBase {
       boolean withinMaxAngle = encoderTicksToDegrees(position) < ROTATE_MAX_ANGLE;
 
       // only run if within bounds or moving back towards within bounds and only if limit switches were not triggered
-      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0) && (climbLimitSwitch.get())) {
-        leadClimbRotate.set(speed * CLIMB_SPEED);
+      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0)) {
+        if(getLimitState() && speed > 0){
+          leadClimbRotate.set(speed * CLIMB_SPEED);
+        } else {
+          leadClimbRotate.set(0);
+        }
       } else {
         leadClimbRotate.set(0);
       }
@@ -173,6 +177,10 @@ public class ClimbSubsystem extends SubsystemBase {
     climbMode = mode;
   }
 
+  public boolean getLimitState(){
+    return (climbLimitSwitch.getValue() > 50);
+  }
+
   /**
    * Returns climbMode
    * @return true if climb is active, false otherwise
@@ -181,9 +189,6 @@ public class ClimbSubsystem extends SubsystemBase {
     return climbMode;
   }
 
-  public boolean getLimitSwitch() {
-    return climbLimitSwitch.get();
-  }
 
   /**
    * Changes the current status of climbMode to the opposite state of what it was
@@ -198,10 +203,8 @@ public class ClimbSubsystem extends SubsystemBase {
     sendable.addBooleanProperty("Climb mode", this::getClimbMode, this::setClimbMode);
     sendable.addDoubleProperty("Left lift encoder", leftClimbLiftEncoder::getIntegratedSensorPosition, null);
     sendable.addDoubleProperty("Right lift encoder", rightClimbLiftEncoder::getIntegratedSensorPosition, null);
-    sendable.addDoubleProperty("Rotate encoder", () -> {
-      return encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition());
-    }, null);
-    sendable.addBooleanProperty("Climb Limit Switch", this::getLimitSwitch, null);
+    sendable.addDoubleProperty("Rotate encoder", () -> encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition()), null);
+    sendable.addDoubleProperty("Climb limit switch", climbLimitSwitch::getValue, null);
   }
 
   /**
