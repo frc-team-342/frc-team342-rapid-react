@@ -16,6 +16,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 import static frc.robot.Constants.ClimbConstants.*;
 
@@ -50,6 +51,10 @@ public class ClimbSubsystem extends SubsystemBase {
 
     followClimbRotate.follow(leadClimbRotate);
 
+    if(Robot.checkType() == Robot.RobotType.A_BOT){
+      followClimbRotate.setInverted(true);
+    }
+    
     // brake mode so that it does not fall when on the bars
     leftClimbLift.setNeutralMode(NeutralMode.Brake);
     rightClimbLift.setNeutralMode(NeutralMode.Brake);
@@ -115,9 +120,9 @@ public class ClimbSubsystem extends SubsystemBase {
 
       // only run if within bounds or moving back towards within bounds and only if limit switches were not triggered
       if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0)) {
-        if(getLimitState() && speed > 0){
+        if(getLimitState() && speed > 0) {
           leadClimbRotate.set(speed * CLIMB_SPEED);
-        } else {
+          } else {
           leadClimbRotate.set(0);
         }
       } else {
