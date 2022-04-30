@@ -34,6 +34,28 @@ public final class Constants {
         public static final double NORMAL_SPEED = 0.8;
         public static final double SLOW_SPEED = 0.4;
 
+        // Constants for wheel PID
+        public static final double WHEEL_P = 0.0;
+        public static final double WHEEL_I = 0.0;
+        public static final double WHEEL_D = 0.0;
+
+        // Constants for wheel feedforward
+        public static final double FF_STATIC = 0.0;
+        public static final double FF_VELOCITY = 0.0;
+
+        // Constants for holonomic PID
+        public static final double HOLONOMIC_P = 0.0;
+        public static final double HOLONOMIC_I = 0.0;
+        public static final double HOLONOMIC_D = 0.0;
+
+        // Constants for rotation PID
+        public static final double ROTATION_P = 0.0;
+        public static final double ROTATION_I = 0.0;
+        public static final double ROTATION_D = 0.0;
+
+        /** Gear ratio for encoder conversion factor */
+        public static final double CONVERSION_FACTOR = 1.0/6.0f;
+
         /** Maximum current that each motor can draw without triggering breakers. */
         public static final int CURRENT_LIMIT = 40;
 

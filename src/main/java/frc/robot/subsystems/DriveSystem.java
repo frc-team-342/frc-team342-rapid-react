@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 // Static imports mean that variable names can be accessed without referencing the class name they came from
@@ -77,6 +79,8 @@ public class DriveSystem extends SubsystemBase {
   private PIDController xAxisController;
   private PIDController yAxisController;
   private ProfiledPIDController rotationController;
+
+  private SimpleMotorFeedforward feedforward;
 
   /** Creates a new DriveSystem. */
   public DriveSystem() {
@@ -129,10 +133,10 @@ public class DriveSystem extends SubsystemBase {
     backRightEncoder = backRight.getEncoder();
 
     // please do not ask how we made this work. 1/6 made error but this is fine
-    frontLeftEncoder.setPositionConversionFactor(1.0f/6.0f);
-    backLeftEncoder.setPositionConversionFactor(1.0f/6.0f);
-    frontRightEncoder.setPositionConversionFactor(1.0f/6.0f);
-    backRightEncoder.setPositionConversionFactor(1.0f/6.0f);
+    frontLeftEncoder.setPositionConversionFactor(CONVERSION_FACTOR);
+    backLeftEncoder.setPositionConversionFactor(CONVERSION_FACTOR);
+    frontRightEncoder.setPositionConversionFactor(CONVERSION_FACTOR);
+    backRightEncoder.setPositionConversionFactor(CONVERSION_FACTOR);
 
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
     gyro = new ADIS16470_IMU();
@@ -141,26 +145,19 @@ public class DriveSystem extends SubsystemBase {
     trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
     // Holonomic PID
-    xAxisController = new PIDController(0.001, 0.0, 0.0);
-    yAxisController = new PIDController(0.001, 0.0, 0.0);
-    rotationController = new ProfiledPIDController(0.0001, 0, 0, new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
+    xAxisController = new PIDController(HOLONOMIC_P, HOLONOMIC_I, HOLONOMIC_D);
+    yAxisController = new PIDController(HOLONOMIC_P, HOLONOMIC_I, HOLONOMIC_D);
+    rotationController = new ProfiledPIDController(ROTATION_P, ROTATION_I, ROTATION_D, 
+      new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
+
+    feedforward = new SimpleMotorFeedforward(FF_STATIC, FF_VELOCITY);
 
     // PID controller setup
-    frontLeftController.setP(0.001);
-    frontLeftController.setI(0.0);
-    frontLeftController.setD(0.0);
-
-    backLeftController.setP(0.001);
-    backLeftController.setI(0.0);
-    backLeftController.setD(0.0);
-
-    frontRightController.setP(0.001);
-    frontRightController.setI(0.0);
-    frontRightController.setD(0.0);
-
-    backRightController.setP(0.001);
-    backRightController.setI(0.0);
-    backRightController.setD(0.0);    
+    for (SparkMaxPIDController controller : List.of(frontLeftController, backLeftController, frontRightController, backRightController)) {
+      controller.setP(WHEEL_P);
+      controller.setI(WHEEL_I);
+      controller.setD(WHEEL_D);
+    }
   }
 
   /**
