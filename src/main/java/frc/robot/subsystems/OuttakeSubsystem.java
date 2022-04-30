@@ -24,6 +24,19 @@ import static frc.robot.Constants.OuttakeConstants.*;
 
 public class OuttakeSubsystem extends SubsystemBase {
 
+  public enum ShooterStates {
+    // runs when shooter is up to speed
+    AUTOMATIC,
+
+    // runs when being reversed to eject cargo
+    REVERSE,
+
+    // runs when being used to partly uptake cargo
+    FORWARDS
+  }
+
+  private ShooterStates currentState;
+
   private WPI_TalonFX shootMotor1;
   private WPI_TalonFX shootMotor2;
   private WPI_TalonSRX feederMotor;
@@ -89,6 +102,8 @@ public class OuttakeSubsystem extends SubsystemBase {
 
     shootMotor1.configSupplyCurrentLimit(currentLimitConfiguration);
     shootMotor2.configSupplyCurrentLimit(currentLimitConfiguration);
+
+    currentState = ShooterStates.AUTOMATIC;
   }
 
    /**
@@ -106,9 +121,18 @@ public class OuttakeSubsystem extends SubsystemBase {
   }
 
   /**
+   * Reverses the Motors to remove the cargo
+   */
+  public void reverse()
+  {
+    shootMotor1.set(ControlMode.PercentOutput, REVERSE_SPEED);
+    shootMotor2.set(ControlMode.PercentOutput, REVERSE_SPEED);
+  }
+
+  /**
    * Sets speed of motors to 0 to stop motor's shooting
    */
-  public void stopShooter(){
+  public void stopShooter() {
     setpoint = 0;
   }
 
@@ -169,6 +193,20 @@ public class OuttakeSubsystem extends SubsystemBase {
     encoder2.setIntegratedSensorPosition(0, 10);
   }
 
+  /**
+   * @param state the state to switch to
+   */
+  public void setState(ShooterStates state) {
+    this.currentState = state;
+  }
+
+  /**
+   * @return the current state
+   */
+  public ShooterStates getState() {
+    return this.currentState;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -176,13 +214,29 @@ public class OuttakeSubsystem extends SubsystemBase {
     shootMotor2.set(TalonFXControlMode.Velocity, getAdjustedSetpoint());
 
     // the velocity variable is updated in period by the upToSpeed() method
-
-    // Open loop control is used on feed motors
-    if (upToSpeed() && setpoint != 0) {
-      // Only feed if the shooter is ready
-      feederMotor.set(ControlMode.PercentOutput, LOAD_SPEED);
-    } else {
-      feederMotor.set(ControlMode.PercentOutput, 0);
+    velocity = velocityMultiplier * encoder1.getIntegratedSensorVelocity();
+  
+    switch (currentState) {
+      // when reversing intake, do not run automatically
+      case REVERSE:
+        feederMotor.set(REVERSE_SPEED);
+        break;
+      
+      // when running intake manually, do not run automatically
+      case FORWARDS:
+        feederMotor.set(LOAD_SPEED);
+        break;
+      
+      // automatic is the default state
+      case AUTOMATIC:
+      default:      
+        // only run if shooter is up to speed
+        if (upToSpeed() && setpoint != 0) {
+          feederMotor.set(LOAD_SPEED);
+        } else {
+          feederMotor.set(0);
+        }
+        break;
     }
   }
 
@@ -201,7 +255,6 @@ public class OuttakeSubsystem extends SubsystemBase {
     builder.addBooleanProperty("Up to speed", this::upToSpeed, null);
     builder.addDoubleProperty("Setpoint", this::getSetpoint, null);
     builder.addDoubleProperty("Adjusted setpoint", this::getAdjustedSetpoint, null);
-
     builder.addDoubleProperty("Velocity", this::getVelocity, null);
     builder.addDoubleProperty("Encoder delta", this::getEncoderDelta, null);
   }
