@@ -47,7 +47,7 @@ public class ClimbSubsystem extends SubsystemBase {
     leadClimbRotate = new WPI_TalonSRX(LEAD_ROTATE_MOTOR);
     followClimbRotate = new WPI_TalonSRX(FOLLOW_ROTATE_MOTOR);
 
-    climbLimitSwitch = new AnalogInput(3);
+    climbLimitSwitch = new AnalogInput(CLIMB_LIMIT_SWITCH_PORT);
 
     followClimbRotate.follow(leadClimbRotate);
 
@@ -182,6 +182,11 @@ public class ClimbSubsystem extends SubsystemBase {
     climbMode = mode;
   }
 
+  /**
+   * Checks to see if limit switch was triggered. Compares current value of the analog input to 50 
+   * When greater than 50, the limit switch has been pressed.
+   * @return True when limit switch is triggered (Indicating climb has reached minimum angle). False otherwise.
+   */
   public boolean getLimitState(){
     return (climbLimitSwitch.getValue() > 50);
   }
@@ -209,7 +214,7 @@ public class ClimbSubsystem extends SubsystemBase {
     sendable.addDoubleProperty("Left lift encoder", leftClimbLiftEncoder::getIntegratedSensorPosition, null);
     sendable.addDoubleProperty("Right lift encoder", rightClimbLiftEncoder::getIntegratedSensorPosition, null);
     sendable.addDoubleProperty("Rotate encoder", () -> encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition()), null);
-    sendable.addDoubleProperty("Climb limit switch", climbLimitSwitch::getValue, null);
+    sendable.addBooleanProperty("Climb limit switch", this::getLimitState, null);
   }
 
   /**
