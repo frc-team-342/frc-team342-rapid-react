@@ -146,6 +146,11 @@ public final class Constants {
         public static final int DEPLOY_RIGHT_MOTOR = 9;
         public static final int ROLLER_MOTOR = 10;
 
+        public static final int RIGHT_LIMIT_SWITCH_UP = 3;
+        public static final int LEFT_LIMIT_SWITCH_UP = 4;
+        public static final int RIGHT_LIMIT_SWITCH_DOWN = 5;
+        public static final int LEFT_LIMIT_SWITCH_DOWN = 6;
+
         public static final double MIN_INTAKE_ANGLE = 52.75;
         public static final double MAX_INTAKE_ANGLE = 15.0;
 
