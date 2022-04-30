@@ -101,7 +101,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
    */
   public void deployIntake() {
-   if(rightLimitSwitchDown.get() == false && leftLimitSwitchDown.get() == false)
+   if(!rightLimitSwitchDown.get() && !leftLimitSwitchDown.get())
    {
     if (currentAngleLeft >= MIN_INTAKE_ANGLE && currentAngleRight >= MIN_INTAKE_ANGLE) {
       deployLeft.set(0);
@@ -129,7 +129,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
    */
   public void retractIntake() {
-  if(rightLimitSwitchUp.get() == false && leftLimitSwitchUp.get() == false)
+  if(!rightLimitSwitchUp.get() && !leftLimitSwitchUp.get())
   {
     if (currentAngleLeft <= MAX_INTAKE_ANGLE && currentAngleRight <= MAX_INTAKE_ANGLE) {
       deployLeft.set(0);
