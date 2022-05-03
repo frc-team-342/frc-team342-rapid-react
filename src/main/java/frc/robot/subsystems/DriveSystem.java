@@ -80,8 +80,6 @@ public class DriveSystem extends SubsystemBase {
   private PIDController yAxisController;
   private ProfiledPIDController rotationController;
 
-  private SimpleMotorFeedforward feedforward;
-
   /** Creates a new DriveSystem. */
   public DriveSystem() {
     // Capitalized and underscored variable names are statically imported constants from Constants.java
@@ -145,18 +143,17 @@ public class DriveSystem extends SubsystemBase {
     trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
     // Holonomic PID
-    xAxisController = new PIDController(HOLONOMIC_P, HOLONOMIC_I, HOLONOMIC_D);
-    yAxisController = new PIDController(HOLONOMIC_P, HOLONOMIC_I, HOLONOMIC_D);
+    xAxisController = new PIDController(X_AXIS_P, X_AXIS_I, X_AXIS_D);
+    yAxisController = new PIDController(Y_AXIS_P, Y_AXIS_I, Y_AXIS_D);
     rotationController = new ProfiledPIDController(ROTATION_P, ROTATION_I, ROTATION_D, 
       new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
-
-    feedforward = new SimpleMotorFeedforward(FF_STATIC, FF_VELOCITY);
 
     // PID controller setup
     for (SparkMaxPIDController controller : List.of(frontLeftController, backLeftController, frontRightController, backRightController)) {
       controller.setP(WHEEL_P);
       controller.setI(WHEEL_I);
       controller.setD(WHEEL_D);
+      controller.setFF(FF_VELOCITY);
     }
   }
 
@@ -196,10 +193,19 @@ public class DriveSystem extends SubsystemBase {
     double y = yAxisController.calculate(currentYVelocity, yVelocity);
     double rot = rotationController.calculate(currentRotVelocity, rotationVelocity);
 
-    // TODO: implementation for field oriented
+    ChassisSpeeds speeds;
 
-    MecanumDriveWheelSpeeds speeds = KINEMATICS.toWheelSpeeds(new ChassisSpeeds(x, y, rot));
-    this.drive(speeds);
+    if (fieldOriented) {
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotationVelocity, new Rotation2d(Math.toRadians(gyro.getAngle())));
+    } else {
+      speeds = new ChassisSpeeds(x, y, rot);
+    }
+    
+    this.drive(KINEMATICS.toWheelSpeeds(speeds));
+  }
+
+  public void driveFF(MecanumDriveWheelSpeeds speeds) {
+    
   }
 
   public Pose2d getPose() {
@@ -222,8 +228,8 @@ public class DriveSystem extends SubsystemBase {
   }
 
   private double rpmToMetersPerSec(double rpm) {
-    // rpm times circumference times 60 sec
-    return rpm * WHEEL_CIRCUMFERENCE * 60;
+    // rpm times circumference divided 60 sec
+    return rpm * WHEEL_CIRCUMFERENCE / 60;
   }
 
   /**
@@ -232,10 +238,10 @@ public class DriveSystem extends SubsystemBase {
    * @param speeds the speeds at which to drive the wheels
    */
   private void drive(MecanumDriveWheelSpeeds speeds) {
-    frontLeftController.setReference(speeds.frontLeftMetersPerSecond, ControlType.kVelocity);
-    backLeftController.setReference(speeds.rearLeftMetersPerSecond, ControlType.kVelocity);
-    frontRightController.setReference(speeds.frontRightMetersPerSecond, ControlType.kVelocity);
-    backRightController.setReference(speeds.rearRightMetersPerSecond, ControlType.kVelocity);
+    frontLeftController.setReference(rpmToMetersPerSec(speeds.frontLeftMetersPerSecond), ControlType.kVelocity);
+    backLeftController.setReference(rpmToMetersPerSec(speeds.rearLeftMetersPerSecond), ControlType.kVelocity);
+    frontRightController.setReference(rpmToMetersPerSec(speeds.frontRightMetersPerSecond), ControlType.kVelocity);
+    backRightController.setReference(rpmToMetersPerSec(speeds.rearRightMetersPerSecond), ControlType.kVelocity);
   }
 
   /**

@@ -35,18 +35,22 @@ public final class Constants {
         public static final double SLOW_SPEED = 0.4;
 
         // Constants for wheel PID
-        public static final double WHEEL_P = 0.0;
+        public static final double WHEEL_P = 0.00435;
         public static final double WHEEL_I = 0.0;
-        public static final double WHEEL_D = 0.0;
+        public static final double WHEEL_D = 0.003;
 
         // Constants for wheel feedforward
         public static final double FF_STATIC = 0.0;
-        public static final double FF_VELOCITY = 0.0;
+        public static final double FF_VELOCITY = 0.1335;
 
         // Constants for holonomic PID
-        public static final double HOLONOMIC_P = 0.0;
-        public static final double HOLONOMIC_I = 0.0;
-        public static final double HOLONOMIC_D = 0.0;
+        public static final double X_AXIS_P = 0.0;
+        public static final double X_AXIS_I = 0.0;
+        public static final double X_AXIS_D = 0.0;
+
+        public static final double Y_AXIS_P = 0.0;
+        public static final double Y_AXIS_I = 0.0;
+        public static final double Y_AXIS_D = 0.0;
 
         // Constants for rotation PID
         public static final double ROTATION_P = 0.0;
