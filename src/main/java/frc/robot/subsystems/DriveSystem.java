@@ -204,10 +204,6 @@ public class DriveSystem extends SubsystemBase {
     this.drive(KINEMATICS.toWheelSpeeds(speeds));
   }
 
-  public void driveFF(MecanumDriveWheelSpeeds speeds) {
-    
-  }
-
   public Pose2d getPose() {
     return odometry.getPoseMeters();
   }
@@ -232,16 +228,21 @@ public class DriveSystem extends SubsystemBase {
     return rpm * WHEEL_CIRCUMFERENCE / 60;
   }
 
+  public double metersPerSecToRpm(double metersPerSec) {
+    // m/s times 60 divided by circumference
+    return metersPerSec * 60 / WHEEL_CIRCUMFERENCE;
+  }
+
   /**
    * Drive the wheel motors at specific velocities, using PID on each motor.
    * 
    * @param speeds the speeds at which to drive the wheels
    */
   private void drive(MecanumDriveWheelSpeeds speeds) {
-    frontLeftController.setReference(rpmToMetersPerSec(speeds.frontLeftMetersPerSecond), ControlType.kVelocity);
-    backLeftController.setReference(rpmToMetersPerSec(speeds.rearLeftMetersPerSecond), ControlType.kVelocity);
-    frontRightController.setReference(rpmToMetersPerSec(speeds.frontRightMetersPerSecond), ControlType.kVelocity);
-    backRightController.setReference(rpmToMetersPerSec(speeds.rearRightMetersPerSecond), ControlType.kVelocity);
+    frontLeftController.setReference(metersPerSecToRpm(speeds.frontLeftMetersPerSecond), ControlType.kVelocity);
+    backLeftController.setReference(metersPerSecToRpm(speeds.rearLeftMetersPerSecond), ControlType.kVelocity);
+    frontRightController.setReference(metersPerSecToRpm(speeds.frontRightMetersPerSecond), ControlType.kVelocity);
+    backRightController.setReference(metersPerSecToRpm(speeds.rearRightMetersPerSecond), ControlType.kVelocity);
   }
 
   /**
