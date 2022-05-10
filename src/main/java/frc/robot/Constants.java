@@ -134,7 +134,7 @@ public final class Constants {
         public static final double LIFT_MAX_POSITION = 225559;
 
         public static final double ROTATE_MIN_ANGLE = -4.75;
-        public static final double ROTATE_MAX_ANGLE = 23.0;
+        public static final double ROTATE_MAX_ANGLE = 16.5;
 
         public static final double CLIMB_SPEED = 0.4;
 

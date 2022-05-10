@@ -118,17 +118,19 @@ public class ClimbSubsystem extends SubsystemBase {
       boolean withinMinAngle = encoderTicksToDegrees(position) > ROTATE_MIN_ANGLE;
       boolean withinMaxAngle = encoderTicksToDegrees(position) < ROTATE_MAX_ANGLE;
 
-      // only run if within bounds or moving back towards within bounds and only if limit switches were not triggered
-      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0)) {
-        if(getLimitState() && speed > 0) {
+      // only run if within bounds or moving back towards within bounds
+      if ((withinMinAngle || speed > 0) && (withinMaxAngle || speed < 0)) {
+        // only move if back limit switch is not triggered or moving forwards
+        if(!getLimitState() || speed > 0) {
           leadClimbRotate.set(speed * CLIMB_SPEED);
-          } else {
+        } else {
           leadClimbRotate.set(0);
         }
       } else {
         leadClimbRotate.set(0);
       }
-    } else {
+    }
+    else {
       // do not run if climb mode is not enabled
       leadClimbRotate.set(0);
     }
@@ -188,7 +190,7 @@ public class ClimbSubsystem extends SubsystemBase {
    * @return True when limit switch is triggered (Indicating climb has reached minimum angle). False otherwise.
    */
   public boolean getLimitState(){
-    return (climbLimitSwitch.getValue() > 50);
+    return (climbLimitSwitch.getValue() < 50);
   }
 
   /**
