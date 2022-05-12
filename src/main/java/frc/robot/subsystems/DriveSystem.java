@@ -185,23 +185,28 @@ public class DriveSystem extends SubsystemBase {
    * @param rotationVelocity radial velocity of the robot in rad/s clockwise-positive
    */
   public void driveVelocity(double xVelocity, double yVelocity, double rotationVelocity) {
-    double currentXVelocity = 0.0; // find motion along x-axis from encoder speeds??
-    double currentYVelocity = 0.0;
-    double currentRotVelocity = 0.0;
+    ChassisSpeeds currentSpeeds = KINEMATICS.toChassisSpeeds(getWheelSpeeds());
 
-    double x = xAxisController.calculate(currentXVelocity, xVelocity);
-    double y = yAxisController.calculate(currentYVelocity, yVelocity);
-    double rot = rotationController.calculate(currentRotVelocity, rotationVelocity);
+    double currentXVelocity = currentSpeeds.vxMetersPerSecond; 
+    double currentYVelocity = currentSpeeds.vyMetersPerSecond;
+    double currentRotVelocity = currentSpeeds.omegaRadiansPerSecond;
 
-    ChassisSpeeds speeds;
+    double x = xAxisController.calculate(currentXVelocity, xVelocity) * currentMode.speedMultiplier;
+    double y = yAxisController.calculate(currentYVelocity, yVelocity) * currentMode.speedMultiplier;
+    double rot = rotationController.calculate(currentRotVelocity, rotationVelocity) * currentMode.speedMultiplier;
+
+    ChassisSpeeds setpointSpeeds;
 
     if (fieldOriented) {
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotationVelocity, new Rotation2d(Math.toRadians(gyro.getAngle())));
+      setpointSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotationVelocity, new Rotation2d(Math.toRadians(gyro.getAngle())));
     } else {
-      speeds = new ChassisSpeeds(x, y, rot);
+      setpointSpeeds = new ChassisSpeeds(x, y, rot);
     }
     
-    this.drive(KINEMATICS.toWheelSpeeds(speeds));
+    MecanumDriveWheelSpeeds speed = KINEMATICS.toWheelSpeeds(setpointSpeeds);
+    speed.desaturate(MAX_WHEEL_SPEED);
+
+    this.drive(speed);
   }
 
   public Pose2d getPose() {
@@ -398,21 +403,29 @@ public class DriveSystem extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("DriveSystem");
     builder.addBooleanProperty("Field Oriented", this::getFieldOriented, null);
-    builder.addDoubleProperty("Speed Multiplier", this::getSpeedMultiplier, null);
-    builder.addDoubleProperty("X Position", this::getX, null);
-    builder.addDoubleProperty("Y Position", this::getY, null);
+    builder.addDoubleProperty("Speed Multiplier (%)", this::getSpeedMultiplier, null);
+    builder.addDoubleProperty("X Position (m)", this::getX, null);
+    builder.addDoubleProperty("Y Position (m)", this::getY, null);
 
     // Encoder positions
-    builder.addDoubleProperty("Left front position", frontLeftEncoder::getPosition, null);
-    builder.addDoubleProperty("Left back position", backLeftEncoder::getPosition, null);
-    builder.addDoubleProperty("Right front position", frontRightEncoder::getPosition, null);
-    builder.addDoubleProperty("Right back position", backRightEncoder::getPosition, null);
+    builder.addDoubleProperty("Left front position (rot)", frontLeftEncoder::getPosition, null);
+    builder.addDoubleProperty("Left back position (rot)", backLeftEncoder::getPosition, null);
+    builder.addDoubleProperty("Right front position (rot)", frontRightEncoder::getPosition, null);
+    builder.addDoubleProperty("Right back position (rot)", backRightEncoder::getPosition, null);
     
     // Encoder velocities
-    builder.addDoubleProperty("Left front velocity", frontLeftEncoder::getVelocity, null);
-    builder.addDoubleProperty("Left back velocity", backLeftEncoder::getPosition, null);
-    builder.addDoubleProperty("Right front velocity", frontRightEncoder::getPosition, null);
-    builder.addDoubleProperty("Right back velocity", backRightEncoder::getPosition, null);    
+    builder.addDoubleProperty("Left front velocity (RPM)", frontLeftEncoder::getVelocity, null);
+    builder.addDoubleProperty("Left back velocity (RPM)", backLeftEncoder::getVelocity, null);
+    builder.addDoubleProperty("Right front velocity (RPM)", frontRightEncoder::getVelocity, null);
+    builder.addDoubleProperty("Right back velocity (RPM)", backRightEncoder::getVelocity, null);
+
+    // Holonomic velocities
+    MecanumDriveWheelSpeeds wheelSpeeds = getWheelSpeeds();
+    ChassisSpeeds chassisSpeeds = KINEMATICS.toChassisSpeeds(wheelSpeeds);
+
+    builder.addDoubleProperty("X Velocity (m per s)", () -> chassisSpeeds.vxMetersPerSecond, null);
+    builder.addDoubleProperty("Y Velocity (m per s)", () -> chassisSpeeds.vyMetersPerSecond, null);
+    builder.addDoubleProperty("Rotation velocity (rad per s)", () -> chassisSpeeds.omegaRadiansPerSecond, null);
   }
 
   /**

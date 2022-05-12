@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSystem;
 
+import static frc.robot.Constants.DriveConstants.*;
+
 public class DriveVelocity extends CommandBase {
   private DriveSystem driveSystem;
   private Joystick joystick;
@@ -28,12 +30,18 @@ public class DriveVelocity extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
+    double xVel = joystick.getX() * MAX_X_SPEED;
+    double yVel = joystick.getY() * MAX_Y_SPEED;
+    double rotVel = joystick.getZ() * MAX_ROTATION_SPEED;
+
+    driveSystem.driveVelocity(xVel, yVel, rotVel);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    driveSystem.drive(0, 0, 0);
+  }
 
   // Returns true when the command should end.
   @Override

@@ -57,6 +57,27 @@ public final class Constants {
         public static final double ROTATION_I = 0.0;
         public static final double ROTATION_D = 0.0;
 
+        /** Maximum speed of each wheel in meters per second. */
+        public static final double MAX_WHEEL_SPEED = 1.0;
+
+        /** Maximum X-axis speed in meters per second. */
+        public static final double MAX_X_SPEED = 1.0;
+
+        /** Maximum X-axis acceleration in meters per second squared. */
+        public static final double MAX_X_ACCELERATION = 1.0;
+
+        /** Maximum Y-axis speed in meters per second. */
+        public static final double MAX_Y_SPEED = 1.0;
+
+        /** Maximum Y-axis acceleration in meters per second squared. */
+        public static final double MAX_Y_ACCELERATION = 1.0;
+
+        /** Maximum angular speed in radians per second squared. */
+        public static final double MAX_ROTATION_SPEED = 1.0;
+
+        /** Maximum angular acceleration in radians per second squared. */
+        public static final double MAX_ROTATION_ACCELERATION = 1.0;
+
         /** Gear ratio for encoder conversion factor */
         public static final double CONVERSION_FACTOR = 1.0/6.0f;
 
@@ -84,12 +105,6 @@ public final class Constants {
 
         /** The maximum acceleration of the robot used during trajectory following. */
         public static final double MAX_ACCELERATION = 1.0;
-
-        /** Maximum angular speed in radians per second squared. */
-        public static final double MAX_ROTATION_SPEED = 1.0;
-
-        /** Maximum angular acceleration in radians per second squared. */
-        public static final double MAX_ROTATION_ACCELERATION = 1.0;
 
         /** Distance from the center of the robot to each of the wheels. */
         public static final MecanumDriveKinematics KINEMATICS = new MecanumDriveKinematics(
