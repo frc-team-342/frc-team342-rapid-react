@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -32,6 +33,8 @@ public class ClimbSubsystem extends SubsystemBase {
   private WPI_TalonSRX followClimbRotate;
 
   private AnalogInput climbLimitSwitch;
+
+  private double position;
 
   // Used for locking the climber controls on the operator control before climb time
   private boolean climbMode;
@@ -112,7 +115,7 @@ public class ClimbSubsystem extends SubsystemBase {
    * @param speed the speed to rotate at, [-1, 1]
    */
   public void rotateClimb(double speed) {
-    double position = leadClimbRotate.getSelectedSensorPosition();
+    position = leadClimbRotate.getSelectedSensorPosition();
 
     if (climbMode) {
       boolean withinMinAngle = encoderTicksToDegrees(position) > ROTATE_MIN_ANGLE;
@@ -144,7 +147,8 @@ public class ClimbSubsystem extends SubsystemBase {
    */
   private double encoderTicksToDegrees(double ticks) {
     // 8192 encoder ticks in a rotation, 360 degrees in a rotation
-    return (ticks / ROTATE_ENCODER_TICKS_PER_ROT) * 360;
+    return ((ticks / ROTATE_ENCODER_TICKS_PER_ROT) * 360) * ROTATION_GEAR_RATIO;
+    
   }
 
   /**
@@ -201,7 +205,6 @@ public class ClimbSubsystem extends SubsystemBase {
     return climbMode;
   }
 
-
   /**
    * Changes the current status of climbMode to the opposite state of what it was
    */
@@ -215,6 +218,7 @@ public class ClimbSubsystem extends SubsystemBase {
     sendable.addBooleanProperty("Climb mode", this::getClimbMode, this::setClimbMode);
     sendable.addDoubleProperty("Left lift encoder", leftClimbLiftEncoder::getIntegratedSensorPosition, null);
     sendable.addDoubleProperty("Right lift encoder", rightClimbLiftEncoder::getIntegratedSensorPosition, null);
+    sendable.addDoubleProperty("Raw rotate encoder", leadClimbRotate::getSelectedSensorPosition, null);
     sendable.addDoubleProperty("Rotate encoder", () -> encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition()), null);
     sendable.addBooleanProperty("Climb limit switch", this::getLimitState, null);
   }
