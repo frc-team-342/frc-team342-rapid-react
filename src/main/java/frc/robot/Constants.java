@@ -133,12 +133,12 @@ public final class Constants {
         public static final double LIFT_MIN_POSITION = 0;
         public static final double LIFT_MAX_POSITION = 225559;
 
-        public static final double ROTATE_MIN_ANGLE = -15.5;
-        public static final double ROTATE_MAX_ANGLE = 30;
+        public static final double ROTATE_MIN_ANGLE = -10.5;
+        public static final double ROTATE_MAX_ANGLE = 25;
 
         public static final double CLIMB_SPEED = 0.4;
 
-        public static final double ROTATE_ENCODER_TICKS_PER_ROT = 4096.0;
+        public static final double ROTATE_ENCODER_TICKS_PER_ROT = 1024.0;
         public static final double ROTATION_GEAR_RATIO = 80.0;
 
         public static final int CLIMB_LIMIT_SWITCH_PORT = 3;

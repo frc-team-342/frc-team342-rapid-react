@@ -29,12 +29,15 @@ public class ClimbSubsystem extends SubsystemBase {
   private TalonFXSensorCollection leftClimbLiftEncoder;
   private TalonFXSensorCollection rightClimbLiftEncoder;
 
+  private SensorCollection pulse;
+
   private WPI_TalonSRX leadClimbRotate;
   private WPI_TalonSRX followClimbRotate;
 
   private AnalogInput climbLimitSwitch;
 
   private double position;
+  double convertedPos;
 
   // Used for locking the climber controls on the operator control before climb time
   private boolean climbMode;
@@ -49,6 +52,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
     leadClimbRotate = new WPI_TalonSRX(LEAD_ROTATE_MOTOR);
     followClimbRotate = new WPI_TalonSRX(FOLLOW_ROTATE_MOTOR);
+
+    pulse = new SensorCollection(leadClimbRotate);
 
     climbLimitSwitch = new AnalogInput(CLIMB_LIMIT_SWITCH_PORT);
 
@@ -115,11 +120,12 @@ public class ClimbSubsystem extends SubsystemBase {
    * @param speed the speed to rotate at, [-1, 1]
    */
   public void rotateClimb(double speed) {
-    position = leadClimbRotate.getSelectedSensorPosition();
+    position = pulse.getPulseWidthPosition();
+    convertedPos = encoderTicksToDegrees(position);
 
     if (climbMode) {
-      boolean withinMinAngle = encoderTicksToDegrees(position) > ROTATE_MIN_ANGLE;
-      boolean withinMaxAngle = encoderTicksToDegrees(position) < ROTATE_MAX_ANGLE;
+      boolean withinMinAngle = convertedPos > ROTATE_MIN_ANGLE;
+      boolean withinMaxAngle = convertedPos < ROTATE_MAX_ANGLE;
 
       // only run if within bounds or moving back towards within bounds
       if ((withinMinAngle || speed > 0) && (withinMaxAngle || speed < 0)) {
@@ -220,6 +226,7 @@ public class ClimbSubsystem extends SubsystemBase {
     sendable.addDoubleProperty("Right lift encoder", rightClimbLiftEncoder::getIntegratedSensorPosition, null);
     sendable.addDoubleProperty("Raw rotate encoder", leadClimbRotate::getSelectedSensorPosition, null);
     sendable.addDoubleProperty("Rotate encoder", () -> encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition()), null);
+    sendable.addDoubleProperty("Position Var", () -> position, null);
     sendable.addBooleanProperty("Climb limit switch", this::getLimitState, null);
   }
 
