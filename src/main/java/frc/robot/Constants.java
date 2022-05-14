@@ -206,6 +206,9 @@ public final class Constants {
     }
 
     public static final class ControllerConstants {
+        // Driver joystick deadband
+        public static final double DRIVER_DEADBAND = 0.15;
+
         // Joystick IDs
         public static final int DRIVER_PORT = 0;
         public static final int OPERATOR_PORT = 1;

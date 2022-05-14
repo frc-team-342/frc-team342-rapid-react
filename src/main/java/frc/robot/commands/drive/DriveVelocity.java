@@ -4,11 +4,13 @@
 
 package frc.robot.commands.drive;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSystem;
 
 import static frc.robot.Constants.DriveConstants.*;
+import static frc.robot.Constants.ControllerConstants.DRIVER_DEADBAND;
 
 public class DriveVelocity extends CommandBase {
   private DriveSystem driveSystem;
@@ -30,9 +32,9 @@ public class DriveVelocity extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double xVel = joystick.getX() * MAX_X_SPEED;
-    double yVel = joystick.getY() * MAX_Y_SPEED;
-    double rotVel = joystick.getZ() * MAX_ROTATION_SPEED;
+    double xVel = MathUtil.applyDeadband(joystick.getX(), DRIVER_DEADBAND) * MAX_X_SPEED;
+    double yVel = MathUtil.applyDeadband(joystick.getY(), DRIVER_DEADBAND) * MAX_Y_SPEED;
+    double rotVel = MathUtil.applyDeadband(joystick.getZ(), DRIVER_DEADBAND) * MAX_ROTATION_SPEED;
 
     driveSystem.driveVelocity(xVel, yVel, rotVel);
   }

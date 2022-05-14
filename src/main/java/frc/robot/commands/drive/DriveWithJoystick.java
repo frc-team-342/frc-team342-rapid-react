@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSystem;
 
+import static frc.robot.Constants.ControllerConstants.DRIVER_DEADBAND;
+
 public class DriveWithJoystick extends CommandBase {
   
   DriveSystem driveSystem;
@@ -33,9 +35,9 @@ public class DriveWithJoystick extends CommandBase {
   public void execute() {
 
     // Checks whether joystick is within a deadzone and returns val
-    double deadBandX = MathUtil.applyDeadband(driver.getX(), 0.15);
-    double deadBandY = MathUtil.applyDeadband(driver.getY(), 0.15);
-    double deadBandZ = MathUtil.applyDeadband(driver.getZ(), 0.15);
+    double deadBandX = MathUtil.applyDeadband(driver.getX(), DRIVER_DEADBAND);
+    double deadBandY = MathUtil.applyDeadband(driver.getY(), DRIVER_DEADBAND);
+    double deadBandZ = MathUtil.applyDeadband(driver.getZ(), DRIVER_DEADBAND);
 
     driveSystem.drive(-deadBandX, deadBandY, -deadBandZ / 2);
 
