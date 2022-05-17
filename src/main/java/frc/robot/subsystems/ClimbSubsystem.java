@@ -121,16 +121,15 @@ public class ClimbSubsystem extends SubsystemBase {
    */
   public void rotateClimb(double speed) {
     position = pulse.getPulseWidthPosition();
-    convertedPos = encoderTicksToDegrees(position);
-
+    
     if (climbMode) {
-      boolean withinMinAngle = convertedPos > ROTATE_MIN_ANGLE;
-      boolean withinMaxAngle = convertedPos < ROTATE_MAX_ANGLE;
-
+      boolean withinMinAngle = position > ROTATE_MIN_ANGLE;
+      boolean withinMaxAngle = position < ROTATE_MAX_ANGLE;
+      
       // only run if within bounds or moving back towards within bounds
-      if ((withinMinAngle || speed > 0) && (withinMaxAngle || speed < 0)) {
+      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0)) {
         // only move if back limit switch is not triggered or moving forwards
-        if(!getLimitState() || speed > 0) {
+        if(!getLimitState() || speed < 0) {
           leadClimbRotate.set(speed * CLIMB_SPEED);
         } else {
           leadClimbRotate.set(0);
