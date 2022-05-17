@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.intake.Deploy;
@@ -28,6 +30,7 @@ import frc.robot.commands.intake.Intake;
 import frc.robot.commands.intake.ManualUptake;
 import frc.robot.commands.intake.Retract;
 import frc.robot.commands.intake.ReverseIntake;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.auto.DriveToCargo;
 import frc.robot.commands.auto.DriveToHub;
 import frc.robot.commands.auto.ShootPreloadedExit;
@@ -35,6 +38,7 @@ import frc.robot.commands.auto.ShootThreeStart;
 import frc.robot.commands.climb.Climb;
 import frc.robot.commands.climb.StageTwoClimb;
 import frc.robot.commands.climb.TurnOnClimbMode;
+import frc.robot.commands.drive.DriveVelocity;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
 import frc.robot.commands.outtake.OuttakeLow;
@@ -84,6 +88,7 @@ public class RobotContainer {
   private Command manualUptake;
 
   private DriveWithJoystick driveWithJoystick;
+  private DriveVelocity driveVelocity;
 
   private OuttakeHigh outtakeHigh;
   private OuttakeLow outtakeLow;
@@ -175,7 +180,8 @@ public class RobotContainer {
 
     // Drive With Joystick
     driveWithJoystick = new DriveWithJoystick(driveSystem, driver);
-    driveSystem.setDefaultCommand(driveWithJoystick);
+    driveVelocity = new DriveVelocity(driveSystem, driver);
+    driveSystem.setDefaultCommand(driveVelocity);
 
     // Climb
     climbCmd = new Climb(climb, operator);
@@ -245,20 +251,24 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    Pose2d curr = driveSystem.getPose();
+    Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+      new Pose2d(), 
+      List.of(),
+      // Drive straight 1 meter
+      new Pose2d(1, 0, new Rotation2d(driveSystem.getGyro())), 
+      DriveConstants.TRAJECTORY_CONFIG
+    );
 
-    return driveSystem.trajectoryCommand(
-      TrajectoryGenerator.generateTrajectory(
-        curr, 
-        List.of(), 
-        new Pose2d(
-          curr.getX() + 1,
-          curr.getY() + 1,
-          curr.getRotation()
-        ), 
-        driveSystem.getTrajectoryConfig()
-      )
-    ).andThen(
+    return new SequentialCommandGroup(
+      // Reset the odometry pose to the start position of the trajectory
+      new InstantCommand(() -> {
+        driveSystem.resetOdometry(trajectory.getInitialPose());
+      }, driveSystem),
+
+      // Follow the trajectory
+      driveSystem.trajectoryCommand(trajectory),
+
+      // Stop driving after the trajectory is finished
       new InstantCommand(() -> {
         driveSystem.drive(0, 0, 0);
       }, driveSystem)

@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -131,16 +132,15 @@ public class DriveSystem extends SubsystemBase {
     backRightEncoder = backRight.getEncoder();
 
     // please do not ask how we made this work. 1/6 made error but this is fine
-    frontLeftEncoder.setPositionConversionFactor(CONVERSION_FACTOR);
-    backLeftEncoder.setPositionConversionFactor(CONVERSION_FACTOR);
-    frontRightEncoder.setPositionConversionFactor(CONVERSION_FACTOR);
-    backRightEncoder.setPositionConversionFactor(CONVERSION_FACTOR);
+    frontLeftEncoder.setPositionConversionFactor(GEAR_RATIO);
+    backLeftEncoder.setPositionConversionFactor(GEAR_RATIO);
+    frontRightEncoder.setPositionConversionFactor(GEAR_RATIO);
+    backRightEncoder.setPositionConversionFactor(GEAR_RATIO);
 
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
     gyro = new ADIS16470_IMU();
 
     odometry = new MecanumDriveOdometry(KINEMATICS, new Rotation2d(gyro.getAngle()));
-    trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
     // Holonomic PID
     xAxisController = new PIDController(X_AXIS_P, X_AXIS_I, X_AXIS_D);
@@ -155,6 +155,8 @@ public class DriveSystem extends SubsystemBase {
       controller.setD(WHEEL_D);
       controller.setFF(FF_VELOCITY);
     }
+
+    gyro.calibrate();
   }
 
   /**
@@ -197,6 +199,9 @@ public class DriveSystem extends SubsystemBase {
 
     ChassisSpeeds setpointSpeeds;
 
+    // if ur reading this ur hot :-)
+    // -ber, 5/14/22
+
     if (fieldOriented) {
       setpointSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotationVelocity, new Rotation2d(Math.toRadians(gyro.getAngle())));
     } else {
@@ -211,6 +216,27 @@ public class DriveSystem extends SubsystemBase {
 
   public Pose2d getPose() {
     return odometry.getPoseMeters();
+  }
+
+  /**
+   * Resets the position of all encoders to 0 and resets the position of odometry.
+   * 
+   * @param pose The pose representing the reset position of the robot.
+   */
+  public void resetOdometry(Pose2d pose) {
+    frontLeftEncoder.setPosition(0);
+    backLeftEncoder.setPosition(0);
+    frontRightEncoder.setPosition(0);
+    backRightEncoder.setPosition(0);
+    
+    odometry.resetPosition(pose, new Rotation2d(Math.toRadians(gyro.getAngle())));
+  }
+
+  /**
+   * Reset the gyro to an angle of 0 degrees.
+   */
+  public void resetGyro() {
+    gyro.reset();
   }
 
   /**
@@ -280,7 +306,7 @@ public class DriveSystem extends SubsystemBase {
       MAX_SPEED, // Maximum speed in m/s
 
       this::drive, // Method pointer to voltage output
-      this // Command dependencies
+      this // Subsytem dependencies
     );
   }
 
@@ -382,14 +408,6 @@ public class DriveSystem extends SubsystemBase {
     backRight.setIdleMode(idleMode);
   }
 
-  private double getX() {
-    return odometry.getPoseMeters().getX();
-  }
-
-  private double getY() {
-    return odometry.getPoseMeters().getY();
-  }
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -404,8 +422,13 @@ public class DriveSystem extends SubsystemBase {
     builder.setSmartDashboardType("DriveSystem");
     builder.addBooleanProperty("Field Oriented", this::getFieldOriented, null);
     builder.addDoubleProperty("Speed Multiplier (%)", this::getSpeedMultiplier, null);
-    builder.addDoubleProperty("X Position (m)", this::getX, null);
-    builder.addDoubleProperty("Y Position (m)", this::getY, null);
+
+    // Odometry positions
+    builder.addDoubleProperty("X Position (m)", () -> odometry.getPoseMeters().getX(), null);
+    builder.addDoubleProperty("Y Position (m)", () -> odometry.getPoseMeters().getY(), null);
+
+    // Gyro angle 
+    builder.addDoubleProperty("Angle (deg)", gyro::getAngle, null);
 
     // Encoder positions
     builder.addDoubleProperty("Left front position (rot)", frontLeftEncoder::getPosition, null);
