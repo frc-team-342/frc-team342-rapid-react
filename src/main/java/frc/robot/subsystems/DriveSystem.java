@@ -14,10 +14,13 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -26,7 +29,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
@@ -292,21 +297,29 @@ public class DriveSystem extends SubsystemBase {
    * @param trajectory the trajectory to follow in the command
    * @return the command that follows the path
    */
-  public MecanumControllerCommand trajectoryCommand(Trajectory trajectory) {
-    return new MecanumControllerCommand(
-      (trajectory != null) ? trajectory : new Trajectory(), // Path to follow
-      this::getPose, // Current robot position
+  public Command trajectoryCommand(Trajectory trajectory) {
+    return new RamseteCommand(
+      trajectory, 
+      this::getPose, 
+      new RamseteController(0, 0), 
+      new SimpleMotorFeedforward(0, 0), 
+      new DifferentialDriveKinematics(
+        TRACK_WIDTH
+      ),
+      () -> new DifferentialDriveWheelSpeeds(
+        rpmToMetersPerSec((frontLeftEncoder.getVelocity() + backLeftEncoder.getVelocity()) / 2),
+        rpmToMetersPerSec((frontRightEncoder.getVelocity() + backRightEncoder.getVelocity()) / 2)
+      ),
+      new PIDController(0, 0, 0), 
+      new PIDController(0, 0, 0), 
+      (leftVolts, rightVolts) -> {
+        frontLeftController.setReference(leftVolts, ControlType.kVoltage);
+        backLeftController.setReference(leftVolts, ControlType.kVoltage);
 
-      KINEMATICS, // Distance from center of robot to each wheel
-
-      xAxisController, // PID controller on x-position
-      yAxisController, // PID controller on y-position
-      rotationController, // PID controller on rotation
-
-      MAX_SPEED, // Maximum speed in m/s
-
-      this::drive, // Method pointer to voltage output
-      this // Subsytem dependencies
+        frontRightController.setReference(rightVolts, ControlType.kVoltage);
+        backRightController.setReference(rightVolts, ControlType.kVoltage);
+      }, 
+      this
     );
   }
 
