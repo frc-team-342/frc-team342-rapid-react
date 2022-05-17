@@ -301,8 +301,8 @@ public class DriveSystem extends SubsystemBase {
     return new RamseteCommand(
       trajectory, 
       this::getPose, 
-      new RamseteController(0, 0), 
-      new SimpleMotorFeedforward(0, 0), 
+      new RamseteController(), 
+      new SimpleMotorFeedforward(FF_STATIC, FF_VELOCITY), 
       new DifferentialDriveKinematics(
         TRACK_WIDTH
       ),
@@ -310,8 +310,8 @@ public class DriveSystem extends SubsystemBase {
         rpmToMetersPerSec((frontLeftEncoder.getVelocity() + backLeftEncoder.getVelocity()) / 2),
         rpmToMetersPerSec((frontRightEncoder.getVelocity() + backRightEncoder.getVelocity()) / 2)
       ),
-      new PIDController(0, 0, 0), 
-      new PIDController(0, 0, 0), 
+      new PIDController(X_AXIS_P, 0, 0), 
+      new PIDController(X_AXIS_P, 0, 0), 
       (leftVolts, rightVolts) -> {
         frontLeftController.setReference(leftVolts, ControlType.kVoltage);
         backLeftController.setReference(leftVolts, ControlType.kVoltage);
