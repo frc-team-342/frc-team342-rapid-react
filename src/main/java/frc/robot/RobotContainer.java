@@ -31,10 +31,7 @@ import frc.robot.commands.intake.ManualUptake;
 import frc.robot.commands.intake.Retract;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.auto.DriveToCargo;
-import frc.robot.commands.auto.DriveToHub;
 import frc.robot.commands.auto.ShootPreloadedExit;
-import frc.robot.commands.auto.ShootThreeStart;
 import frc.robot.commands.climb.Climb;
 import frc.robot.commands.climb.StageTwoClimb;
 import frc.robot.commands.climb.TurnOnClimbMode;
@@ -202,7 +199,6 @@ public class RobotContainer {
 
     // Makes the autonomous chooser and associated commands
     autoChooser = new SendableChooser<>();
-    shootThreeStart = new ShootThreeStart(outtake, driveSystem, photon, intake, limelight);
 
     shootPreloadHigh = new ShootPreloadedExit(driveSystem, outtake, true);
     shootPreloadLow = new ShootPreloadedExit(driveSystem, outtake, false);

@@ -62,6 +62,7 @@ public class PhotonVision implements Sendable {
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("PhotonVision");
         builder.addBooleanProperty("Driver Mode", this::getDriverMode, null);
+        builder.addBooleanProperty("Has Targets", this::hasTargets, null);
     }
 
     /**
