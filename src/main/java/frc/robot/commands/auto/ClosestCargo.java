@@ -11,10 +11,15 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGenerationException;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.drive.RotateToAngle;
+import frc.robot.commands.intake.Deploy;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.OuttakeSubsystem;
@@ -58,10 +63,31 @@ public class ClosestCargo extends SequentialCommandGroup {
         // run if target is found
         new SequentialCommandGroup(
           // rotate to face cargo
-          new RotateToAngle(drive, drive.getGyro() + angle)
+          new RotateToAngle(drive, drive.getGyro() + angle),
 
           // drive to cargo position
-          //drive.trajectoryCommand(generateTrajectory())
+          new RunCommand(() -> {
+            // drive towards cargo
+            drive.driveWithTargeting(0.3, 0, angle);
+          }, drive).raceWith(
+            // drive until within distance
+            new WaitUntilCommand(() -> {
+              // distance is an meters
+              return photon.getDistance() <= 0.2;
+            })
+          ).andThen(() -> {
+            // stop driving
+            drive.setBrakeMode(true);
+            drive.drive(0, 0, 0);
+          }),
+
+          // intake only works on B bot
+          new ConditionalCommand(
+            new InstantCommand(), 
+            new Deploy(intake).withTimeout(2.0),
+            // check for which robot code is running on
+            () -> Robot.checkType() == Robot.RobotType.B_BOT
+          )
         ),
 
         // do nothing if not found

@@ -37,7 +37,7 @@ public class PhotonVision implements Sendable {
     private PipelineMode pipeline;
 
     private double camHeight = Constants.VisionConstants.CAM_HEIGHT;
-    private double targetHeight = Constants.VisionConstants.TARGET_HEIGHT;
+    private double targetHeight = 0;
     private double camAngle = Constants.VisionConstants.CAM_ANGLE;
 
     private String name;
