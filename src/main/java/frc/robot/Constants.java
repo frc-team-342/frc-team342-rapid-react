@@ -134,8 +134,8 @@ public final class Constants {
         public static final double LIFT_MAX_POSITION = 225559;
 
         // Pulse Width Locations
-        public static final double ROTATE_MIN_ANGLE = 3556;
-        public static final double ROTATE_MAX_ANGLE = 4100; 
+        public static final double ROTATE_MIN_ANGLE = 4200;
+        public static final double ROTATE_MAX_ANGLE = 3400; 
 
         public static final double CLIMB_SPEED = 0.4;
 
