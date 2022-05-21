@@ -41,9 +41,16 @@ public final class Constants {
         public static final double WHEEL_I = 0.0;
         public static final double WHEEL_D = 0.003;
 
-        // Constants for wheel feedforward
-        public static final double FF_STATIC = 0.0;
-        public static final double FF_VELOCITY = 0.1335;
+        // Constants for motor feedforward
+        public static final double WHEEL_FF = 0.1335;
+        
+        // Constants for Ramsete feedforward
+        public static final double FF_STATIC = 0.167;
+        public static final double FF_VELOCITY = 2.63;
+        public static final double FF_ACCELERATION = 0.425;
+
+        // Constants for Ramsete PID
+        public static final double RAMSETE_P = 0.00289;
 
         // Constants for holonomic PID
         public static final double X_AXIS_P = 0.001;

@@ -158,7 +158,7 @@ public class DriveSystem extends SubsystemBase {
       controller.setP(WHEEL_P);
       controller.setI(WHEEL_I);
       controller.setD(WHEEL_D);
-      controller.setFF(FF_VELOCITY);
+      controller.setFF(WHEEL_FF);
     }
 
     gyro.calibrate();
@@ -302,7 +302,11 @@ public class DriveSystem extends SubsystemBase {
       trajectory, 
       this::getPose, 
       new RamseteController(), 
-      new SimpleMotorFeedforward(FF_STATIC, FF_VELOCITY), 
+      new SimpleMotorFeedforward(
+        FF_STATIC, 
+        FF_VELOCITY,
+        FF_ACCELERATION
+      ), 
       new DifferentialDriveKinematics(
         TRACK_WIDTH
       ),
@@ -310,8 +314,8 @@ public class DriveSystem extends SubsystemBase {
         rpmToMetersPerSec((frontLeftEncoder.getVelocity() + backLeftEncoder.getVelocity()) / 2),
         rpmToMetersPerSec((frontRightEncoder.getVelocity() + backRightEncoder.getVelocity()) / 2)
       ),
-      new PIDController(X_AXIS_P, 0, 0), 
-      new PIDController(X_AXIS_P, 0, 0), 
+      new PIDController(RAMSETE_P, 0.0, 0.0), 
+      new PIDController(RAMSETE_P, 0.0, 0.0), 
       (leftVolts, rightVolts) -> {
         frontLeftController.setReference(leftVolts, ControlType.kVoltage);
         backLeftController.setReference(leftVolts, ControlType.kVoltage);
