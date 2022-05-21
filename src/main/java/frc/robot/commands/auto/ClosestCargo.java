@@ -4,8 +4,16 @@
 
 package frc.robot.commands.auto;
 
+import java.util.List;
+
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGenerationException;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.drive.RotateToAngle;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -23,6 +31,7 @@ public class ClosestCargo extends SequentialCommandGroup {
   private PhotonVision photon;
   
   private double angle = 0;
+  private boolean targetFound = false;
 
   /** Creates a new ClosestCargo. */
   public ClosestCargo(DriveSystem drive, IntakeSubsystem intake, OuttakeSubsystem outtake, Limelight limelight, PhotonVision photon) {
@@ -34,21 +43,42 @@ public class ClosestCargo extends SequentialCommandGroup {
     this.photon = photon;
     
     addCommands(
-      // find angle of cargo, NaN if not present
+      // find if cargo is visible, if so find angle
       new InstantCommand(() -> {
-        if (photon.hasTargets()) {
+        targetFound = photon.hasTargets();
+
+        // set angle if target found
+        if (targetFound) {
           angle = photon.getHorizontalOffset();
-        } else {
-          // do not rotate if target isnt found
-          angle = 0;
         }
       }),
 
-      // rotate to face the cargo
-      new RotateToAngle(drive, drive.getGyro() + angle),
+      // only run the rest of command if cargo is found
+      new ConditionalCommand(
+        // run if target is found
+        new SequentialCommandGroup(
+          // rotate to face cargo
+          new RotateToAngle(drive, drive.getGyro() + angle)
 
-      // drive to it?? pid 
-      new AutoDrive(drive, 0.0, 0.0)
+          // drive to cargo position
+          //drive.trajectoryCommand(generateTrajectory())
+        ),
+
+        // do nothing if not found
+        new PrintCommand("Cargo not found"),
+
+        // condition for running command
+        () -> targetFound
+      )
+    );
+  }
+
+  private Trajectory generateTrajectory() {
+    return TrajectoryGenerator.generateTrajectory(
+      drive.getPose(), 
+      List.of(), 
+      drive.getPose().transformBy(photon.transformToTarget()), 
+      DriveConstants.TRAJECTORY_CONFIG
     );
   }
 }
