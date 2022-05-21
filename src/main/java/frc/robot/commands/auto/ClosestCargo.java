@@ -4,25 +4,17 @@
 
 package frc.robot.commands.auto;
 
-import java.util.List;
-
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrajectoryParameterizer.TrajectoryGenerationException;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.drive.RotateToAngle;
 import frc.robot.commands.intake.Deploy;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.OuttakeSubsystem;
 import frc.robot.vision.Limelight;
 import frc.robot.vision.PhotonVision;
 
@@ -30,7 +22,6 @@ import frc.robot.vision.PhotonVision;
 public class ClosestCargo extends SequentialCommandGroup {
   private DriveSystem drive;
   private IntakeSubsystem intake;
-  private OuttakeSubsystem outtake;
 
   private Limelight limelight;
   private PhotonVision photon;
@@ -39,10 +30,9 @@ public class ClosestCargo extends SequentialCommandGroup {
   private boolean targetFound = false;
 
   /** Creates a new ClosestCargo. */
-  public ClosestCargo(DriveSystem drive, IntakeSubsystem intake, OuttakeSubsystem outtake, Limelight limelight, PhotonVision photon) {
+  public ClosestCargo(DriveSystem drive, IntakeSubsystem intake, Limelight limelight, PhotonVision photon) {
     this.drive = drive;
     this.intake = intake;
-    this.outtake = outtake;
 
     this.limelight = limelight;
     this.photon = photon;
@@ -96,15 +86,6 @@ public class ClosestCargo extends SequentialCommandGroup {
         // condition for running command
         () -> targetFound
       )
-    );
-  }
-
-  private Trajectory generateTrajectory() {
-    return TrajectoryGenerator.generateTrajectory(
-      drive.getPose(), 
-      List.of(), 
-      drive.getPose().transformBy(photon.transformToTarget()), 
-      DriveConstants.TRAJECTORY_CONFIG
     );
   }
 }
