@@ -6,6 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.constraint.MecanumDriveKinematicsConstraint;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 
@@ -34,6 +36,60 @@ public final class Constants {
         public static final double NORMAL_SPEED = 0.8;
         public static final double SLOW_SPEED = 0.4;
 
+        // Constants for wheel PID
+        public static final double WHEEL_P = 0.00435;
+        public static final double WHEEL_I = 0.0;
+        public static final double WHEEL_D = 0.003;
+
+        // Constants for motor feedforward
+        public static final double WHEEL_FF = 0.1335;
+        
+        // Constants for Ramsete feedforward
+        public static final double FF_STATIC = 0.167;
+        public static final double FF_VELOCITY = 2.63;
+        public static final double FF_ACCELERATION = 0.425;
+
+        // Constants for Ramsete PID
+        public static final double RAMSETE_P = 0.00289;
+
+        // Constants for holonomic PID
+        public static final double X_AXIS_P = 0.001;
+        public static final double X_AXIS_I = 0.0;
+        public static final double X_AXIS_D = 0.0;
+
+        public static final double Y_AXIS_P = 0.001;
+        public static final double Y_AXIS_I = 0.0;
+        public static final double Y_AXIS_D = 0.0;
+
+        // Constants for rotation PID
+        public static final double ROTATION_P = 0.001;
+        public static final double ROTATION_I = 0.0;
+        public static final double ROTATION_D = 0.0;
+
+        /** Maximum speed of each wheel in meters per second. */
+        public static final double MAX_WHEEL_SPEED = 1.0;
+
+        /** Maximum X-axis speed in meters per second. */
+        public static final double MAX_X_SPEED = 1.3;
+
+        /** Maximum X-axis acceleration in meters per second squared. */
+        public static final double MAX_X_ACCELERATION = 0.8;
+
+        /** Maximum Y-axis speed in meters per second. */
+        public static final double MAX_Y_SPEED = 1.0;
+
+        /** Maximum Y-axis acceleration in meters per second squared. */
+        public static final double MAX_Y_ACCELERATION = 0.5;
+
+        /** Maximum angular speed in radians per second squared. */
+        public static final double MAX_ROTATION_SPEED = 0.8;
+
+        /** Maximum angular acceleration in radians per second squared. */
+        public static final double MAX_ROTATION_ACCELERATION = 0.3;
+
+        /** Gear ratio for encoder conversion factor */
+        public static final double GEAR_RATIO = 1.0/6.0f;
+
         /** Maximum current that each motor can draw without triggering breakers. */
         public static final int CURRENT_LIMIT = 40;
 
@@ -59,12 +115,6 @@ public final class Constants {
         /** The maximum acceleration of the robot used during trajectory following. */
         public static final double MAX_ACCELERATION = 1.0;
 
-        /** Maximum angular speed in radians per second squared. */
-        public static final double MAX_ROTATION_SPEED = 1.0;
-
-        /** Maximum angular acceleration in radians per second squared. */
-        public static final double MAX_ROTATION_ACCELERATION = 1.0;
-
         /** Distance from the center of the robot to each of the wheels. */
         public static final MecanumDriveKinematics KINEMATICS = new MecanumDriveKinematics(
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), 
@@ -72,6 +122,16 @@ public final class Constants {
             new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), 
             new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)
         );
+
+        /** Speed constraints for trajectory control. */
+        public static final MecanumDriveKinematicsConstraint CONSTRAINT = new MecanumDriveKinematicsConstraint(
+            KINEMATICS, 
+            MAX_WHEEL_SPEED
+        );
+
+        public static final TrajectoryConfig TRAJECTORY_CONFIG = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION)
+            .setKinematics(KINEMATICS)
+            .addConstraint(CONSTRAINT);
     }
 
     public static final class VisionConstants {
@@ -165,6 +225,9 @@ public final class Constants {
     }
 
     public static final class ControllerConstants {
+        // Driver joystick deadband
+        public static final double DRIVER_DEADBAND = 0.15;
+
         // Joystick IDs
         public static final int DRIVER_PORT = 0;
         public static final int OPERATOR_PORT = 1;

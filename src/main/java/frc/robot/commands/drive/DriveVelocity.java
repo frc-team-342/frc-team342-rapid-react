@@ -9,23 +9,22 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSystem;
 
+import static frc.robot.Constants.DriveConstants.*;
 import static frc.robot.Constants.ControllerConstants.DRIVER_DEADBAND;
 
-public class DriveWithJoystick extends CommandBase {
-  
-  DriveSystem driveSystem;
-  Joystick driver;
-  
-  /** Creates a new DriveWithJoystick. */
-  public DriveWithJoystick(DriveSystem drive, Joystick j) {
+public class DriveVelocity extends CommandBase {
+  private DriveSystem driveSystem;
+  private Joystick joystick;
 
-    addRequirements(drive);
-    this.driveSystem = drive;
-    this.driver = j;
+  /** Creates a new DriveVelocity. */
+  public DriveVelocity(DriveSystem driveSystem, Joystick joystick) {
+    this.driveSystem = driveSystem;
+    this.joystick = joystick;
+
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(driveSystem);
   }
-  
-  
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {}
@@ -33,20 +32,16 @@ public class DriveWithJoystick extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double xVel = MathUtil.applyDeadband(joystick.getX(), DRIVER_DEADBAND) * MAX_X_SPEED;
+    double yVel = MathUtil.applyDeadband(joystick.getY(), DRIVER_DEADBAND) * MAX_Y_SPEED;
+    double rotVel = MathUtil.applyDeadband(joystick.getZ(), DRIVER_DEADBAND) * MAX_ROTATION_SPEED;
 
-    // Checks whether joystick is within a deadzone and returns val
-    double deadBandX = MathUtil.applyDeadband(driver.getX(), DRIVER_DEADBAND);
-    double deadBandY = MathUtil.applyDeadband(driver.getY(), DRIVER_DEADBAND);
-    double deadBandZ = MathUtil.applyDeadband(driver.getZ(), DRIVER_DEADBAND);
-
-    driveSystem.drive(-deadBandX, deadBandY, -deadBandZ / 2);
-
+    driveSystem.driveVelocity(xVel, yVel, rotVel);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    
     driveSystem.drive(0, 0, 0);
   }
 
