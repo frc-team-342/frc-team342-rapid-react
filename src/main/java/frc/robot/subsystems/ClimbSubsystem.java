@@ -131,19 +131,17 @@ public class ClimbSubsystem extends SubsystemBase {
     
     if(climbMode){  // If climbmode is enabled, arms are in max or moving back in, and limit switch is not triggered (or moving away from l.s)
       
-      if(minOrForward){
-        if(getLimitState()){
-          if(speed > 0){
-            leadClimbRotate.set(0);
-          } else {
+      if(minOrForward) {
+        if(limitOverride){
             leadClimbRotate.set(speed * CLIMB_SPEED);
+          } else {
+            leadClimbRotate.set(0);
           }
         } else {
-          leadClimbRotate.set(speed * CLIMB_SPEED);
+          leadClimbRotate.set(0);
         }
       }
     }
-  }
   /**
    * Converts encoder ticks to degrees of motor rotation
    * 
