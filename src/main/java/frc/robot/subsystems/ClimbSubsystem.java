@@ -121,26 +121,29 @@ public class ClimbSubsystem extends SubsystemBase {
    * @param speed the speed to rotate at, [-1, 1]
    */
   public void rotateClimb(double speed) {
+    
+    boolean withinMinAngle = position > ROTATE_MIN_ANGLE;
+    boolean minOrForward = withinMinAngle || speed > 0;
+    boolean limitOverride = !getLimitState() || speed < 0;
+
     position = pulse.getPulseWidthPosition();
     currSpeed = speed;
-
-    if (climbMode) {
-      boolean withinMinAngle = position > ROTATE_MIN_ANGLE;
-      boolean withinMaxAngle = position < ROTATE_MAX_ANGLE;
+    
+    if(climbMode){  // If climbmode is enabled, arms are in max or moving back in, and limit switch is not triggered (or moving away from l.s)
       
-      // only run if within bounds and if limit switch is not triggered, or if it is triggered but moving forward
-      if ((withinMinAngle || speed < 0) && (!getLimitState() || speed > 0)) {
-          // only move if limit switch is not triggered or moving forwards
+      if(minOrForward){
+        if(getLimitState()){
+          if(speed > 0){
+            leadClimbRotate.set(0);
+          } else {
+            leadClimbRotate.set(speed * CLIMB_SPEED);
+          }
+        } else {
           leadClimbRotate.set(speed * CLIMB_SPEED);
-      } else {
-          leadClimbRotate.set(0);
+        }
       }
-    } else {
-      // do not run if climb mode is not enabled
-      leadClimbRotate.set(0);
     }
   }
-
   /**
    * Converts encoder ticks to degrees of motor rotation
    * 
