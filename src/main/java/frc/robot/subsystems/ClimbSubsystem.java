@@ -39,6 +39,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
   private double position;
   private double currSpeed;
+  private String status;
+
 
   // Used for locking the climber controls on the operator control before climb time
   private boolean climbMode;
@@ -59,6 +61,8 @@ public class ClimbSubsystem extends SubsystemBase {
     climbLimitSwitch = new AnalogInput(CLIMB_LIMIT_SWITCH_PORT);
 
     followClimbRotate.follow(leadClimbRotate);
+
+    status = "Null";
 
     if(Robot.checkType() == Robot.RobotType.A_BOT){
       followClimbRotate.setInverted(true);
@@ -122,24 +126,39 @@ public class ClimbSubsystem extends SubsystemBase {
    */
   public void rotateClimb(double speed) {
     
-    boolean withinMinAngle = position > ROTATE_MIN_ANGLE;
-    boolean minOrForward = withinMinAngle || speed > 0;
-    boolean limitOverride = !getLimitState() || speed < 0;
-
     position = pulse.getPulseWidthPosition();
     currSpeed = speed;
+
+    boolean withinMinAngle = position > ROTATE_MIN_ANGLE;
+    boolean minOrForward = withinMinAngle || speed > 0;
+    boolean limitOverride = getLimitState() || speed < 0;
+
     
-    if(climbMode){  // If climbmode is enabled, arms are in max or moving back in, and limit switch is not triggered (or moving away from l.s)
-      
-      if(minOrForward) {
-        if(limitOverride){
-            leadClimbRotate.set(speed * CLIMB_SPEED);
+    
+    if (climbMode) {
+
+      // only run if within bounds or moving back towards within bounds
+      if (minOrForward) {
+        if(getLimitState() == true){
+          if(speed < 0){
+              leadClimbRotate.set(0);
+              status = "Limit switch is triggered. Moving wrong way.";
+            } else {
+              leadClimbRotate.set(speed * CLIMB_SPEED);
+              status = "Limit switch triggered. Moving away from L.S";
+            }
           } else {
-            leadClimbRotate.set(0);
+          leadClimbRotate.set(speed * CLIMB_SPEED);
+          status = "Limit switch not triggered. Move as normal.";
           }
         } else {
-          leadClimbRotate.set(0);
-        }
+        leadClimbRotate.set(0);
+        status = "Out of bounds and not moving back into them.";
+      }
+    } else {
+      // do not run if climb mode is not enabled
+      leadClimbRotate.set(0);
+      status = "Climb mode not enabled.";
       }
     }
   /**
@@ -194,7 +213,7 @@ public class ClimbSubsystem extends SubsystemBase {
   /**
    * Checks to see if limit switch was triggered. Compares current value of the analog input to 50 
    * When greater than 50, the limit switch has been pressed.
-   * @return True when limit switch is triggered (Indicating climb has reached minimum angle). False otherwise.
+   * @return True when limit switch is triggered False otherwise.
    */
   public boolean getLimitState(){
     return (climbLimitSwitch.getValue() < 50);
@@ -226,6 +245,7 @@ public class ClimbSubsystem extends SubsystemBase {
     sendable.addDoubleProperty("Current Rotate Speed", () -> currSpeed, null);
     sendable.addDoubleProperty("Position", () -> position, null);
     sendable.addDoubleProperty("Limit Switch Val", () -> climbLimitSwitch.getValue(), null);
+    sendable.addStringProperty("Status", () -> status, null);
   }
 
   /**
