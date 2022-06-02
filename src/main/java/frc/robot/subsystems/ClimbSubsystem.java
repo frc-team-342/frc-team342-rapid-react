@@ -129,8 +129,8 @@ public class ClimbSubsystem extends SubsystemBase {
     position = pulse.getPulseWidthPosition();
     currSpeed = speed;
 
-    boolean withinMinAngle = position > ROTATE_MIN_ANGLE;
-    boolean minOrForward = withinMinAngle || speed > 0;
+    boolean withinMaxAngle = position < ROTATE_MAX_ANGLE;
+    boolean minOrForward = withinMaxAngle || speed < 0;
     boolean limitOverride = getLimitState() || speed < 0;
 
     
@@ -139,7 +139,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
       // only run if within bounds or moving back towards within bounds
       if (minOrForward) {
-        if(getLimitState() == true){
+        if(getLimitState()){
           if(speed < 0){
               leadClimbRotate.set(0);
               status = "Limit switch is triggered. Moving wrong way.";
