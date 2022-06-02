@@ -11,10 +11,13 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -28,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 // Static imports mean that variable names can be accessed without referencing the class name they came from
@@ -73,6 +77,8 @@ public class DriveSystem extends SubsystemBase {
   private MecanumDriveOdometry odometry;
   private TrajectoryConfig trajectoryConfig;
 
+  private PIDController xAxisController;
+  private PIDController yAxisController;
   private ProfiledPIDController rotationController;
 
   /** Creates a new DriveSystem. */
@@ -125,27 +131,46 @@ public class DriveSystem extends SubsystemBase {
     frontRightEncoder = frontRight.getEncoder();
     backRightEncoder = backRight.getEncoder();
 
+    // please do not ask how we made this work. 1/6 made error but this is fine
+    frontLeftEncoder.setPositionConversionFactor(GEAR_RATIO);
+    backLeftEncoder.setPositionConversionFactor(GEAR_RATIO);
+    frontRightEncoder.setPositionConversionFactor(GEAR_RATIO);
+    backRightEncoder.setPositionConversionFactor(GEAR_RATIO);
+
     mecanumDrive = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
     gyro = new ADIS16470_IMU();
 
     odometry = new MecanumDriveOdometry(KINEMATICS, new Rotation2d(gyro.getAngle()));
-    trajectoryConfig = new TrajectoryConfig(MAX_SPEED, MAX_ACCELERATION);
 
-    rotationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
+    // Holonomic PID
+    xAxisController = new PIDController(X_AXIS_P, X_AXIS_I, X_AXIS_D);
+    yAxisController = new PIDController(Y_AXIS_P, Y_AXIS_I, Y_AXIS_D);
+    rotationController = new ProfiledPIDController(ROTATION_P, ROTATION_I, ROTATION_D, 
+      new TrapezoidProfile.Constraints(MAX_ROTATION_SPEED, MAX_ROTATION_ACCELERATION));
+
+    // PID controller setup
+    for (SparkMaxPIDController controller : List.of(frontLeftController, backLeftController, frontRightController, backRightController)) {
+      controller.setP(WHEEL_P);
+      controller.setI(WHEEL_I);
+      controller.setD(WHEEL_D);
+      controller.setFF(FF_VELOCITY);
+    }
+
+    gyro.calibrate();
   }
 
   /**
    * Drives based on whether driving is field oriented or not
    * 
-   * @param xVelocity velocity of the robot moving forward
-   * @param yVelocity velocity of the robot moving side-to-side 
-   * @param rotationVelocity velocity of robot moving clockwise 
+   * @param xOutput percent output of the robot moving forward
+   * @param yOutput percent output of the robot moving side-to-side 
+   * @param rotationOutput percent output of robot moving clockwise 
    **/
-  public void drive(double xVelocity, double yVelocity, double rotationVelocity) {
+  public void drive(double xOutput, double yOutput, double rotationOutput) {
     // Used for slow mode 
-    double x = xVelocity * currentMode.speedMultiplier;
-    double y = yVelocity * currentMode.speedMultiplier;
-    double rotation = rotationVelocity * currentMode.speedMultiplier;
+    double x = xOutput * currentMode.speedMultiplier;
+    double y = yOutput * currentMode.speedMultiplier;
+    double rotation = rotationOutput * currentMode.speedMultiplier;
     
     if (fieldOriented) {
       mecanumDrive.driveCartesian(y, x, rotation, -gyro.getAngle());
@@ -154,23 +179,89 @@ public class DriveSystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Drive the robot at a specific velocity along each axis using PID
+   * 
+   * @param xVelocity velocity of the robot moving forwards in m/s
+   * @param yVelocity velocity of the robot moving side-to-side in m/s
+   * @param rotationVelocity radial velocity of the robot in rad/s clockwise-positive
+   */
+  public void driveVelocity(double xVelocity, double yVelocity, double rotationVelocity) {
+    ChassisSpeeds currentSpeeds = KINEMATICS.toChassisSpeeds(getWheelSpeeds());
+
+    double currentXVelocity = currentSpeeds.vxMetersPerSecond; 
+    double currentYVelocity = currentSpeeds.vyMetersPerSecond;
+    double currentRotVelocity = currentSpeeds.omegaRadiansPerSecond;
+
+    double x = xAxisController.calculate(currentXVelocity, xVelocity) * currentMode.speedMultiplier;
+    double y = yAxisController.calculate(currentYVelocity, yVelocity) * currentMode.speedMultiplier;
+    double rot = rotationController.calculate(currentRotVelocity, rotationVelocity) * currentMode.speedMultiplier;
+
+    ChassisSpeeds setpointSpeeds;
+
+    // if ur reading this ur hot :-)
+    // -ber, 5/14/22
+
+    if (fieldOriented) {
+      setpointSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotationVelocity, new Rotation2d(Math.toRadians(gyro.getAngle())));
+    } else {
+      setpointSpeeds = new ChassisSpeeds(x, y, rot);
+    }
+    
+    MecanumDriveWheelSpeeds speed = KINEMATICS.toWheelSpeeds(setpointSpeeds);
+    speed.desaturate(MAX_WHEEL_SPEED);
+
+    this.drive(speed);
+  }
+
   public Pose2d getPose() {
     return odometry.getPoseMeters();
   }
 
   /**
+   * Resets the position of all encoders to 0 and resets the position of odometry.
+   * 
+   * @param pose The pose representing the reset position of the robot.
+   */
+  public void resetOdometry(Pose2d pose) {
+    frontLeftEncoder.setPosition(0);
+    backLeftEncoder.setPosition(0);
+    frontRightEncoder.setPosition(0);
+    backRightEncoder.setPosition(0);
+    
+    odometry.resetPosition(pose, new Rotation2d(Math.toRadians(gyro.getAngle())));
+  }
+
+  /**
+   * Reset the gyro to an angle of 0 degrees.
+   */
+  public void resetGyro() {
+    gyro.reset();
+  }
+
+  /**
    * Get the current speeds of the wheel as a MecanumDriveWheelSpeeds object. <br/>
-   * Units are RPM.
+   * Units are meters per second.
    * 
    * @return the current wheel speeds
    */
   private MecanumDriveWheelSpeeds getWheelSpeeds() {
     return new MecanumDriveWheelSpeeds(
-      frontLeftEncoder.getVelocity(),
-      backLeftEncoder.getVelocity(),
-      frontRightEncoder.getVelocity(),
-      backRightEncoder.getVelocity()
+      rpmToMetersPerSec(frontLeftEncoder.getVelocity()),
+      rpmToMetersPerSec(backLeftEncoder.getVelocity()),
+      rpmToMetersPerSec(frontRightEncoder.getVelocity()),
+      rpmToMetersPerSec(backRightEncoder.getVelocity())
     );
+  }
+
+  private double rpmToMetersPerSec(double rpm) {
+    // rpm times circumference divided 60 sec
+    return rpm * WHEEL_CIRCUMFERENCE / 60;
+  }
+
+  public double metersPerSecToRpm(double metersPerSec) {
+    // m/s times 60 divided by circumference
+    return metersPerSec * 60 / WHEEL_CIRCUMFERENCE;
   }
 
   /**
@@ -179,10 +270,10 @@ public class DriveSystem extends SubsystemBase {
    * @param speeds the speeds at which to drive the wheels
    */
   private void drive(MecanumDriveWheelSpeeds speeds) {
-    frontLeftController.setReference(speeds.frontLeftMetersPerSecond, ControlType.kVelocity);
-    backLeftController.setReference(speeds.rearLeftMetersPerSecond, ControlType.kVelocity);
-    frontRightController.setReference(speeds.frontRightMetersPerSecond, ControlType.kVelocity);
-    backRightController.setReference(speeds.rearRightMetersPerSecond, ControlType.kVelocity);
+    frontLeftController.setReference(metersPerSecToRpm(speeds.frontLeftMetersPerSecond), ControlType.kVelocity);
+    backLeftController.setReference(metersPerSecToRpm(speeds.rearLeftMetersPerSecond), ControlType.kVelocity);
+    frontRightController.setReference(metersPerSecToRpm(speeds.frontRightMetersPerSecond), ControlType.kVelocity);
+    backRightController.setReference(metersPerSecToRpm(speeds.rearRightMetersPerSecond), ControlType.kVelocity);
   }
 
   /**
@@ -208,14 +299,14 @@ public class DriveSystem extends SubsystemBase {
 
       KINEMATICS, // Distance from center of robot to each wheel
 
-      new PIDController(0, 0, 0), // PID controller on x-position
-      new PIDController(0, 0, 0), // PID controller on y-position
+      xAxisController, // PID controller on x-position
+      yAxisController, // PID controller on y-position
       rotationController, // PID controller on rotation
 
       MAX_SPEED, // Maximum speed in m/s
 
       this::drive, // Method pointer to voltage output
-      this // Command dependencies
+      this // Subsytem dependencies
     );
   }
 
@@ -330,9 +421,35 @@ public class DriveSystem extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("DriveSystem");
     builder.addBooleanProperty("Field Oriented", this::getFieldOriented, null);
-    builder.addDoubleProperty("Speed Multiplier", this::getSpeedMultiplier, null);
-  }
+    builder.addDoubleProperty("Speed Multiplier (%)", this::getSpeedMultiplier, null);
 
+    // Odometry positions
+    builder.addDoubleProperty("X Position (m)", () -> odometry.getPoseMeters().getX(), null);
+    builder.addDoubleProperty("Y Position (m)", () -> odometry.getPoseMeters().getY(), null);
+
+    // Gyro angle 
+    builder.addDoubleProperty("Angle (deg)", gyro::getAngle, null);
+
+    // Encoder positions
+    builder.addDoubleProperty("Left front position (rot)", frontLeftEncoder::getPosition, null);
+    builder.addDoubleProperty("Left back position (rot)", backLeftEncoder::getPosition, null);
+    builder.addDoubleProperty("Right front position (rot)", frontRightEncoder::getPosition, null);
+    builder.addDoubleProperty("Right back position (rot)", backRightEncoder::getPosition, null);
+    
+    // Encoder velocities
+    builder.addDoubleProperty("Left front velocity (RPM)", frontLeftEncoder::getVelocity, null);
+    builder.addDoubleProperty("Left back velocity (RPM)", backLeftEncoder::getVelocity, null);
+    builder.addDoubleProperty("Right front velocity (RPM)", frontRightEncoder::getVelocity, null);
+    builder.addDoubleProperty("Right back velocity (RPM)", backRightEncoder::getVelocity, null);
+
+    // Holonomic velocities
+    MecanumDriveWheelSpeeds wheelSpeeds = getWheelSpeeds();
+    ChassisSpeeds chassisSpeeds = KINEMATICS.toChassisSpeeds(wheelSpeeds);
+
+    builder.addDoubleProperty("X Velocity (m per s)", () -> chassisSpeeds.vxMetersPerSecond, null);
+    builder.addDoubleProperty("Y Velocity (m per s)", () -> chassisSpeeds.vyMetersPerSecond, null);
+    builder.addDoubleProperty("Rotation velocity (rad per s)", () -> chassisSpeeds.omegaRadiansPerSecond, null);
+  }
 
   /**
    * Checks whether each motor controller is physically connected to the robot.

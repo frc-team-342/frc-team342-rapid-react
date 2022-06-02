@@ -37,7 +37,7 @@ public class PhotonVision implements Sendable {
     private PipelineMode pipeline;
 
     private double camHeight = Constants.VisionConstants.CAM_HEIGHT;
-    private double targetHeight = Constants.VisionConstants.TARGET_HEIGHT;
+    private double targetHeight = 0;
     private double camAngle = Constants.VisionConstants.CAM_ANGLE;
 
     private String name;
@@ -62,6 +62,7 @@ public class PhotonVision implements Sendable {
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("PhotonVision");
         builder.addBooleanProperty("Driver Mode", this::getDriverMode, null);
+        builder.addBooleanProperty("Has Targets", this::hasTargets, null);
     }
 
     /**
