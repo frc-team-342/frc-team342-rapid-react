@@ -93,9 +93,9 @@ public class IntakeSubsystem extends SubsystemBase {
     } else {
       if (isDeployLeftBehind()) {
         deployLeft.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * INTAKE_P));
-        deployRight.set(DEPLOY_SPEED);
+        deployRight.set((DEPLOY_SPEED) - (getDeltaDeployEncoders() * INTAKE_P));
       } else if (isDeployRightBehind()) {
-        deployLeft.set(DEPLOY_SPEED);
+        deployLeft.set((DEPLOY_SPEED) - (getDeltaDeployEncoders() * INTAKE_P));
         deployRight.set((DEPLOY_SPEED) + (getDeltaDeployEncoders() * INTAKE_P));
       } else {
         deployLeft.set(DEPLOY_SPEED);
@@ -118,9 +118,9 @@ public class IntakeSubsystem extends SubsystemBase {
     } else {
       if (isDeployLeftBehind()) {
         deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
-        deployRight.set(DEPLOY_SPEED * -1);
+        deployRight.set((DEPLOY_SPEED * -1) - (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
       } else if (isDeployRightBehind()) {
-        deployLeft.set(DEPLOY_SPEED * -1);
+        deployLeft.set((DEPLOY_SPEED * -1) - (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
         deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
       } else {
         deployLeft.set(DEPLOY_SPEED * -1);
