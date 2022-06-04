@@ -189,6 +189,7 @@ public class RobotContainer {
     SmartDashboard.putData(limelight);
     SmartDashboard.putData(photon);
     SmartDashboard.putData(climb);
+    SmartDashboard.putData(intake);
 
     // Makes the autonomous chooser and associated commands
     autoChooser = new SendableChooser<>();

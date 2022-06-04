@@ -221,10 +221,10 @@ public class IntakeSubsystem extends SubsystemBase {
     sendable.addDoubleProperty("Current Angle Left", this::getCurrentAngleLeft, null);
     sendable.addDoubleProperty("Current Angle Right", this::getCurrentAngleRight, null);
     sendable.addDoubleProperty("Delta Deploy Encoders", this::getDeltaDeployEncoders, null);
-    sendable.addBooleanProperty("Right back limit switch", rightLimitSwitchUp::get, null);
-    sendable.addBooleanProperty("Left back limit switch", leftLimitSwitchUp::get, null);
-    sendable.addBooleanProperty("Right forward limit switch", rightLimitSwitchDown::get, null);
-    sendable.addBooleanProperty("Left forward limit switch", leftLimitSwitchDown::get, null);
+    sendable.addBooleanProperty("Right back limit switch", () -> !rightLimitSwitchUp.get(), null);
+    sendable.addBooleanProperty("Left back limit switch", () -> !leftLimitSwitchUp.get(), null);
+    sendable.addBooleanProperty("Right forward limit switch", () -> !rightLimitSwitchDown.get(), null);
+    sendable.addBooleanProperty("Left forward limit switch", () -> !leftLimitSwitchDown.get(), null);
     
   }
 
