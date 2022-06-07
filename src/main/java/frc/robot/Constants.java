@@ -100,10 +100,10 @@ public final class Constants {
         public static final double CPR = 2048;
 
         /** RPM to shoot for low hub. */
-        public static final double LOW_RPM = 2300.0f;
+        public static final double LOW_RPM = 2075.0f;
 
         /** RPM to shoot for upper hub. */
-        public static final double HIGH_RPM = 4200.0f; 
+        public static final double HIGH_RPM = 3975.0f; 
 
         /** RPM tolerance for being considered up to speed. */
         public static final double RPM_ERROR = 45;
