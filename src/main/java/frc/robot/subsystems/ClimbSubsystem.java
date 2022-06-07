@@ -14,7 +14,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.util.concurrent.Semaphore;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -131,9 +130,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
     boolean withinMaxAngle = position < ROTATE_MAX_ANGLE;
     boolean minOrForward = withinMaxAngle || speed < 0;
-    boolean limitOverride = getLimitState() || speed < 0;
 
-    
+    //Checks for climb mode being enabled. 
     
     if (climbMode) {
 
@@ -242,9 +240,6 @@ public class ClimbSubsystem extends SubsystemBase {
     sendable.addDoubleProperty("Right lift encoder", rightClimbLiftEncoder::getIntegratedSensorPosition, null);
     sendable.addDoubleProperty("Rotate encoder", () -> encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition()), null);
     sendable.addBooleanProperty("Climb limit switch", this::getLimitState, null);
-    sendable.addDoubleProperty("Current Rotate Speed", () -> currSpeed, null);
-    sendable.addDoubleProperty("Position", () -> position, null);
-    sendable.addDoubleProperty("Limit Switch Val", () -> climbLimitSwitch.getValue(), null);
     sendable.addStringProperty("Status", () -> status, null);
   }
 
