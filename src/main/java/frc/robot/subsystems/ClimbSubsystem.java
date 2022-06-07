@@ -9,12 +9,15 @@ import java.util.Map;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 import static frc.robot.Constants.ClimbConstants.*;
 
@@ -26,8 +29,17 @@ public class ClimbSubsystem extends SubsystemBase {
   private TalonFXSensorCollection leftClimbLiftEncoder;
   private TalonFXSensorCollection rightClimbLiftEncoder;
 
+  private SensorCollection pulse;
+
   private WPI_TalonSRX leadClimbRotate;
   private WPI_TalonSRX followClimbRotate;
+
+  private AnalogInput climbLimitSwitch;
+
+  private double position;
+  private double currSpeed;
+  private String status;
+
 
   // Used for locking the climber controls on the operator control before climb time
   private boolean climbMode;
@@ -43,8 +55,18 @@ public class ClimbSubsystem extends SubsystemBase {
     leadClimbRotate = new WPI_TalonSRX(LEAD_ROTATE_MOTOR);
     followClimbRotate = new WPI_TalonSRX(FOLLOW_ROTATE_MOTOR);
 
+    pulse = leadClimbRotate.getSensorCollection();
+
+    climbLimitSwitch = new AnalogInput(CLIMB_LIMIT_SWITCH_PORT);
+
     followClimbRotate.follow(leadClimbRotate);
 
+    status = "Null";
+
+    if(Robot.checkType() == Robot.RobotType.A_BOT){
+      followClimbRotate.setInverted(true);
+    }
+    
     // brake mode so that it does not fall when on the bars
     leftClimbLift.setNeutralMode(NeutralMode.Brake);
     rightClimbLift.setNeutralMode(NeutralMode.Brake);
@@ -102,24 +124,41 @@ public class ClimbSubsystem extends SubsystemBase {
    * @param speed the speed to rotate at, [-1, 1]
    */
   public void rotateClimb(double speed) {
-    double position = leadClimbRotate.getSelectedSensorPosition();
+    
+    position = pulse.getPulseWidthPosition();
+    currSpeed = speed;
 
+    boolean withinMaxAngle = position < ROTATE_MAX_ANGLE;
+    boolean minOrForward = withinMaxAngle || speed < 0;
+
+    //Checks for climb mode being enabled. 
+    
     if (climbMode) {
-      boolean withinMinAngle = encoderTicksToDegrees(position) > ROTATE_MIN_ANGLE;
-      boolean withinMaxAngle = encoderTicksToDegrees(position) < ROTATE_MAX_ANGLE;
 
       // only run if within bounds or moving back towards within bounds
-      if ((withinMinAngle || speed < 0) && (withinMaxAngle || speed > 0)) {
-        leadClimbRotate.set(speed * CLIMB_SPEED);
-      } else {
+      if (minOrForward) {
+        if(getLimitState()){
+          if(speed < 0){
+              leadClimbRotate.set(0);
+              status = "Limit switch is triggered. Moving wrong way.";
+            } else {
+              leadClimbRotate.set(speed * CLIMB_SPEED);
+              status = "Limit switch triggered. Moving away from L.S";
+            }
+          } else {
+          leadClimbRotate.set(speed * CLIMB_SPEED);
+          status = "Limit switch not triggered. Move as normal.";
+          }
+        } else {
         leadClimbRotate.set(0);
+        status = "Out of bounds and not moving back into them.";
       }
     } else {
       // do not run if climb mode is not enabled
       leadClimbRotate.set(0);
+      status = "Climb mode not enabled.";
+      }
     }
-  }
-
   /**
    * Converts encoder ticks to degrees of motor rotation
    * 
@@ -128,7 +167,8 @@ public class ClimbSubsystem extends SubsystemBase {
    */
   private double encoderTicksToDegrees(double ticks) {
     // 8192 encoder ticks in a rotation, 360 degrees in a rotation
-    return (ticks / ROTATE_ENCODER_TICKS_PER_ROT) * 360;
+    return ((ticks / ROTATE_ENCODER_TICKS_PER_ROT) * 360) * ROTATION_GEAR_RATIO;
+    
   }
 
   /**
@@ -169,6 +209,15 @@ public class ClimbSubsystem extends SubsystemBase {
   }
 
   /**
+   * Checks to see if limit switch was triggered. Compares current value of the analog input to 50 
+   * When greater than 50, the limit switch has been pressed.
+   * @return True when limit switch is triggered False otherwise.
+   */
+  public boolean getLimitState(){
+    return (climbLimitSwitch.getValue() < 50);
+  }
+
+  /**
    * Returns climbMode
    * @return true if climb is active, false otherwise
    */
@@ -189,9 +238,9 @@ public class ClimbSubsystem extends SubsystemBase {
     sendable.addBooleanProperty("Climb mode", this::getClimbMode, this::setClimbMode);
     sendable.addDoubleProperty("Left lift encoder", leftClimbLiftEncoder::getIntegratedSensorPosition, null);
     sendable.addDoubleProperty("Right lift encoder", rightClimbLiftEncoder::getIntegratedSensorPosition, null);
-    sendable.addDoubleProperty("Rotate encoder", () -> {
-      return encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition());
-    }, null);
+    sendable.addDoubleProperty("Rotate encoder", () -> encoderTicksToDegrees(leadClimbRotate.getSelectedSensorPosition()), null);
+    sendable.addBooleanProperty("Climb limit switch", this::getLimitState, null);
+    sendable.addStringProperty("Status", () -> status, null);
   }
 
   /**

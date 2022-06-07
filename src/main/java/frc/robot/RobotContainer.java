@@ -7,8 +7,6 @@ package frc.robot;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -20,16 +18,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.intake.Deploy;
-import frc.robot.commands.intake.Intake;
 import frc.robot.commands.intake.ManualUptake;
 import frc.robot.commands.intake.Retract;
 import frc.robot.commands.intake.ReverseIntake;
-import frc.robot.commands.auto.DriveToCargo;
-import frc.robot.commands.auto.DriveToHub;
 import frc.robot.commands.auto.ShootPreloadedExit;
 import frc.robot.commands.auto.ShootThreeStart;
 import frc.robot.commands.climb.Climb;
-import frc.robot.commands.climb.StageTwoClimb;
 import frc.robot.commands.climb.TurnOnClimbMode;
 import frc.robot.commands.drive.DriveWithJoystick;
 import frc.robot.commands.outtake.OuttakeHigh;
@@ -189,6 +183,7 @@ public class RobotContainer {
     SmartDashboard.putData(limelight);
     SmartDashboard.putData(photon);
     SmartDashboard.putData(climb);
+    SmartDashboard.putData(intake);
 
     // Makes the autonomous chooser and associated commands
     autoChooser = new SendableChooser<>();
