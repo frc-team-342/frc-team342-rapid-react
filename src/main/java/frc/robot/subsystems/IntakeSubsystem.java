@@ -36,6 +36,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private double intakeSpeed = INTAKE_SPEED;
 
+  public enum LimitSwitchPosition {
+    LEFT_UP,
+    LEFT_DOWN,
+    RIGHT_UP,
+    RIGHT_DOWN
+  }
+
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     // capital variable names are statically imported constants
@@ -101,8 +108,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
    */
   public void deployIntake() {
-   if(!rightLimitSwitchDown.get() && !leftLimitSwitchDown.get())
-   {
+   if(!getLimitSwitch(LimitSwitchPosition.RIGHT_DOWN) && !getLimitSwitch(LimitSwitchPosition.LEFT_DOWN)) {
     if (currentAngleLeft >= MIN_INTAKE_ANGLE && currentAngleRight >= MIN_INTAKE_ANGLE) {
       deployLeft.set(0);
       deployRight.set(0);
@@ -118,6 +124,9 @@ public class IntakeSubsystem extends SubsystemBase {
         deployRight.set(DEPLOY_SPEED);
       }
     }
+  } else {
+    deployLeft.set(0);
+    deployRight.set(0);
   }
 }
 
@@ -129,25 +138,40 @@ public class IntakeSubsystem extends SubsystemBase {
    * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
    */
   public void retractIntake() {
-  if(!rightLimitSwitchUp.get() && !leftLimitSwitchUp.get())
-  {
-    if (currentAngleLeft <= MAX_INTAKE_ANGLE && currentAngleRight <= MAX_INTAKE_ANGLE) {
+    if (!getLimitSwitch(LimitSwitchPosition.RIGHT_UP) && !getLimitSwitch(LimitSwitchPosition.LEFT_UP)) {
+      if (currentAngleLeft <= MAX_INTAKE_ANGLE && currentAngleRight <= MAX_INTAKE_ANGLE) {
+        deployLeft.set(0);
+        deployRight.set(0);
+      } else {
+        if (isDeployLeftBehind()) {
+          deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
+          deployRight.set(DEPLOY_SPEED * -1);
+        } else if (isDeployRightBehind()) {
+          deployLeft.set(DEPLOY_SPEED * -1);
+          deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
+        } else {
+          deployLeft.set(DEPLOY_SPEED * -1);
+          deployRight.set(DEPLOY_SPEED * -1);
+        }
+      }
+    } else {
       deployLeft.set(0);
       deployRight.set(0);
-    } else {
-      if (isDeployLeftBehind()) {
-        deployLeft.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
-        deployRight.set(DEPLOY_SPEED * -1);
-      } else if (isDeployRightBehind()) {
-        deployLeft.set(DEPLOY_SPEED * -1);
-        deployRight.set((DEPLOY_SPEED * -1) + (getDeltaDeployEncoders() * -1.0f * INTAKE_P));
-      } else {
-        deployLeft.set(DEPLOY_SPEED * -1);
-        deployRight.set(DEPLOY_SPEED * -1);
-      }
     }
   }
-}
+
+  /**
+   * automatically handles inversions
+   */
+  public boolean getLimitSwitch(LimitSwitchPosition position) {
+    switch (position) {
+      case LEFT_UP: return leftLimitSwitchUp.get();
+      case LEFT_DOWN: return leftLimitSwitchDown.get();
+      case RIGHT_UP: return !rightLimitSwitchUp.get();
+      case RIGHT_DOWN: return !rightLimitSwitchDown.get();
+      default: return false;
+    }
+  }
 
   /**
    * Runs the intake rollers inwards to intake cargo
@@ -221,10 +245,10 @@ public class IntakeSubsystem extends SubsystemBase {
     sendable.addDoubleProperty("Current Angle Left", this::getCurrentAngleLeft, null);
     sendable.addDoubleProperty("Current Angle Right", this::getCurrentAngleRight, null);
     sendable.addDoubleProperty("Delta Deploy Encoders", this::getDeltaDeployEncoders, null);
-    sendable.addBooleanProperty("Right back limit switch", () -> !rightLimitSwitchUp.get(), null);
-    sendable.addBooleanProperty("Left back limit switch", () -> !leftLimitSwitchUp.get(), null);
-    sendable.addBooleanProperty("Right forward limit switch", () -> !rightLimitSwitchDown.get(), null);
-    sendable.addBooleanProperty("Left forward limit switch", () -> !leftLimitSwitchDown.get(), null);
+    sendable.addBooleanProperty("Right back limit switch", () -> getLimitSwitch(LimitSwitchPosition.RIGHT_UP), null);
+    sendable.addBooleanProperty("Left back limit switch", () -> getLimitSwitch(LimitSwitchPosition.LEFT_UP), null);
+    sendable.addBooleanProperty("Right forward limit switch", () -> getLimitSwitch(LimitSwitchPosition.RIGHT_DOWN), null);
+    sendable.addBooleanProperty("Left forward limit switch", () -> getLimitSwitch(LimitSwitchPosition.LEFT_DOWN), null);
     
   }
 
