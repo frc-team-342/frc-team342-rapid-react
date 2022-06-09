@@ -11,9 +11,12 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.commands.intake.Intake;
 
 import static frc.robot.Constants.IntakeConstants.*;
 
@@ -22,6 +25,11 @@ public class IntakeSubsystem extends SubsystemBase {
   private WPI_TalonSRX deployRight;
   
   private WPI_TalonSRX rollerMotor;
+
+  private DigitalInput rightLimitSwitchUp;
+  private DigitalInput leftLimitSwitchUp;
+  private DigitalInput rightLimitSwitchDown;
+  private DigitalInput leftLimitSwitchDown;
 
   private double currentAngleLeft;
   private double currentAngleRight;
@@ -34,6 +42,12 @@ public class IntakeSubsystem extends SubsystemBase {
     deployLeft = new WPI_TalonSRX(DEPLOY_LEFT_MOTOR);
     deployRight = new WPI_TalonSRX(DEPLOY_RIGHT_MOTOR);
     rollerMotor = new WPI_TalonSRX(ROLLER_MOTOR);
+
+    //Limit switches for the intake
+    rightLimitSwitchUp = new DigitalInput(RIGHT_LIMIT_SWITCH_UP);
+    leftLimitSwitchUp = new DigitalInput(LEFT_LIMIT_SWITCH_UP);
+    rightLimitSwitchDown = new DigitalInput(RIGHT_LIMIT_SWITCH_DOWN);
+    leftLimitSwitchDown = new DigitalInput(LEFT_LIMIT_SWITCH_DOWN);
 
     // different inversions on A and B bot
     if (Robot.checkType() == Robot.RobotType.A_BOT) {
@@ -87,6 +101,8 @@ public class IntakeSubsystem extends SubsystemBase {
    * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
    */
   public void deployIntake() {
+   if(!rightLimitSwitchDown.get() && !leftLimitSwitchDown.get())
+   {
     if (currentAngleLeft >= MIN_INTAKE_ANGLE && currentAngleRight >= MIN_INTAKE_ANGLE) {
       deployLeft.set(0);
       deployRight.set(0);
@@ -103,6 +119,7 @@ public class IntakeSubsystem extends SubsystemBase {
       }
     }
   }
+}
 
   /**
    * Retracts the intake from the intaking position above the bumpers. <br>
@@ -112,6 +129,8 @@ public class IntakeSubsystem extends SubsystemBase {
    * Adds more power to one of the motors if it is behind the other by multiplying the difference by a constant and adding it to output.
    */
   public void retractIntake() {
+  if(!rightLimitSwitchUp.get() && !leftLimitSwitchUp.get())
+  {
     if (currentAngleLeft <= MAX_INTAKE_ANGLE && currentAngleRight <= MAX_INTAKE_ANGLE) {
       deployLeft.set(0);
       deployRight.set(0);
@@ -128,6 +147,7 @@ public class IntakeSubsystem extends SubsystemBase {
       }
     }
   }
+}
 
   /**
    * Runs the intake rollers inwards to intake cargo
@@ -201,6 +221,11 @@ public class IntakeSubsystem extends SubsystemBase {
     sendable.addDoubleProperty("Current Angle Left", this::getCurrentAngleLeft, null);
     sendable.addDoubleProperty("Current Angle Right", this::getCurrentAngleRight, null);
     sendable.addDoubleProperty("Delta Deploy Encoders", this::getDeltaDeployEncoders, null);
+    sendable.addBooleanProperty("Right back limit switch", () -> !rightLimitSwitchUp.get(), null);
+    sendable.addBooleanProperty("Left back limit switch", () -> !leftLimitSwitchUp.get(), null);
+    sendable.addBooleanProperty("Right forward limit switch", () -> !rightLimitSwitchDown.get(), null);
+    sendable.addBooleanProperty("Left forward limit switch", () -> !leftLimitSwitchDown.get(), null);
+    
   }
 
 
