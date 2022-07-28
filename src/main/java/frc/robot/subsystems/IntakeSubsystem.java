@@ -9,6 +9,8 @@ import java.util.Map;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 
@@ -21,7 +23,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private WPI_TalonSRX deployLeft;
   private WPI_TalonSRX deployRight;
   
-  private WPI_TalonSRX rollerMotor;
+  private CANSparkMax rollerMotor;
 
   private double currentAngleLeft;
   private double currentAngleRight;
@@ -33,16 +35,12 @@ public class IntakeSubsystem extends SubsystemBase {
     // capital variable names are statically imported constants
     deployLeft = new WPI_TalonSRX(DEPLOY_LEFT_MOTOR);
     deployRight = new WPI_TalonSRX(DEPLOY_RIGHT_MOTOR);
-    rollerMotor = new WPI_TalonSRX(ROLLER_MOTOR);
+    rollerMotor = new CANSparkMax(ROLLER_MOTOR, MotorType.kBrushless);
 
-    // different inversions on A and B bot
     if (Robot.checkType() == Robot.RobotType.A_BOT) {
-      rollerMotor.setInverted(false);
-    }
-
-    if (Robot.checkType() == Robot.RobotType.B_BOT) {
-      // b bot is 9:1 gear ratio on rollers and a bot is 3:1
-      intakeSpeed = 0.7;
+      rollerMotor.setInverted(true);
+    } else {
+      rollerMotor.setInverted(true);
     }
 
     deployRight.setInverted(true);
@@ -54,8 +52,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // roller motor wiggling causes it to lose power and led to it burning out previously
     // lower current limit is necessary so that it doesnt stall and burn out
-    rollerMotor.configPeakCurrentLimit(ROLLER_CURRENT_LIMIT);
-    rollerMotor.configPeakCurrentDuration(CURRENT_DURATION);
+    rollerMotor.setSmartCurrentLimit(ROLLER_CURRENT_LIMIT);
+    rollerMotor.setSmartCurrentLimit(CURRENT_DURATION);
   }
 
   @Override
@@ -219,7 +217,7 @@ public class IntakeSubsystem extends SubsystemBase {
     motors.put("Deploy right motor", deployRight.getLastError() == ErrorCode.OK);
 
     rollerMotor.getBusVoltage();
-    motors.put("Roller motor", rollerMotor.getLastError() == ErrorCode.OK);
+    motors.put("Roller motor", rollerMotor.getFirmwareString() != "v0.0.0");
 
     // still not 100% on this tbh
     motors.put("Deploy left encoder", deployLeft.getSensorCollection().getPulseWidthRiseToFallUs() != 0);
