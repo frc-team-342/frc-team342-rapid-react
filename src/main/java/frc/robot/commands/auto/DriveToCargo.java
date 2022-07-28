@@ -18,7 +18,7 @@ public class DriveToCargo extends SequentialCommandGroup {
 
   private DriveSystem subsystem;
   private PhotonVision photon;
-
+  
   private Trajectory trajectory;
 
   /** Creates a new DriveToCargo. */

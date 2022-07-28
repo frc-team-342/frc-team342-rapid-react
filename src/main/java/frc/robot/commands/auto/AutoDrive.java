@@ -40,7 +40,7 @@ public class AutoDrive extends CommandBase {
   public void initialize() {
     timer.reset();
     timer.start();
-
+    
     // set brake mode so it does not continue coasting after auto
     subsystem.setBrakeMode(true);
   }
@@ -48,13 +48,14 @@ public class AutoDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.drive(0, speed, 0);
+    subsystem.drive(0, -speed, 0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     subsystem.drive(0, 0, 0);
+    subsystem.toggleFieldOriented();
   }
 
   // Returns true when the command should end.

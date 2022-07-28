@@ -57,6 +57,7 @@ public class RobotContainer {
   private Limelight limelight;
 
   private InstantCommand toggleFieldOriented; 
+  private InstantCommand setFieldOriented;
   private InstantCommand toggleSlowMode;
   private InstantCommand toggleTurboMode;
   private InstantCommand resetIntakeEncoders;
