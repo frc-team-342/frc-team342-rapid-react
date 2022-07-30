@@ -65,7 +65,7 @@ public class DriveSystem extends SubsystemBase {
   private RelativeEncoder frontRightEncoder;
   private RelativeEncoder backRightEncoder;
 
-  private boolean fieldOriented = false;
+  private boolean fieldOriented;
   private ADIS16470_IMU gyro;
 
   private MecanumDrive mecanumDrive;
@@ -77,6 +77,8 @@ public class DriveSystem extends SubsystemBase {
 
   /** Creates a new DriveSystem. */
   public DriveSystem() {
+    fieldOriented = true;
+
     // Capitalized and underscored variable names are statically imported constants from Constants.java
     frontLeft = new CANSparkMax(FRONT_LEFT_MOTOR, MotorType.kBrushless);
     backLeft = new CANSparkMax(BACK_LEFT_MOTOR, MotorType.kBrushless);
